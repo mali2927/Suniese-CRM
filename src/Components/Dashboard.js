@@ -20,6 +20,9 @@ import {
   Map,
   Download,
   Sun,
+  Home,
+  Settings,
+  Info,
 } from "lucide-react";
 
 ChartJS.register(
@@ -73,8 +76,38 @@ const Dashboard = () => {
   // Inline styles
   const styles = {
     container: {
+      display: "flex",
       minHeight: "100vh",
       backgroundColor: "#f5f5f5",
+    },
+    sidebar: {
+      width: "250px",
+      backgroundColor: "#ffffff",
+      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+      padding: "1rem",
+      display: "flex",
+      flexDirection: "column",
+      borderRight: "1px solid #ddd",
+    },
+    sidebarItem: {
+      padding: "0.5rem 1rem",
+      borderRadius: "0.25rem",
+      cursor: "pointer",
+      marginBottom: "0.5rem",
+      display: "flex",
+      alignItems: "center",
+      color: "#2d3436",
+      transition: "background-color 0.2s",
+    },
+    sidebarItemActive: {
+      backgroundColor: "#3498db",
+      color: "#ffffff",
+    },
+    sidebarIcon: {
+      marginRight: "0.5rem",
+    },
+    mainContent: {
+      flex: 1,
       padding: "2rem",
     },
     navbar: {
@@ -252,79 +285,91 @@ const Dashboard = () => {
 
   return (
     <div style={styles.container}>
-      <nav style={styles.navbar}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-          <Sun style={styles.navbarIcon} />
-          <h1 style={styles.navbarTitle}>Solar Dashboard</h1>
-        </div>
-        <button
-          style={styles.navbarButton}
-          onMouseOver={(e) =>
-            (e.currentTarget.style.backgroundColor =
-              styles.navbarButtonHover.backgroundColor)
-          }
-          onMouseOut={(e) =>
-            (e.currentTarget.style.backgroundColor =
-              styles.navbarButton.backgroundColor)
-          }
+      <aside style={styles.sidebar}>
+        <div
+          style={{
+            ...styles.sidebarItem,
+            ...(activeTab === "overview" ? styles.sidebarItemActive : {}),
+          }}
+          onClick={() => setActiveTab("overview")}
         >
-          Logout
-        </button>
-      </nav>
+          <Home style={styles.sidebarIcon} /> Overview
+        </div>
+        <div
+          style={{
+            ...styles.sidebarItem,
+            ...(activeTab === "leads" ? styles.sidebarItemActive : {}),
+          }}
+          onClick={() => setActiveTab("leads")}
+        >
+          <FileText style={styles.sidebarIcon} /> Lead Management
+        </div>
+        <div
+          style={{
+            ...styles.sidebarItem,
+            ...(activeTab === "users" ? styles.sidebarItemActive : {}),
+          }}
+          onClick={() => setActiveTab("users")}
+        >
+          <Users style={styles.sidebarIcon} /> User Management
+        </div>
+        <div
+          style={{
+            ...styles.sidebarItem,
+            ...(activeTab === "settings" ? styles.sidebarItemActive : {}),
+          }}
+          onClick={() => setActiveTab("settings")}
+        >
+          <Settings style={styles.sidebarIcon} /> Settings
+        </div>
+        <div
+          style={{
+            ...styles.sidebarItem,
+            ...(activeTab === "info" ? styles.sidebarItemActive : {}),
+          }}
+          onClick={() => setActiveTab("info")}
+        >
+          <Info style={styles.sidebarIcon} /> Info
+        </div>
+      </aside>
 
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
-        <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
-          <Users style={styles.cardIcon} />
-          <h2 style={styles.cardTitle}>Total Door Knockers</h2>
-          <p style={styles.cardValue}>24</p>
-        </motion.div>
-        <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
-          <FileText style={styles.cardIcon} />
-          <h2 style={styles.cardTitle}>Total Leads</h2>
-          <p style={styles.cardValue}>1,234</p>
-        </motion.div>
-        <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
-          <DollarSign style={styles.cardIcon} />
-          <h2 style={styles.cardTitle}>Total Revenue</h2>
-          <p style={styles.cardValue}>$567,890</p>
-        </motion.div>
-      </div>
+      <main style={styles.mainContent}>
+        <div style={styles.navbar}>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <Sun style={styles.navbarIcon} />
+            <h1 style={styles.navbarTitle}>Solar Dashboard</h1>
+          </div>
+          <button
+            style={styles.navbarButton}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.backgroundColor =
+                styles.navbarButtonHover.backgroundColor)
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.backgroundColor =
+                styles.navbarButton.backgroundColor)
+            }
+          >
+            Logout
+          </button>
+        </div>
 
-      <div style={styles.chartContainer}>
-        <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem" }}>
-          <button
-            style={{
-              ...styles.tabButton,
-              ...(activeTab === "overview"
-                ? styles.tabButtonActive
-                : styles.tabButtonInactive),
-            }}
-            onClick={() => setActiveTab("overview")}
-          >
-            Overview
-          </button>
-          <button
-            style={{
-              ...styles.tabButton,
-              ...(activeTab === "leads"
-                ? styles.tabButtonActive
-                : styles.tabButtonInactive),
-            }}
-            onClick={() => setActiveTab("leads")}
-          >
-            Lead Management
-          </button>
-          <button
-            style={{
-              ...styles.tabButton,
-              ...(activeTab === "users"
-                ? styles.tabButtonActive
-                : styles.tabButtonInactive),
-            }}
-            onClick={() => setActiveTab("users")}
-          >
-            User Management
-          </button>
+        <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
+          <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
+            <Users style={styles.cardIcon} />
+            <h2 style={styles.cardTitle}>Total Door Knockers</h2>
+            <p style={styles.cardValue}>24</p>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
+            <FileText style={styles.cardIcon} />
+            <h2 style={styles.cardTitle}>Total Leads</h2>
+            <p style={styles.cardValue}>1,234</p>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
+            <DollarSign style={styles.cardIcon} />
+            <h2 style={styles.cardTitle}>Total Revenue</h2>
+            <p style={styles.cardValue}>$567,890</p>
+          </motion.div>
         </div>
 
         {activeTab === "overview" && (
@@ -335,11 +380,11 @@ const Dashboard = () => {
               gap: "2rem",
             }}
           >
-            <div>
+            <div style={styles.chartContainer}>
               <h3 style={styles.chartTitle}>Lead Distribution</h3>
               <Pie data={pieData} />
             </div>
-            <div>
+            <div style={styles.chartContainer}>
               <h3 style={styles.chartTitle}>Performance Trends</h3>
               <Line data={lineData} />
             </div>
@@ -348,188 +393,32 @@ const Dashboard = () => {
 
         {activeTab === "leads" && (
           <div>
-            <h3 style={styles.chartTitle}>Lead Management</h3>
-            <table style={styles.table}>
-              <thead style={styles.tableHeader}>
-                <tr>
-                  <th style={styles.tableHeaderCell}>Door Knocker</th>
-                  <th style={styles.tableHeaderCell}>Total Leads</th>
-                  <th style={styles.tableHeaderCell}>Hot Leads</th>
-                  <th style={styles.tableHeaderCell}>Converted Sales</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style={styles.tableBodyCell}>John Doe</td>
-                  <td style={styles.tableBodyCell}>150</td>
-                  <td style={styles.tableBodyCell}>30</td>
-                  <td style={styles.tableBodyCell}>15</td>
-                </tr>
-                <tr style={styles.tableRowEven}>
-                  <td style={styles.tableBodyCell}>Jane Smith</td>
-                  <td style={styles.tableBodyCell}>120</td>
-                  <td style={styles.tableBodyCell}>25</td>
-                  <td style={styles.tableBodyCell}>12</td>
-                </tr>
-                {/* Add more rows as needed */}
-              </tbody>
-            </table>
+            <h2>Lead Management</h2>
+            {/* Add your Lead Management content here */}
           </div>
         )}
 
         {activeTab === "users" && (
           <div>
-            <h3 style={styles.chartTitle}>User Management</h3>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "1rem",
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: "#f5f5f5",
-                  padding: "1rem",
-                  borderRadius: "0.5rem",
-                }}
-              >
-                <h4 style={{ fontWeight: "600", marginBottom: "0.5rem" }}>
-                  Generate Login Credentials
-                </h4>
-                <input
-                  type="email"
-                  placeholder="Door Knocker Email"
-                  style={styles.input}
-                />
-                <button
-                  style={{ ...styles.button, ...styles.buttonGreen }}
-                  onMouseOver={(e) =>
-                    (e.currentTarget.style.backgroundColor =
-                      styles.buttonGreenHover.backgroundColor)
-                  }
-                  onMouseOut={(e) =>
-                    (e.currentTarget.style.backgroundColor =
-                      styles.buttonGreen.backgroundColor)
-                  }
-                >
-                  Generate & Send
-                </button>
-              </div>
-              <div
-                style={{
-                  backgroundColor: "#f5f5f5",
-                  padding: "1rem",
-                  borderRadius: "0.5rem",
-                }}
-              >
-                <h4 style={{ fontWeight: "600", marginBottom: "0.5rem" }}>
-                  Assign Territory
-                </h4>
-                <select style={styles.select}>
-                  <option>Select Door Knocker</option>
-                  <option>John Doe</option>
-                  <option>Jane Smith</option>
-                </select>
-                <input
-                  type="text"
-                  placeholder="Postal Code"
-                  style={styles.input}
-                />
-                <button
-                  style={{ ...styles.button, ...styles.buttonBlue }}
-                  onMouseOver={(e) =>
-                    (e.currentTarget.style.backgroundColor =
-                      styles.buttonBlueHover.backgroundColor)
-                  }
-                  onMouseOut={(e) =>
-                    (e.currentTarget.style.backgroundColor =
-                      styles.buttonBlue.backgroundColor)
-                  }
-                >
-                  Assign
-                </button>
-              </div>
-            </div>
+            <h2>User Management</h2>
+            {/* Add your User Management content here */}
           </div>
         )}
-      </div>
 
-      <div style={styles.quickActions}>
-        <h3 style={styles.quickActionsTitle}>Quick Actions</h3>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr 1fr",
-            gap: "1rem",
-          }}
-        >
-          <button
-            style={{
-              ...styles.quickActionsButton,
-              ...styles.quickActionsButtonMail,
-            }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                styles.quickActionsButtonMailHover.backgroundColor)
-            }
-            onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                styles.quickActionsButtonMail.backgroundColor)
-            }
-          >
-            <Mail style={{ marginRight: "0.5rem" }} /> Send Bulk Emails
-          </button>
-          <button
-            style={{
-              ...styles.quickActionsButton,
-              ...styles.quickActionsButtonMap,
-            }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                styles.quickActionsButtonMapHover.backgroundColor)
-            }
-            onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                styles.quickActionsButtonMap.backgroundColor)
-            }
-          >
-            <Map style={{ marginRight: "0.5rem" }} /> View Territories
-          </button>
-          <button
-            style={{
-              ...styles.quickActionsButton,
-              ...styles.quickActionsButtonDownload,
-            }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                styles.quickActionsButtonDownloadHover.backgroundColor)
-            }
-            onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                styles.quickActionsButtonDownload.backgroundColor)
-            }
-          >
-            <Download style={{ marginRight: "0.5rem" }} /> Export Reports
-          </button>
-          <button
-            style={{
-              ...styles.quickActionsButton,
-              ...styles.quickActionsButtonDollar,
-            }}
-            onMouseOver={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                styles.quickActionsButtonDollarHover.backgroundColor)
-            }
-            onMouseOut={(e) =>
-              (e.currentTarget.style.backgroundColor =
-                styles.quickActionsButtonDollar.backgroundColor)
-            }
-          >
-            <DollarSign style={{ marginRight: "0.5rem" }} /> Set Commission
-          </button>
-        </div>
-      </div>
+        {activeTab === "settings" && (
+          <div>
+            <h2>Settings</h2>
+            {/* Add your Settings content here */}
+          </div>
+        )}
+
+        {activeTab === "info" && (
+          <div>
+            <h2>Info</h2>
+            {/* Add your Info content here */}
+          </div>
+        )}
+      </main>
     </div>
   );
 };
