@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const SunIcon = () => (
   <svg
@@ -112,13 +113,12 @@ const styles = {
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempted with:", { email, password });
+  const handleLogin = () => {
+    // Add login logic here
+    navigate("/dashboard"); // Redirect to the dashboard after login
   };
-
   return (
     <div style={styles.container}>
       <motion.div
@@ -149,7 +149,7 @@ export default function LoginPage() {
         </motion.div>
         <h1 style={styles.title}>Sunrise Energy Solutions</h1>
         <h2 style={styles.subtitle}>CRM Login</h2>
-        <form onSubmit={handleSubmit} style={styles.form}>
+        <form onSubmit={handleLogin} style={styles.form}>
           <div style={styles.inputGroup}>
             <label htmlFor="email" style={styles.label}>
               Email
