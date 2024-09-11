@@ -6,6 +6,8 @@ import Users from "./Components/AdminComponents/Users";
 import Settings from "./Components/AdminComponents/Settings";
 import Info from "./Components/AdminComponents/Info";
 import Leads from "./Components/AdminComponents/Leads";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 import "./App.css";
 
 function App() {
