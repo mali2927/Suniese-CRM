@@ -11,12 +11,14 @@ const Users = () => {
       name: "John Doe",
       email: "john@example.com",
       designation: "Lead Collector",
+      postcodes: "12345, 67890",
     },
     {
       id: 2,
       name: "Jane Smith",
       email: "jane@example.com",
       designation: "Sales Manager",
+      postcodes: "54321, 98765",
     },
   ];
 
@@ -25,6 +27,7 @@ const Users = () => {
     name: "",
     email: "",
     designation: "",
+    postcodes: "",
   });
   const [editingUser, setEditingUser] = useState(null);
 
@@ -36,10 +39,15 @@ const Users = () => {
 
   // Add new user
   const addUser = () => {
-    if (newUser.name && newUser.email && newUser.designation) {
+    if (
+      newUser.name &&
+      newUser.email &&
+      newUser.designation &&
+      newUser.postcodes
+    ) {
       const id = users.length ? users[users.length - 1].id + 1 : 1;
       setUsers([...users, { id, ...newUser }]);
-      setNewUser({ name: "", email: "", designation: "" });
+      setNewUser({ name: "", email: "", designation: "", postcodes: "" });
     }
   };
 
@@ -60,7 +68,7 @@ const Users = () => {
       users.map((user) => (user.id === editingUser.id ? newUser : user))
     );
     setEditingUser(null);
-    setNewUser({ name: "", email: "", designation: "" });
+    setNewUser({ name: "", email: "", designation: "", postcodes: "" });
   };
 
   return (
@@ -75,7 +83,7 @@ const Users = () => {
             {/* User Form */}
             <div className="card p-4 mb-4">
               <div className="row">
-                <div className="col-md-4">
+                <div className="col-md-3">
                   <input
                     type="text"
                     name="name"
@@ -85,7 +93,7 @@ const Users = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-3">
                   <input
                     type="email"
                     name="email"
@@ -95,13 +103,23 @@ const Users = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="col-md-4">
+                <div className="col-md-3">
                   <input
                     type="text"
                     name="designation"
                     className="form-control mb-2"
                     placeholder="Designation"
                     value={newUser.designation}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="col-md-3">
+                  <input
+                    type="text"
+                    name="postcodes"
+                    className="form-control mb-2"
+                    placeholder="Postcodes (comma separated)"
+                    value={newUser.postcodes}
                     onChange={handleChange}
                   />
                 </div>
@@ -126,6 +144,7 @@ const Users = () => {
                   <th>Name</th>
                   <th>Email</th>
                   <th>Designation</th>
+                  <th>Postcodes</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -135,6 +154,7 @@ const Users = () => {
                     <td>{user.name}</td>
                     <td>{user.email}</td>
                     <td>{user.designation}</td>
+                    <td>{user.postcodes}</td>
                     <td>
                       <button
                         className="btn btn-sm btn-warning mr-2"
