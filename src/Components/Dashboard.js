@@ -1,7 +1,12 @@
 // Dashboard.js
 import React from "react";
 import { motion } from "framer-motion";
-import { DollarSign, Users as UsersIcon, FileText } from "lucide-react";
+import {
+  DollarSign,
+  PoundSterling,
+  Users as UsersIcon,
+  FileText,
+} from "lucide-react";
 import Navbar from "./Navbar";
 import Sidebar from "./SideBar"; // Import the Sidebar component
 import Overview from "./AdminComponents/overView";
@@ -25,9 +30,9 @@ const Dashboard = () => {
             <p>1,234</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
-            <DollarSign style={styles.cardIcon} />
+            <PoundSterling style={styles.cardIcon} />
             <h2>Total Revenue</h2>
-            <p>$567,890</p>
+            <p>£567,890</p>
           </motion.div>
         </div>
         {/* Include the Overview component here */}
