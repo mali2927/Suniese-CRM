@@ -23,14 +23,20 @@ export const styles = {
     alignItems: "center",
     color: "#2d3436",
     transition: "background-color 0.2s",
+    backgroundColor: "#ffffff", // Adding background color to resemble a box
+    border: "1px solid #dfe6e9", // Adding a border for the box
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // Adding shadow for box effect
+    textDecoration: "none", // Removing underline
   },
   sidebarItemActive: {
     backgroundColor: "#3498db",
     color: "#ffffff",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.9)", // Stronger shadow when active
   },
   sidebarIcon: {
     marginRight: "0.5rem",
   },
+
   mainContent: {
     flex: 1,
     padding: "2rem",
