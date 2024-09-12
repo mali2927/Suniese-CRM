@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import "../Styles/LoginPage.css"; // Import the CSS file
 
 const SunIcon = () => (
   <svg
@@ -26,106 +27,24 @@ const SunIcon = () => (
   </svg>
 );
 
-const styles = {
-  container: {
-    minHeight: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: "linear-gradient(135deg, #fef9c3, #fde68a, #fcd34d)",
-  },
-  formContainer: {
-    backgroundColor: "white",
-    padding: "2rem",
-    borderRadius: "0.5rem",
-    boxShadow:
-      "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-    width: "100%",
-    maxWidth: "400px",
-    margin: "2rem",
-  },
-  iconContainer: {
-    display: "flex",
-    justifyContent: "center",
-    marginBottom: "1.5rem",
-  },
-  title: {
-    fontSize: "1.875rem",
-    fontWeight: "bold",
-    textAlign: "center",
-    color: "#1f2937",
-    marginBottom: "1rem",
-  },
-  subtitle: {
-    fontSize: "1.25rem",
-    textAlign: "center",
-    color: "#4b5563",
-    marginBottom: "1.5rem",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-  },
-  inputGroup: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  label: {
-    fontSize: "0.875rem",
-    fontWeight: "500",
-    color: "#374151",
-    marginBottom: "0.25rem",
-  },
-  input: {
-    padding: "0.5rem",
-    borderRadius: "0.25rem",
-    border: "1px solid #d1d5db",
-    fontSize: "1rem",
-  },
-  button: {
-    backgroundColor: "#fbbf24",
-    color: "white",
-    padding: "0.75rem",
-    borderRadius: "0.25rem",
-    border: "none",
-    fontSize: "1rem",
-    fontWeight: "500",
-    cursor: "pointer",
-    transition: "background-color 0.3s ease",
-  },
-  forgotPassword: {
-    textAlign: "center",
-    marginTop: "1rem",
-  },
-  forgotPasswordLink: {
-    color: "#fbbf24",
-    textDecoration: "none",
-    fontSize: "0.875rem",
-  },
-  sunIcon: {
-    width: "3rem",
-    height: "3rem",
-    color: "#fbbf24",
-  },
-};
-
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = (e) => {
+    e.preventDefault();
     // Add login logic here
     navigate("/dashboard"); // Redirect to the dashboard after login
   };
+
   return (
-    <div style={styles.container}>
+    <div className="login-container">
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        style={styles.formContainer}
+        className="login-form-container"
       >
         <motion.div
           initial={{ scale: 0 }}
@@ -141,17 +60,17 @@ export default function LoginPage() {
               ease: "linear",
             },
           }}
-          style={styles.iconContainer}
+          className="icon-wrapper"
         >
-          <div style={styles.sunIcon}>
+          <div className="sun-icon-wrapper">
             <SunIcon />
           </div>
         </motion.div>
-        <h1 style={styles.title}>Sunrise Energy Solutions</h1>
-        <h2 style={styles.subtitle}>CRM Login</h2>
-        <form onSubmit={handleLogin} style={styles.form}>
-          <div style={styles.inputGroup}>
-            <label htmlFor="email" style={styles.label}>
+        <h1 className="page-title">Sunrise Energy Solutions</h1>
+        <h2 className="page-subtitle">CRM Login</h2>
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="input-group">
+            <label htmlFor="email" className="input-label">
               Email
             </label>
             <input
@@ -160,12 +79,12 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              style={styles.input}
+              className="input-field"
               placeholder="your.email@example.com"
             />
           </div>
-          <div style={styles.inputGroup}>
-            <label htmlFor="password" style={styles.label}>
+          <div className="input-group">
+            <label htmlFor="password" className="input-label">
               Password
             </label>
             <input
@@ -174,7 +93,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              style={styles.input}
+              className="input-field"
               placeholder="Enter your password"
             />
           </div>
@@ -182,13 +101,13 @@ export default function LoginPage() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             type="submit"
-            style={styles.button}
+            className="submit-button"
           >
             Sign In
           </motion.button>
         </form>
-        <div style={styles.forgotPassword}>
-          <a href="#" style={styles.forgotPasswordLink}>
+        <div className="forgot-password-wrapper">
+          <a href="#" className="forgot-password-link">
             Forgot password?
           </a>
         </div>
