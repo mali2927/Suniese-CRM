@@ -1,4 +1,3 @@
-// Leads.js
 import React, { useState } from "react";
 import Navbar from "../Navbar";
 import Sidebar from "../SideBar";
@@ -7,13 +6,60 @@ import { ListGroup, Button } from "react-bootstrap";
 import LeadsTable from "../AdminComponents/LeadsTable";
 import LeadActions from "../AdminComponents/LeadAction";
 import AddLeadModal from "../AdminComponents/AddLeadModel";
-import ReportModal from "../AdminComponents/ReportModal"; // Import the new ReportModal component
+import ReportModal from "../AdminComponents/ReportModal";
 
+// Dummy data for leads
 const dummyLeads = [
-  { id: 1, name: "John Doe", status: "cold", details: "Lead 1 details" },
-  { id: 2, name: "Jane Smith", status: "warm", details: "Lead 2 details" },
-  { id: 3, name: "Mike Johnson", status: "hot", details: "Lead 3 details" },
-  { id: 4, name: "John Doe", status: "hot", details: "Lead 1 details" },
+  {
+    id: 1,
+    name: "John Doe",
+    status: "cold",
+    details: "Lead 1 details",
+    consultantId: 1,
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    status: "warm",
+    details: "Lead 2 details",
+    consultantId: 2,
+  },
+  {
+    id: 3,
+    name: "Mike Johnson",
+    status: "hot",
+    details: "Lead 3 details",
+    consultantId: 3,
+  },
+  {
+    id: 4,
+    name: "Emily Davis",
+    status: "hot",
+    details: "Lead 4 details",
+    consultantId: 1,
+  },
+];
+
+// Dummy data for sales consultants
+const dummyConsultants = [
+  {
+    id: 1,
+    name: "Alice Brown",
+    email: "alice.brown@example.com",
+    designation: "Senior Consultant",
+  },
+  {
+    id: 2,
+    name: "Bob White",
+    email: "bob.white@example.com",
+    designation: "Junior Consultant",
+  },
+  {
+    id: 3,
+    name: "Carol Green",
+    email: "carol.green@example.com",
+    designation: "Lead Consultant",
+  },
 ];
 
 const Leads = () => {
@@ -24,6 +70,7 @@ const Leads = () => {
     name: "",
     status: "cold",
     details: "",
+    consultantId: 1, // Default consultantId
   });
   const [activeSection, setActiveSection] = useState(null);
 
@@ -35,7 +82,7 @@ const Leads = () => {
     );
   };
 
-  const convertToSale = (id) => {
+  const convertToSale = (id, paymentAmount) => {
     if (
       window.confirm("Are you sure you want to convert this lead to a sale?")
     ) {
@@ -63,7 +110,8 @@ const Leads = () => {
             handleStatusChange={handleStatusChange}
             convertToSale={convertToSale}
             type="individualLeads"
-            onViewReport={() => setShowReport(true)} // Pass function to show the report modal
+            onViewReport={() => setShowReport(true)}
+            salesConsultants={dummyConsultants} // Pass the dummy consultants data
           />
         );
       case "transferLeads":
@@ -72,6 +120,7 @@ const Leads = () => {
             leads={leads}
             handleStatusChange={handleStatusChange}
             type="transferLeads"
+            salesConsultants={dummyConsultants} // Pass the dummy consultants data if needed
           />
         );
       default:
@@ -107,8 +156,7 @@ const Leads = () => {
           show={showReport}
           onHide={() => setShowReport(false)}
           leadData={leads}
-        />{" "}
-        {/* Include the report modal */}
+        />
       </main>
     </div>
   );
