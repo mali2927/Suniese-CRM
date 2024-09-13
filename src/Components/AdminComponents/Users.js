@@ -11,12 +11,14 @@ const Users = () => {
       name: "John Doe",
       email: "john@example.com",
       designation: "Lead Collector",
+      active: true, // Added active property
     },
     {
       id: 2,
       name: "Jane Smith",
       email: "jane@example.com",
       designation: "Sales Manager",
+      active: true, // Added active property
     },
   ];
 
@@ -25,6 +27,7 @@ const Users = () => {
     name: "",
     email: "",
     designation: "",
+    active: true, // Default to active when adding new users
   });
   const [editingUser, setEditingUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); // State for search term
@@ -45,7 +48,7 @@ const Users = () => {
     if (newUser.name && newUser.email && newUser.designation) {
       const id = users.length ? users[users.length - 1].id + 1 : 1;
       setUsers([...users, { id, ...newUser }]);
-      setNewUser({ name: "", email: "", designation: "" });
+      setNewUser({ name: "", email: "", designation: "", active: true });
     }
   };
 
@@ -66,7 +69,16 @@ const Users = () => {
       users.map((user) => (user.id === editingUser.id ? newUser : user))
     );
     setEditingUser(null);
-    setNewUser({ name: "", email: "", designation: "" });
+    setNewUser({ name: "", email: "", designation: "", active: true });
+  };
+
+  // Toggle user active status
+  const toggleActiveStatus = (id) => {
+    setUsers(
+      users.map((user) =>
+        user.id === id ? { ...user, active: !user.active } : user
+      )
+    );
   };
 
   // Filter users based on search term
@@ -90,7 +102,7 @@ const Users = () => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Search by name, email, or designation"
+                placeholder="Search"
                 value={searchTerm}
                 onChange={handleSearchChange}
               />
@@ -150,6 +162,7 @@ const Users = () => {
                   <th>Name</th>
                   <th>Email</th>
                   <th>Designation</th>
+                  <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -159,18 +172,25 @@ const Users = () => {
                     <td>{user.name}</td>
                     <td>{user.email}</td>
                     <td>{user.designation}</td>
+                    <td>{user.active ? "Active" : "Inactive"}</td>
                     <td>
                       <button
-                        className="btn btn-sm btn-warning mr-2"
+                        className="btn btn-sm btn-warning mx-2"
                         onClick={() => startEditUser(user)}
                       >
                         Edit
                       </button>
                       <button
-                        className="btn btn-sm btn-danger"
+                        className="btn btn-sm btn-danger mx-2"
                         onClick={() => deleteUser(user.id)}
                       >
                         Delete
+                      </button>
+                      <button
+                        className="btn btn-sm btn-secondary mx-2"
+                        onClick={() => toggleActiveStatus(user.id)}
+                      >
+                        {user.active ? "Deactivate" : "Activate"}
                       </button>
                     </td>
                   </tr>
