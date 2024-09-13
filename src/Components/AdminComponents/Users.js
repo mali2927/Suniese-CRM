@@ -11,14 +11,14 @@ const Users = () => {
       name: "John Doe",
       email: "john@example.com",
       designation: "Lead Collector",
-      postcodes: "12345, 67890",
+
     },
     {
       id: 2,
       name: "Jane Smith",
       email: "jane@example.com",
       designation: "Sales Manager",
-      postcodes: "54321, 98765",
+
     },
   ];
 
@@ -27,7 +27,7 @@ const Users = () => {
     name: "",
     email: "",
     designation: "",
-    postcodes: "",
+
   });
   const [editingUser, setEditingUser] = useState(null);
 
@@ -42,12 +42,12 @@ const Users = () => {
     if (
       newUser.name &&
       newUser.email &&
-      newUser.designation &&
-      newUser.postcodes
+      newUser.designation 
+
     ) {
       const id = users.length ? users[users.length - 1].id + 1 : 1;
       setUsers([...users, { id, ...newUser }]);
-      setNewUser({ name: "", email: "", designation: "", postcodes: "" });
+      setNewUser({ name: "", email: "", designation: ""});
     }
   };
 
@@ -68,7 +68,7 @@ const Users = () => {
       users.map((user) => (user.id === editingUser.id ? newUser : user))
     );
     setEditingUser(null);
-    setNewUser({ name: "", email: "", designation: "", postcodes: "" });
+    setNewUser({ name: "", email: "", designation: "", });
   };
 
   return (
@@ -113,16 +113,7 @@ const Users = () => {
                     onChange={handleChange}
                   />
                 </div>
-                <div className="col-md-3">
-                  <input
-                    type="text"
-                    name="postcodes"
-                    className="form-control mb-2"
-                    placeholder="Postcodes (comma separated)"
-                    value={newUser.postcodes}
-                    onChange={handleChange}
-                  />
-                </div>
+            
               </div>
               <div>
                 {editingUser ? (
@@ -144,7 +135,7 @@ const Users = () => {
                   <th>Name</th>
                   <th>Email</th>
                   <th>Designation</th>
-                  <th>Postcodes</th>
+
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -154,7 +145,7 @@ const Users = () => {
                     <td>{user.name}</td>
                     <td>{user.email}</td>
                     <td>{user.designation}</td>
-                    <td>{user.postcodes}</td>
+
                     <td>
                       <button
                         className="btn btn-sm btn-warning mr-2"
