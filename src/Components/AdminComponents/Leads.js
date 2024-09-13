@@ -1,36 +1,39 @@
 // Leads.js
-import React, { useState } from "react";
-import Navbar from "../Navbar";
-import Sidebar from "../SideBar";
-import { styles } from "../../Styles/dashboardStyles";
-import { ListGroup, Button } from "react-bootstrap";
-import LeadsTable from "../AdminComponents/LeadsTable";
-import LeadActions from "../AdminComponents/LeadAction";
-import AddLeadModal from "../AdminComponents/AddLeadModel";
+import React, { useState } from 'react';
+import Navbar from '../Navbar';
+import Sidebar from '../SideBar';
+import { styles } from '../../Styles/dashboardStyles';
+import { ListGroup, Button } from 'react-bootstrap';
+import LeadsTable from '../AdminComponents/LeadsTable';
+import LeadActions from '../AdminComponents/LeadAction';
+import AddLeadModal from '../AdminComponents/AddLeadModel';
+import ReportModal from '../AdminComponents/ReportModal'; // Import the new ReportModal component
 
 const dummyLeads = [
-  { id: 1, name: "John Doe", status: "cold", details: "Lead 1 details" },
-  { id: 2, name: "Jane Smith", status: "warm", details: "Lead 2 details" },
-  { id: 3, name: "Mike Johnson", status: "hot", details: "Lead 3 details" },
+  { id: 1, name: 'John Doe', status: 'cold', details: 'Lead 1 details' },
+  { id: 1, name: 'John Doe', status: 'hot', details: 'Lead 1 details' },
+  { id: 2, name: 'Jane Smith', status: 'warm', details: 'Lead 2 details' },
+  { id: 3, name: 'Mike Johnson', status: 'hot', details: 'Lead 3 details' },
 ];
 
 const Leads = () => {
   const [leads, setLeads] = useState(dummyLeads);
   const [showModal, setShowModal] = useState(false);
-  const [newLead, setNewLead] = useState({ name: "", status: "cold", details: "" });
+  const [showReport, setShowReport] = useState(false); // New state to handle report modal
+  const [newLead, setNewLead] = useState({ name: '', status: 'cold', details: '' });
   const [activeSection, setActiveSection] = useState(null);
 
   const handleStatusChange = (id, newStatus) => {
     setLeads(
-      leads.map((lead) =>
+      leads.map(lead =>
         lead.id === id ? { ...lead, status: newStatus } : lead
       )
     );
   };
 
-  const convertToSale = (id) => {
-    if (window.confirm("Are you sure you want to convert this lead to a sale?")) {
-      setLeads(leads.filter((lead) => lead.id !== id));
+  const convertToSale = id => {
+    if (window.confirm('Are you sure you want to convert this lead to a sale?')) {
+      setLeads(leads.filter(lead => lead.id !== id));
     }
   };
 
@@ -39,8 +42,8 @@ const Leads = () => {
     setShowModal(false);
   };
 
-  const renderSectionContent = (section) => {
-    switch(section) {
+  const renderSectionContent = section => {
+    switch (section) {
       case 'totalLeads':
         return (
           <ListGroup variant="flush">
@@ -54,6 +57,7 @@ const Leads = () => {
             handleStatusChange={handleStatusChange}
             convertToSale={convertToSale}
             type="individualLeads"
+            onViewReport={() => setShowReport(true)} // Pass function to show the report modal
           />
         );
       case 'transferLeads':
@@ -92,6 +96,8 @@ const Leads = () => {
           setNewLead={setNewLead}
           addLead={addLead}
         />
+
+        <ReportModal show={showReport} onHide={() => setShowReport(false)} leadData={leads} /> {/* Include the report modal */}
       </main>
     </div>
   );

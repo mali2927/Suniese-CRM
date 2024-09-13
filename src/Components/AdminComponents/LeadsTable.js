@@ -1,8 +1,8 @@
 // LeadsTable.js
-import React from "react";
-import { Table, Button } from "react-bootstrap";
+import React from 'react';
+import { Table, Button } from 'react-bootstrap';
 
-const LeadsTable = ({ leads, handleStatusChange, convertToSale, type }) => {
+const LeadsTable = ({ leads, handleStatusChange, convertToSale, type, onViewReport }) => { // Accept onViewReport prop
   return (
     <Table striped bordered hover responsive className="mt-3">
       <thead className="thead-dark">
@@ -10,19 +10,19 @@ const LeadsTable = ({ leads, handleStatusChange, convertToSale, type }) => {
           <th>ID</th>
           <th>Name</th>
           <th>Status</th>
-          {type === "individualLeads" ? <th>Details</th> : null}
+          {type === 'individualLeads' ? <th>Details</th> : null}
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        {leads.map((lead) => (
+        {leads.map(lead => (
           <tr key={lead.id}>
             <td>{lead.id}</td>
             <td>{lead.name}</td>
             <td>{lead.status}</td>
-            {type === "individualLeads" ? <td>{lead.details}</td> : null}
+            {type === 'individualLeads' ? <td>{lead.details}</td> : null}
             <td>
-              {type === "individualLeads" ? (
+              {type === 'individualLeads' ? (
                 <>
                   <Button
                     variant="outline-warning"
@@ -30,7 +30,7 @@ const LeadsTable = ({ leads, handleStatusChange, convertToSale, type }) => {
                     onClick={() =>
                       handleStatusChange(
                         lead.id,
-                        lead.status === "cold" ? "warm" : "hot"
+                        lead.status === 'cold' ? 'warm' : 'hot'
                       )
                     }
                   >
@@ -47,8 +47,7 @@ const LeadsTable = ({ leads, handleStatusChange, convertToSale, type }) => {
                   <Button
                     variant="outline-info"
                     className="me-2 mb-2"
-           
-                   
+                    onClick={onViewReport} // Trigger onViewReport when button is clicked
                   >
                     View Report
                   </Button>
@@ -58,21 +57,21 @@ const LeadsTable = ({ leads, handleStatusChange, convertToSale, type }) => {
                   <Button
                     variant="outline-info"
                     className="me-2 mb-2"
-                    onClick={() => handleStatusChange(lead.id, "cold")}
+                    onClick={() => handleStatusChange(lead.id, 'cold')}
                   >
                     Set to Cold
                   </Button>
                   <Button
                     variant="outline-warning"
                     className="me-2 mb-2"
-                    onClick={() => handleStatusChange(lead.id, "warm")}
+                    onClick={() => handleStatusChange(lead.id, 'warm')}
                   >
                     Set to Warm
                   </Button>
                   <Button
                     variant="outline-success"
                     className="me-2 mb-2"
-                    onClick={() => handleStatusChange(lead.id, "hot")}
+                    onClick={() => handleStatusChange(lead.id, 'hot')}
                   >
                     Set to Hot
                   </Button>
