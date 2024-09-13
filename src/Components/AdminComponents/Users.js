@@ -11,14 +11,12 @@ const Users = () => {
       name: "John Doe",
       email: "john@example.com",
       designation: "Lead Collector",
-
     },
     {
       id: 2,
       name: "Jane Smith",
       email: "jane@example.com",
       designation: "Sales Manager",
-
     },
   ];
 
@@ -27,9 +25,9 @@ const Users = () => {
     name: "",
     email: "",
     designation: "",
-
   });
   const [editingUser, setEditingUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(""); // State for search term
 
   // Handle form change
   const handleChange = (e) => {
@@ -37,17 +35,17 @@ const Users = () => {
     setNewUser({ ...newUser, [name]: value });
   };
 
+  // Handle search change
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
   // Add new user
   const addUser = () => {
-    if (
-      newUser.name &&
-      newUser.email &&
-      newUser.designation 
-
-    ) {
+    if (newUser.name && newUser.email && newUser.designation) {
       const id = users.length ? users[users.length - 1].id + 1 : 1;
       setUsers([...users, { id, ...newUser }]);
-      setNewUser({ name: "", email: "", designation: ""});
+      setNewUser({ name: "", email: "", designation: "" });
     }
   };
 
@@ -68,8 +66,15 @@ const Users = () => {
       users.map((user) => (user.id === editingUser.id ? newUser : user))
     );
     setEditingUser(null);
-    setNewUser({ name: "", email: "", designation: "", });
+    setNewUser({ name: "", email: "", designation: "" });
   };
+
+  // Filter users based on search term
+  const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.designation.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <>
@@ -79,6 +84,17 @@ const Users = () => {
           <Navbar />
           <div className="container mt-4">
             <h2 className="mb-4">Users Management</h2>
+
+            {/* Search Bar */}
+            <div className="mb-4">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search by name, email, or designation"
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
 
             {/* User Form */}
             <div className="card p-4 mb-4">
@@ -113,7 +129,6 @@ const Users = () => {
                     onChange={handleChange}
                   />
                 </div>
-            
               </div>
               <div>
                 {editingUser ? (
@@ -135,17 +150,15 @@ const Users = () => {
                   <th>Name</th>
                   <th>Email</th>
                   <th>Designation</th>
-
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
+                {filteredUsers.map((user) => (
                   <tr key={user.id}>
                     <td>{user.name}</td>
                     <td>{user.email}</td>
                     <td>{user.designation}</td>
-
                     <td>
                       <button
                         className="btn btn-sm btn-warning mr-2"
