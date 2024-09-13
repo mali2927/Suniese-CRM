@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Home,
   FileText,
@@ -7,26 +7,58 @@ import {
   Settings as SettingsIcon,
   Info as InfoIcon,
 } from "lucide-react";
-import { styles } from "../Styles/dashboardStyles"; // Assuming the styles are stored here
 
 const Sidebar = () => {
+  const location = useLocation();
+
+  const isActive = (path) => {
+    return location.pathname === path ? "active" : "";
+  };
+
   return (
-    <aside style={styles.sidebar}>
-      <Link to="/dashboard" style={styles.sidebarItem}>
-        <Home style={styles.sidebarIcon} /> Overview
-      </Link>
-      <Link to="/leads" style={styles.sidebarItem}>
-        <FileText style={styles.sidebarIcon} /> Lead Management
-      </Link>
-      <Link to="/user" style={styles.sidebarItem}>
-        <UsersIcon style={styles.sidebarIcon} /> User Management
-      </Link>
-      <Link to="/settings" style={styles.sidebarItem}>
-        <SettingsIcon style={styles.sidebarIcon} /> Settings
-      </Link>
-      <Link to="/info" style={styles.sidebarItem}>
-        <InfoIcon style={styles.sidebarIcon} /> Info
-      </Link>
+    <aside className="bg-light p-3 vh-100">
+      <div className="list-group">
+        <Link
+          to="/dashboard"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/dashboard"
+          )}`}
+        >
+          <Home className="me-2" /> Overview
+        </Link>
+        <Link
+          to="/leads"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/leads"
+          )}`}
+        >
+          <FileText className="me-2" /> Lead Management
+        </Link>
+        <Link
+          to="/user"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/user"
+          )}`}
+        >
+          <UsersIcon className="me-2" /> User Management
+        </Link>
+        <Link
+          to="/settings"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/settings"
+          )}`}
+        >
+          <SettingsIcon className="me-2" /> Settings
+        </Link>
+        <Link
+          to="/info"
+          className={`list-group-item list-group-item-action d-flex align-items-center ${isActive(
+            "/info"
+          )}`}
+        >
+          <InfoIcon className="me-2" /> Info
+        </Link>
+      </div>
     </aside>
   );
 };
