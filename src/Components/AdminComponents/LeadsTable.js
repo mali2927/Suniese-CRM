@@ -43,6 +43,15 @@ const LeadsTable = ({ leads, handleStatusChange, convertToSale, type }) => {
                   >
                     Convert to Sale
                   </Button>
+
+                  <Button
+                    variant="outline-info"
+                    className="me-2 mb-2"
+           
+                   
+                  >
+                    View Report
+                  </Button>
                 </>
               ) : (
                 <>
