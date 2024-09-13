@@ -178,8 +178,8 @@ const LeadsTable = ({
           <Button variant="secondary" onClick={handleModalClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleModalSave}>
-            OK
+          <Button variant="primary" onClick={handleModalClose}>
+            OK{" "}
           </Button>
         </Modal.Footer>
       </Modal>
