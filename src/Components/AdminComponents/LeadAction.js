@@ -28,6 +28,14 @@ const LeadActions = ({ setActiveSection }) => {
           Transfer Leads
         </Nav.Link>
       </Nav.Item>
+
+      <Nav.Item>
+        <Nav.Link
+         
+        >
+          Won Leads
+        </Nav.Link>
+      </Nav.Item>
     </Nav>
   );
 };
