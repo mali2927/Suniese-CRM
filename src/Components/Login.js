@@ -13,20 +13,18 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(""); // Clear any previous errors
-
+  
     try {
-      const response = await fetch(
-        `http://127.0.0.1:8000/api/login?email=${email}&password=${password}`,
-        {
-          method: "GET", // Use POST method for login
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
+      const response = await fetch("http://127.0.0.1:8000/api/login", {
+        method: "POST", // Use POST method for login
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }), // Send email and password in the request body
+      });
+  
       const data = await response.json();
-
+  
       if (response.ok) {
         // If login is successful
         localStorage.setItem("token", data.token); // Store token in local storage
@@ -41,6 +39,7 @@ export default function LoginPage() {
       setError("An error occurred. Please try again later.");
     }
   };
+  
 
   return (
     <div className="login-container">
