@@ -21,7 +21,7 @@ const Dashboard = () => {
         <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
           <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
             <UsersIcon style={styles.cardIcon} />
-            <h2>Total Door Knockers</h2>
+            <h2>Total Sales Consultants</h2>
             <p>24</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
