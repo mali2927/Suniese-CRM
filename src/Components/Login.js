@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import "../Styles/LoginPage.css"; // Import the CSS file
 import SunIcon from "./assets/SunIcon";
-
+import config from '../config'; // Import the config file
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,7 +15,7 @@ export default function LoginPage() {
     setError(""); // Clear any previous errors
   
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/login", {
+      const response = await fetch(`${config.baseURL}/login`, {
         method: "POST", // Use POST method for login
         headers: {
           "Content-Type": "application/json",

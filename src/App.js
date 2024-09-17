@@ -9,6 +9,7 @@ import Leads from "./Components/AdminComponents/Leads";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import "./App.css";
+import ProtectedRoute from '../src/ProtectedRoute'; // Import the ProtectedRoute component
 
 function App() {
   return (
@@ -18,12 +19,27 @@ function App() {
           {/* Route for Login Page */}
           <Route path="/" element={<LoginPage />} />
 
-          {/* Route for Dashboard */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/leads" element={<Leads />} />
-          <Route path="/info" element={<Info />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/user" element={<Users />} />
+          {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={<ProtectedRoute element={Dashboard} roleRequired="superadmin" />}
+          />
+          <Route
+            path="/leads"
+            element={<ProtectedRoute element={Leads} roleRequired="superadmin" />}
+          />
+          <Route
+            path="/info"
+            element={<ProtectedRoute element={Info} roleRequired="superadmin" />}
+          />
+          <Route
+            path="/settings"
+            element={<ProtectedRoute element={Settings} roleRequired="superadmin" />}
+          />
+          <Route
+            path="/user"
+            element={<ProtectedRoute element={Users} roleRequired="superadmin" />}
+          />
         </Routes>
       </div>
     </Router>

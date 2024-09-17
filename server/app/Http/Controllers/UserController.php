@@ -105,9 +105,11 @@ class UserController extends Controller
             $hashedToken = hash('sha256', $token);
     
             $user = User::where('email', $email)->where('api_token', $hashedToken)->first();
-    
             if ($user) {
-                return response()->json(['isAuthenticated' => true]);
+                return response()->json([
+                    'isAuthenticated' => true,
+                    'role' => $user->role // or replace with the actual method/attribute to get the role
+                ]);
             } else {
                 return response()->json(['isAuthenticated' => false], 401);
             }
