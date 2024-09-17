@@ -117,4 +117,13 @@ class UserController extends Controller
     
     
     }
+    public function addUser(Request $request)
+    {
+
+
+        log::debug($request);
+
+
+    }
+
 }

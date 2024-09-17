@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Navbar from "../Navbar";
 import Sidebar from "../SideBar";
 import { styles } from "../../Styles/dashboardStyles";
+import config from '../../../src/config'; // Import the config file
 
 const Users = () => {
   // Dummy data for users
@@ -44,13 +45,57 @@ const Users = () => {
   };
 
   // Add new user
-  const addUser = () => {
+  const addUser = async () => {
+    // Define the email regex pattern
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+    // Check if all fields are filled
     if (newUser.name && newUser.email && newUser.designation) {
-      const id = users.length ? users[users.length - 1].id + 1 : 1;
-      setUsers([...users, { id, ...newUser }]);
-      setNewUser({ name: "", email: "", designation: "", active: true });
+      // Validate the email format
+      if (!emailRegex.test(newUser.email)) {
+        alert('Please enter a valid email address.');
+        return; // Stop execution if email is invalid
+      }
+  
+      try {
+        // Send a POST request to the backend
+        const response = await fetch(`${config.baseURL}/addUser`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: newUser.name,
+            email: newUser.email,
+            designation: newUser.designation,
+          }),
+        });
+  
+        // Check if the response is okay
+        if (!response.ok) {
+          throw new Error('Failed to add user');
+        }
+  
+        // Check if response body has content
+        const text = await response.text();
+        const result = text ? JSON.parse(text) : {};
+  
+        // Assuming 'id' is returned from the API response
+        const id = result.id || (users.length ? users[users.length - 1].id + 1 : 1);
+  
+        // Update local state with the new user
+        setUsers([...users, { id, ...newUser }]);
+        setNewUser({ name: '', email: '', designation: '', active: true });
+      } catch (error) {
+        console.error('Error adding user:', error);
+      }
+    } else {
+      alert('Please fill out all fields.');
     }
   };
+  
+  
+  
 
   // Delete user
   const deleteUser = (id) => {
