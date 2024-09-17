@@ -8,6 +8,8 @@ const Navbar = () => {
 
   const handleLogout = () => {
     // Add login logic here
+    localStorage.removeItem('email');
+localStorage.removeItem('token');
     navigate("/"); // Redirect to the dashboard after login
   };
   return (
