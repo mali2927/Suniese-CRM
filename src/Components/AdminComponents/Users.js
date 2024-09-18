@@ -41,7 +41,6 @@ const Users = () => {
     }
   };
   
-
   // useEffect to fetch users when the component mounts
   useEffect(() => {
     fetchUsers();
@@ -99,15 +98,17 @@ const Users = () => {
         const result = await response.json();
 
         if (response.ok) {
-          // Assuming 'id' is returned from the API response
+          // Optionally, you can remove the local state update and rely solely on fetchUsers
+          // But keeping it can provide immediate UI feedback
           const id = result.id || (users.length ? users[users.length - 1].id + 1 : 1);
-
-          // Update local state with the new user
           setUsers([...users, { id, ...newUser }]);
           setNewUser({ name: '', email: '', designation: '', active: true });
 
           // Show success message
           alert(result.message || 'User added successfully!');
+
+          // **Fetch the updated list of users**
+          fetchUsers();
         } else {
           // If the response is not okay, handle the error message from the backend
           alert(result.message || 'Failed to add user. Please try again.');
@@ -122,8 +123,32 @@ const Users = () => {
   };
 
   // Delete user
-  const deleteUser = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
+  const deleteUser = async (id) => {
+    try {
+      const response = await fetch(`${config.baseURL}/deleteUser`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Optionally, remove the user from local state
+        setUsers(users.filter((user) => user.id !== id));
+        alert(result.message || 'User deleted successfully!');
+
+        // **Fetch the updated list of users**
+        fetchUsers();
+      } else {
+        alert(result.message || 'Failed to delete user.');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('An error occurred while deleting the user.');
+    }
   };
 
   // Edit user
@@ -133,21 +158,73 @@ const Users = () => {
   };
 
   // Save edited user
-  const saveUser = () => {
-    setUsers(
-      users.map((user) => (user.id === editingUser.id ? newUser : user))
-    );
-    setEditingUser(null);
-    setNewUser({ name: "", email: "", designation: "", active: true });
+  const saveUser = async () => {
+    // If email is not editable, ensure it's preserved
+    const updatedUser = { ...newUser, email: editingUser.email };
+
+    try {
+      // Send a PUT request to update the user
+      const response = await fetch(`${config.baseURL}/updateUser`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedUser),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setEditingUser(null);
+        setNewUser({ name: "", email: "", designation: "", active: true });
+
+        // Show success message
+        alert(result.message || 'User updated successfully!');
+
+        // **Fetch the updated list of users**
+        fetchUsers();
+      } else {
+        // Handle backend error
+        alert(result.message || 'Failed to update user. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+      alert('An error occurred while updating the user. Please try again.');
+    }
   };
 
   // Toggle user active status
-  const toggleActiveStatus = (id) => {
-    setUsers(
-      users.map((user) =>
-        user.id === id ? { ...user, active: !user.active } : user
-      )
-    );
+  const toggleActiveStatus = async (id) => {
+    try {
+      const userToToggle = users.find(user => user.id === id);
+      if (!userToToggle) {
+        alert('User not found.');
+        return;
+      }
+
+      // Send a PUT request to update the user's active status
+      const response = await fetch(`${config.baseURL}/toggleUserStatus`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id, active: !userToToggle.active }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert(result.message || 'User status updated successfully!');
+
+        // **Fetch the updated list of users**
+        fetchUsers();
+      } else {
+        alert(result.message || 'Failed to update user status.');
+      }
+    } catch (error) {
+      console.error('Error toggling user status:', error);
+      alert('An error occurred while updating the user status.');
+    }
   };
 
   // Filter users based on search term
@@ -198,6 +275,7 @@ const Users = () => {
                     placeholder="Email"
                     value={newUser.email}
                     onChange={handleChange}
+                    disabled={editingUser !== null} // Disable when editing
                   />
                 </div>
                 <div className="col-md-3">
@@ -221,6 +299,17 @@ const Users = () => {
                     Add User
                   </button>
                 )}
+                {editingUser && (
+                  <button
+                    className="btn btn-secondary mx-2"
+                    onClick={() => {
+                      setEditingUser(null);
+                      setNewUser({ name: "", email: "", designation: "", active: true });
+                    }}
+                  >
+                    Cancel
+                  </button>
+                )}
               </div>
             </div>
 
@@ -236,34 +325,48 @@ const Users = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.name}</td>
-                    <td>{user.email}</td>
-                    <td>{user.designation}</td>
-                    <td>{user.active ? "Active" : "Inactive"}</td>
-                    <td>
-                      <button
-                        className="btn btn-sm btn-warning mx-2"
-                        onClick={() => startEditUser(user)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="btn btn-sm btn-danger mx-2"
-                        onClick={() => deleteUser(user.id)}
-                      >
-                        Delete
-                      </button>
-                      <button
-                        className="btn btn-sm btn-secondary mx-2"
-                        onClick={() => toggleActiveStatus(user.id)}
-                      >
-                        {user.active ? "Deactivate" : "Activate"}
-                      </button>
+                {loading ? (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : filteredUsers.length > 0 ? (
+                  filteredUsers.map((user) => (
+                    <tr key={user.id}>
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td>{user.designation}</td>
+                      <td>{user.active ? "Active" : "Inactive"}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-warning mx-2"
+                          onClick={() => startEditUser(user)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="btn btn-sm btn-danger mx-2"
+                          onClick={() => deleteUser(user.id)}
+                        >
+                          Delete
+                        </button>
+                        <button
+                          className="btn btn-sm btn-secondary mx-2"
+                          onClick={() => toggleActiveStatus(user.id)}
+                        >
+                          {user.active ? "Deactivate" : "Activate"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      No users found.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

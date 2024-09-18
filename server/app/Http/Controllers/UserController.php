@@ -149,11 +149,52 @@ class UserController extends Controller
     }
 
 
-    public function editUser(Request $request){
+    public function updateUser(Request $request)
+    {
 
 
+        try {
+            // Retrieve the user by email
+            $user = User::where('email', $request->email)->first();
 
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found.',
+                ], 404); // Not Found
+            }
+
+            // Update the user's details
+            $user->name = $request->name;
+            $user->role = $request->designation; // Assuming 'role' corresponds to 'designation'
+            $user->status = $request->active ? 1 : 0; // Assuming 'status' is stored as integer
+
+            // Save the changes
+            $user->save();
+
+            // Return a success response
+            return response()->json([
+                'success' => true,
+                'message' => 'User updated successfully.',
+                'data' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'designation' => $user->role,
+                    'active' => (bool) $user->status,
+                ],
+            ], 200); // OK
+
+        } catch (\Exception $e) {
+            // Handle any unexpected errors
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating the user.',
+                'error' => $e->getMessage(),
+            ], 500); // Internal Server Error
+        }
     }
+
 
     public function showUsers()
     {
@@ -168,5 +209,7 @@ class UserController extends Controller
             'data' => $users
         ]);
     }
+
+
 
 }
