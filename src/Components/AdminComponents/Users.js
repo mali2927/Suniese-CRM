@@ -1,29 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar";
 import Sidebar from "../SideBar";
 import { styles } from "../../Styles/dashboardStyles";
 import config from '../../../src/config'; // Import the config file
 
 const Users = () => {
-  // Dummy data for users
-  const initialUsers = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      designation: "Lead Collector",
-      active: true, // Added active property
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      designation: "Sales Manager",
-      active: true, // Added active property
-    },
-  ];
+  // State for managing users and loading status
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true); // Add a loading state
 
-  const [users, setUsers] = useState(initialUsers);
+  // Function to fetch users from the API
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(`${config.baseURL}/showUsers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      const result = await response.json();
+  
+      if (result.success) {
+        // Map the data to ensure `role` is transformed to `designation`
+        const mappedUsers = result.data.map((user) => ({
+          ...user,
+          designation: user.role, // Map role to designation
+          active: user.status !== null ? user.status : true, // If status is null, set it to true (active)
+        }));
+  
+        setUsers(mappedUsers); // Update users state with mapped data
+      } else {
+        alert('Failed to fetch users');
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      alert('An error occurred while fetching users.');
+    } finally {
+      setLoading(false); // Set loading to false after the fetch is complete
+    }
+  };
+  
+
+  // useEffect to fetch users when the component mounts
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  // State for new user, editing user, and search term
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
@@ -48,7 +72,7 @@ const Users = () => {
   const addUser = async () => {
     // Define the email regex pattern
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  
+
     // Check if all fields are filled
     if (newUser.name && newUser.email && newUser.designation) {
       // Validate the email format
@@ -56,7 +80,7 @@ const Users = () => {
         alert('Please enter a valid email address.');
         return; // Stop execution if email is invalid
       }
-  
+
       try {
         // Send a POST request to the backend
         const response = await fetch(`${config.baseURL}/addUser`, {
@@ -70,19 +94,18 @@ const Users = () => {
             designation: newUser.designation,
           }),
         });
-  
+
         // Parse the response data
         const result = await response.json();
-  
-        // Check if the response is okay (status code in the 200 range)
+
         if (response.ok) {
           // Assuming 'id' is returned from the API response
           const id = result.id || (users.length ? users[users.length - 1].id + 1 : 1);
-  
+
           // Update local state with the new user
           setUsers([...users, { id, ...newUser }]);
           setNewUser({ name: '', email: '', designation: '', active: true });
-  
+
           // Show success message
           alert(result.message || 'User added successfully!');
         } else {
@@ -97,11 +120,6 @@ const Users = () => {
       alert('Please fill out all fields.');
     }
   };
-  
-  
-  
-  
-  
 
   // Delete user
   const deleteUser = (id) => {
@@ -134,9 +152,9 @@ const Users = () => {
 
   // Filter users based on search term
   const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.designation.toLowerCase().includes(searchTerm.toLowerCase())
+    (user.name ? user.name.toLowerCase() : "").includes(searchTerm.toLowerCase()) ||
+    (user.email ? user.email.toLowerCase() : "").includes(searchTerm.toLowerCase()) ||
+    (user.designation ? user.designation.toLowerCase() : "").includes(searchTerm.toLowerCase())
   );
 
   return (

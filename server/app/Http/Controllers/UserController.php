@@ -135,6 +135,7 @@ class UserController extends Controller
         $user->email = $request->input('email');
         $user->role = $request->input('designation');
         $user->password = Hash::make('123456789'); // Hash the default password
+        $user->status=('Active');
       
         $user->save(); // Save the user to the database
     
@@ -150,9 +151,22 @@ class UserController extends Controller
 
     public function editUser(Request $request){
 
-        
 
 
+    }
+
+    public function showUsers()
+    {
+        // Retrieve emails, roles, and status of all users except 'SuperAdmin' and 'Admin'
+        $users = User::whereNotIn('role', ['SuperAdmin', 'Admin'])
+                     ->select('name','email', 'role', 'status')
+                     ->get();
+    
+        // Return the result as a JSON response
+        return response()->json([
+            'success' => true,
+            'data' => $users
+        ]);
     }
 
 }
