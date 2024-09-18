@@ -11,10 +11,10 @@ Route::get('/user', function (Request $request) {
 Route::get('/userRegister', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 Route::post('/handleSession', [UserController::class, 'handleSession']);
+
 Route::post('/addUser', [UserController::class, 'addUser']);
 Route::post('/editUser', [UserController::class, 'editUser']);
 Route::post('/showUsers', [UserController::class, 'showUsers']);
-
-
 Route::put('/updateUser', [UserController::class, 'updateUser']);
+
 

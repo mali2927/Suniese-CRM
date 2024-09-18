@@ -46,11 +46,21 @@ const Users = () => {
     fetchUsers();
   }, []);
 
+  // Define available designations
+  const designationOptions = [
+    "Sales Consultant",
+    "Manager",
+    "Engineer",
+    "HR Specialist",
+    "Marketing Coordinator",
+    // Add more designations as needed
+  ];
+
   // State for new user, editing user, and search term
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
-    designation: "",
+    designation: "Sales Consultant", // Set default designation
     active: true, // Default to active when adding new users
   });
   const [editingUser, setEditingUser] = useState(null);
@@ -102,7 +112,7 @@ const Users = () => {
           // But keeping it can provide immediate UI feedback
           const id = result.id || (users.length ? users[users.length - 1].id + 1 : 1);
           setUsers([...users, { id, ...newUser }]);
-          setNewUser({ name: '', email: '', designation: '', active: true });
+          setNewUser({ name: '', email: '', designation: 'Sales Consultant', active: true }); // Reset designation to default
 
           // Show success message
           alert(result.message || 'User added successfully!');
@@ -176,7 +186,7 @@ const Users = () => {
 
       if (response.ok) {
         setEditingUser(null);
-        setNewUser({ name: "", email: "", designation: "", active: true });
+        setNewUser({ name: "", email: "", designation: "Sales Consultant", active: true }); // Reset designation to default
 
         // Show success message
         alert(result.message || 'User updated successfully!');
@@ -279,14 +289,19 @@ const Users = () => {
                   />
                 </div>
                 <div className="col-md-3">
-                  <input
-                    type="text"
+                  {/* Designation Dropdown */}
+                  <select
                     name="designation"
                     className="form-control mb-2"
-                    placeholder="Designation"
                     value={newUser.designation}
                     onChange={handleChange}
-                  />
+                  >
+                    {designationOptions.map((designation, index) => (
+                      <option key={index} value={designation}>
+                        {designation}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               <div>
@@ -304,7 +319,7 @@ const Users = () => {
                     className="btn btn-secondary mx-2"
                     onClick={() => {
                       setEditingUser(null);
-                      setNewUser({ name: "", email: "", designation: "", active: true });
+                      setNewUser({ name: "", email: "", designation: "Sales Consultant", active: true }); // Reset designation to default
                     }}
                   >
                     Cancel
