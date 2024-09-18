@@ -71,28 +71,34 @@ const Users = () => {
           }),
         });
   
-        // Check if the response is okay
-        if (!response.ok) {
-          throw new Error('Failed to add user');
+        // Parse the response data
+        const result = await response.json();
+  
+        // Check if the response is okay (status code in the 200 range)
+        if (response.ok) {
+          // Assuming 'id' is returned from the API response
+          const id = result.id || (users.length ? users[users.length - 1].id + 1 : 1);
+  
+          // Update local state with the new user
+          setUsers([...users, { id, ...newUser }]);
+          setNewUser({ name: '', email: '', designation: '', active: true });
+  
+          // Show success message
+          alert(result.message || 'User added successfully!');
+        } else {
+          // If the response is not okay, handle the error message from the backend
+          alert(result.message || 'Failed to add user. Please try again.');
         }
-  
-        // Check if response body has content
-        const text = await response.text();
-        const result = text ? JSON.parse(text) : {};
-  
-        // Assuming 'id' is returned from the API response
-        const id = result.id || (users.length ? users[users.length - 1].id + 1 : 1);
-  
-        // Update local state with the new user
-        setUsers([...users, { id, ...newUser }]);
-        setNewUser({ name: '', email: '', designation: '', active: true });
       } catch (error) {
         console.error('Error adding user:', error);
+        alert('An error occurred while adding the user. Please try again.');
       }
     } else {
       alert('Please fill out all fields.');
     }
   };
+  
+  
   
   
   

@@ -112,16 +112,45 @@ class UserController extends Controller
                 ]);
             } else {
                 return response()->json(['isAuthenticated' => false], 401);
-            }
-        
-    
-    
+            }    
     }
     public function addUser(Request $request)
     {
 
+        $existingUser = User::where('email', $request->input('email'))->first();
+    
+        if ($existingUser) {
+            // Return a custom response with error message to the front end
+            return response()->json([
+                'success' => false,
+                'message' => 'The email address is already registered.',
+            ], 422); // 422 Unprocessable Entity
+        }
+    
+        // Log the inputs (optional)
+    
+        // Store the data in the database
+        $user = new User();
+        $user->name = $request->input('name');
+        $user->email = $request->input('email');
+        $user->role = $request->input('designation');
+        $user->password = Hash::make('123456789'); // Hash the default password
+      
+        $user->save(); // Save the user to the database
+    
+        return response()->json([
+            'success' => true,
+            'message' => 'User created successfully!'
+        ]);
 
-        log::debug($request);
+
+
+    }
+
+
+    public function editUser(Request $request){
+
+        
 
 
     }
