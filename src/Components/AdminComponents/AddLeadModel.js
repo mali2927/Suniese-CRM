@@ -46,6 +46,32 @@ const AddLeadModal = ({
       setLoading(false);
     }
   };
+
+  const resetForm = () => {
+    setNewLead({
+      title: "",
+      firstName: "",
+      surname: "",
+      email: "",
+      phoneNumber: "",
+      houseNumber: "",
+      streetName: "",
+      townCity: "",
+      postalCode: "",
+      homeownershipStatus: "",
+      systemQuoted: "",
+      quotedPrice: "",
+      meetingTime: "",
+      bestTimeToCall: "",
+      consultantId: "",
+    });
+  };
+
+  const handleSaveLead = async () => {
+    await addLead();
+    resetForm();
+  };
+
   return (
     <Modal show={showModal} onHide={() => setShowModal(false)}>
       <Modal.Header closeButton>
@@ -303,7 +329,7 @@ const AddLeadModal = ({
         <Button variant="secondary" onClick={() => setShowModal(false)}>
           Close
         </Button>
-        <Button variant="primary" onClick={addLead}>
+        <Button variant="primary" onClick={handleSaveLead}>
           Save Lead
         </Button>
       </Modal.Footer>
