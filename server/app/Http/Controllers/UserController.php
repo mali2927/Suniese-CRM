@@ -210,6 +210,20 @@ class UserController extends Controller
         ]);
     }
 
+    public function showAllUsers()
+    {
+        // Retrieve all users
+        $users = User::all(); // Select all users with *
+    
+        // Return the result as a JSON response
+        return response()->json([
+            'success' => true,
+            'data' => $users
+        ]);
+    }
+    
+
+
 
 
 }

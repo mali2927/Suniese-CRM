@@ -67,11 +67,23 @@ const Leads = () => {
   const [showModal, setShowModal] = useState(false);
   const [showReport, setShowReport] = useState(false); // New state to handle report modal
   const [newLead, setNewLead] = useState({
-    name: "",
-    status: "cold",
-    details: "",
+    title: "",
+    firstName: "",
+    surname: "",
+    email: "",
+    phoneNumber: "",
+    houseNumber: "",
+    streetName: "",
+    townCity: "",
+    postalCode: "",
+    homeownershipStatus: "Owner", // Default value
+    systemQuoted: "10 panels with battery", // Default value
+    quotedPrice: "",
+    meetingTime: "",
+    bestTimeToCall: "",
     consultantId: 1, // Default consultantId
   });
+
   const [activeSection, setActiveSection] = useState(null);
 
   const handleStatusChange = (id, newStatus) => {

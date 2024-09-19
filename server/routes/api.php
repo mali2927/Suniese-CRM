@@ -15,6 +15,7 @@ Route::post('/handleSession', [UserController::class, 'handleSession']);
 Route::post('/addUser', [UserController::class, 'addUser']);
 Route::post('/editUser', [UserController::class, 'editUser']);
 Route::post('/showUsers', [UserController::class, 'showUsers']);
+Route::post('/showAllUsers', [UserController::class, 'showAllUsers']);
 Route::put('/updateUser', [UserController::class, 'updateUser']);
 
 
