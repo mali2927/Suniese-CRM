@@ -7,6 +7,7 @@ import LeadsTable from "../AdminComponents/LeadsTable";
 import LeadActions from "../AdminComponents/LeadAction";
 import AddLeadModal from "../AdminComponents/AddLeadModel";
 import ReportModal from "../AdminComponents/ReportModal";
+import config from "../../config";
 
 // Dummy data for leads
 const dummyLeads = [
@@ -102,9 +103,32 @@ const Leads = () => {
     }
   };
 
-  const addLead = () => {
-    setLeads([...leads, { id: leads.length + 1, ...newLead }]);
-    setShowModal(false);
+  const addLead = async () => {
+    console.log(newLead);
+    try {
+      const response = await fetch(`${config.baseURL}/leads`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...newLead,
+          user_id: newLead.consultantId, // Assuming consultantId maps to user_id
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("Lead added successfully");
+        setShowModal(false); // Close the modal
+      } else {
+        alert("Failed to add lead");
+      }
+    } catch (error) {
+      console.error("Error adding lead:", error);
+      alert("An error occurred while adding the lead.");
+    }
   };
 
   const renderSectionContent = (section) => {
