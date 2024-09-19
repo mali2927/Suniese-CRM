@@ -14,6 +14,26 @@ class LeadController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
+
+
+     public function index()
+     {
+         try {
+             $leads = Lead::with('user')->get(); // Retrieve all leads with related user data
+             return response()->json([
+                 'success' => true,
+                 'data' => $leads
+             ]);
+         } catch (\Exception $e) {
+             Log::error('Error fetching leads: ' . $e->getMessage());
+             return response()->json([
+                 'success' => false,
+                 'message' => 'An error occurred while fetching leads.',
+             ], 500);
+         }
+     }
+     
+
     public function store(Request $request)
     {
         try{

@@ -23,6 +23,7 @@ Route::put('/updateUser', [UserController::class, 'updateUser']);
 //Leads APIS
 
 Route::post('/leads', [LeadController::class, 'store']);
+Route::get('/leads', [LeadController::class, 'index']);
 
 
 

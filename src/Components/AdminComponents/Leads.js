@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar";
 import Sidebar from "../SideBar";
 import { styles } from "../../Styles/dashboardStyles";
@@ -86,7 +86,24 @@ const Leads = () => {
   });
 
   const [activeSection, setActiveSection] = useState(null);
+  useEffect(() => {
+    const fetchLeads = async () => {
+      try {
+        const response = await fetch(`${config.baseURL}/leads`);
+        const result = await response.json();
+        if (result.success) {
+          setLeads(result.data);
+        } else {
+          alert("Failed to fetch leads");
+        }
+      } catch (error) {
+        console.error("Error fetching leads:", error);
+        alert("An error occurred while fetching leads.");
+      }
+    };
 
+    fetchLeads();
+  }, []);
   const handleStatusChange = (id, newStatus) => {
     setLeads(
       leads.map((lead) =>
