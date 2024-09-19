@@ -49,8 +49,8 @@ const Users = () => {
   // Define available designations
   const designationOptions = [
     "Sales Consultant",
-    "Manager",
-    "Engineer",
+    "Senior Sales Consultant",
+    "Energy Consultant",
     "HR Specialist",
     "Marketing Coordinator",
     // Add more designations as needed
