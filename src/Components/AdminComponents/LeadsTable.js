@@ -8,6 +8,8 @@ import {
   DropdownButton,
   Dropdown,
 } from "react-bootstrap";
+import ConvertLeadToSaleModal from "./Modals/ConvertLeadToSaleModal";
+import EditLeadModal from "./Modals/EditLeadModal";
 
 const LeadsTable = ({
   type,
@@ -20,6 +22,16 @@ const LeadsTable = ({
   const [showModal, setShowModal] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState(null);
   const [paymentAmount, setPaymentAmount] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingLead, setEditingLead] = useState({
+    first_name: "",
+    surname: "",
+    email: "",
+    phone_number: "",
+    quoted_price: "",
+    meeting_time: "",
+    status: "",
+  });
 
   useEffect(() => {
     const fetchLeads = async () => {
@@ -38,9 +50,7 @@ const LeadsTable = ({
     };
 
     fetchLeads();
-  }, []); // Empty dependency array means this runs once on mount
-
-  console.log(leads);
+  }, []);
 
   const handleDropdownSelect = (leadId, action) => {
     switch (action) {
@@ -70,50 +80,27 @@ const LeadsTable = ({
     }
   };
 
-  const handleModalClose = () => {
-    setShowModal(false);
-    setPaymentAmount("");
-    setSelectedLeadId(null);
+  const handleEditLead = (lead) => {
+    setEditingLead(lead);
+    setShowEditModal(true);
+  };
+
+  const handleEditSave = () => {
+    const updatedLeads = leads.map((lead) =>
+      lead.id === editingLead.id ? { ...editingLead } : lead
+    );
+    setLeads(updatedLeads);
+    setShowEditModal(false);
   };
 
   const handleModalSave = () => {
     handleStatusChange(selectedLeadId, "won");
     convertToSale(selectedLeadId, paymentAmount);
-    handleModalClose();
+    setShowModal(false);
   };
 
   return (
     <>
-      {type === "individualLeads" && (
-        <Table striped bordered hover responsive className="mt-3">
-          <thead className="thead-dark">
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Designation</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {salesConsultants.map((consultant) => (
-              <tr key={consultant.id}>
-                <td>{consultant.name}</td>
-                <td>{consultant.email}</td>
-                <td>{consultant.designation}</td>
-                <td>
-                  <Button
-                    variant="outline-info"
-                    onClick={() => onViewReport(consultant.id)}
-                  >
-                    View Report
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
-
       {type === "transferLeads" && (
         <Table striped bordered hover responsive className="mt-3">
           <thead className="thead-dark">
@@ -134,17 +121,21 @@ const LeadsTable = ({
             {leads.map((lead) => (
               <tr key={lead.id}>
                 <td>{lead.id}</td>
-                <td>{lead.user?.name || "N/A"}</td>{" "}
-                {/* If lead.user is null, display 'N/A' */}
+                <td>{lead.user?.name || "N/A"}</td>
                 <td>{lead.first_name || "N/A"}</td>
                 <td>{lead.surname || "N/A"}</td>
                 <td>{lead.email || "N/A"}</td>
                 <td>{lead.phone_number || "N/A"}</td>
                 <td>{lead.quoted_price || "N/A"}</td>
                 <td>{lead.meeting_time || "N/A"}</td>
-                <td>{lead.status?.title || "N/A"}</td>{" "}
-                {/* If lead.status is null, display 'N/A' */}
+                <td>{lead.status?.title || "N/A"}</td>
                 <td>
+                  <Button
+                    variant="outline-info"
+                    onClick={() => handleEditLead(lead)}
+                  >
+                    Edit
+                  </Button>
                   <DropdownButton
                     id={`dropdown-action-${lead.id}`}
                     title="Actions"
@@ -154,56 +145,31 @@ const LeadsTable = ({
                       as="button"
                       onClick={() => handleDropdownSelect(lead.id, "setCold")}
                     >
-                      <Button
-                        variant="outline-primary"
-                        className="w-100 text-left"
-                      >
-                        Set to Cold
-                      </Button>
+                      Set to Cold
                     </Dropdown.Item>
                     <Dropdown.Item
                       as="button"
                       onClick={() => handleDropdownSelect(lead.id, "setWarm")}
                     >
-                      <Button
-                        variant="outline-warning"
-                        className="w-100 text-left"
-                      >
-                        Set to Warm
-                      </Button>
+                      Set to Warm
                     </Dropdown.Item>
                     <Dropdown.Item
                       as="button"
                       onClick={() => handleDropdownSelect(lead.id, "setHot")}
                     >
-                      <Button
-                        variant="outline-success"
-                        className="w-100 text-left"
-                      >
-                        Set to Hot
-                      </Button>
+                      Set to Hot
                     </Dropdown.Item>
                     <Dropdown.Item
                       as="button"
                       onClick={() => handleDropdownSelect(lead.id, "lostLead")}
                     >
-                      <Button
-                        variant="outline-danger"
-                        className="w-100 text-left"
-                      >
-                        Lost Lead
-                      </Button>
+                      Lost Lead
                     </Dropdown.Item>
                     <Dropdown.Item
                       as="button"
                       onClick={() => handleDropdownSelect(lead.id, "wonLead")}
                     >
-                      <Button
-                        variant="outline-success"
-                        className="w-100 text-left"
-                      >
-                        Won Lead
-                      </Button>
+                      Won Lead
                     </Dropdown.Item>
                   </DropdownButton>
                 </td>
@@ -213,33 +179,21 @@ const LeadsTable = ({
         </Table>
       )}
 
-      {/* Modal for payment amount */}
-      <Modal show={showModal} onHide={handleModalClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Convert Lead to Sale</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group controlId="formPaymentAmount">
-              <Form.Label>Payment Amount</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Enter amount"
-                value={paymentAmount}
-                onChange={(e) => setPaymentAmount(e.target.value)}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleModalClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleModalSave}>
-            Save
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      <ConvertLeadToSaleModal
+        show={showModal}
+        handleClose={() => setShowModal(false)}
+        paymentAmount={paymentAmount}
+        setPaymentAmount={setPaymentAmount}
+        handleSave={handleModalSave}
+      />
+
+      <EditLeadModal
+        show={showEditModal}
+        handleClose={() => setShowEditModal(false)}
+        editingLead={editingLead}
+        setEditingLead={setEditingLead}
+        handleSave={handleEditSave}
+      />
     </>
   );
 };
