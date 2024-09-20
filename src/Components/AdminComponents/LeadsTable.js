@@ -7,7 +7,10 @@ import {
   Form,
   DropdownButton,
   Dropdown,
+  Row,
+  Col,
 } from "react-bootstrap";
+
 import ConvertLeadToSaleModal from "./Modals/ConvertLeadToSaleModal";
 import EditLeadModal from "./Modals/EditLeadModal";
 
@@ -130,48 +133,64 @@ const LeadsTable = ({
                 <td>{lead.meeting_time || "N/A"}</td>
                 <td>{lead.status?.title || "N/A"}</td>
                 <td>
-                  <Button
-                    variant="outline-info"
-                    onClick={() => handleEditLead(lead)}
-                  >
-                    Edit
-                  </Button>
-                  <DropdownButton
-                    id={`dropdown-action-${lead.id}`}
-                    title="Actions"
-                    variant="outline-primary"
-                  >
-                    <Dropdown.Item
-                      as="button"
-                      onClick={() => handleDropdownSelect(lead.id, "setCold")}
-                    >
-                      Set to Cold
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as="button"
-                      onClick={() => handleDropdownSelect(lead.id, "setWarm")}
-                    >
-                      Set to Warm
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as="button"
-                      onClick={() => handleDropdownSelect(lead.id, "setHot")}
-                    >
-                      Set to Hot
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as="button"
-                      onClick={() => handleDropdownSelect(lead.id, "lostLead")}
-                    >
-                      Lost Lead
-                    </Dropdown.Item>
-                    <Dropdown.Item
-                      as="button"
-                      onClick={() => handleDropdownSelect(lead.id, "wonLead")}
-                    >
-                      Won Lead
-                    </Dropdown.Item>
-                  </DropdownButton>
+                  <Row>
+                    <Col>
+                      <Button
+                        variant="outline-info"
+                        onClick={() => handleEditLead(lead)}
+                      >
+                        Edit
+                      </Button>
+                    </Col>
+                    <Col>
+                      <DropdownButton
+                        id={`dropdown-action-${lead.id}`}
+                        title="Change Status"
+                        variant="outline-primary"
+                      >
+                        <Dropdown.Item
+                          as="button"
+                          onClick={() =>
+                            handleDropdownSelect(lead.id, "setCold")
+                          }
+                        >
+                          Set to Cold
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          as="button"
+                          onClick={() =>
+                            handleDropdownSelect(lead.id, "setWarm")
+                          }
+                        >
+                          Set to Warm
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          as="button"
+                          onClick={() =>
+                            handleDropdownSelect(lead.id, "setHot")
+                          }
+                        >
+                          Set to Hot
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          as="button"
+                          onClick={() =>
+                            handleDropdownSelect(lead.id, "lostLead")
+                          }
+                        >
+                          Lost Lead
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                          as="button"
+                          onClick={() =>
+                            handleDropdownSelect(lead.id, "wonLead")
+                          }
+                        >
+                          Won Lead
+                        </Dropdown.Item>
+                      </DropdownButton>
+                    </Col>
+                  </Row>
                 </td>
               </tr>
             ))}
