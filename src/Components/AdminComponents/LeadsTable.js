@@ -134,14 +134,16 @@ const LeadsTable = ({
             {leads.map((lead) => (
               <tr key={lead.id}>
                 <td>{lead.id}</td>
-                <td>{lead.user.name}</td>
-                <td>{lead.first_name}</td>
-                <td>{lead.surname}</td>
-                <td>{lead.email}</td>
-                <td>{lead.phone_number}</td>
-                <td>{lead.quoted_price}</td>
-                <td>{lead.meeting_time}</td>
-                <td>{lead.status}</td>
+                <td>{lead.user?.name || "N/A"}</td>{" "}
+                {/* If lead.user is null, display 'N/A' */}
+                <td>{lead.first_name || "N/A"}</td>
+                <td>{lead.surname || "N/A"}</td>
+                <td>{lead.email || "N/A"}</td>
+                <td>{lead.phone_number || "N/A"}</td>
+                <td>{lead.quoted_price || "N/A"}</td>
+                <td>{lead.meeting_time || "N/A"}</td>
+                <td>{lead.status?.title || "N/A"}</td>{" "}
+                {/* If lead.status is null, display 'N/A' */}
                 <td>
                   <DropdownButton
                     id={`dropdown-action-${lead.id}`}

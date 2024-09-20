@@ -10,12 +10,15 @@ const AddLeadModal = ({
   addLead,
 }) => {
   const [users, setUsers] = useState([]);
+  const [statuses, setStatuses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingStatuses, setLoadingStatuses] = useState(true);
 
   // Fetch users when modal opens
   useEffect(() => {
     if (showModal) {
       fetchUsers();
+      fetchStatuses();
     }
   }, [showModal]);
 
@@ -47,6 +50,24 @@ const AddLeadModal = ({
     }
   };
 
+  const fetchStatuses = async () => {
+    try {
+      const response = await fetch(`${config.baseURL}/lead-statuses`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const result = await response.json();
+      setStatuses(result); // Store statuses in state
+    } catch (error) {
+      console.error("Error fetching lead statuses:", error);
+      alert("An error occurred while fetching lead statuses.");
+    } finally {
+      setLoadingStatuses(false);
+    }
+  };
+
   const resetForm = () => {
     setNewLead({
       title: "",
@@ -64,6 +85,7 @@ const AddLeadModal = ({
       meetingTime: "",
       bestTimeToCall: "",
       consultantId: "",
+      status: "", // Add statusId for the status field
     });
   };
 
@@ -280,7 +302,7 @@ const AddLeadModal = ({
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3" controlId="formMeetingTime">
-                <Form.Label>Convenient Date and Time for a Meeting</Form.Label>
+                <Form.Label>Convenient Date and Time</Form.Label>
                 <Form.Control
                   type="datetime-local"
                   value={newLead.meetingTime}
@@ -319,6 +341,25 @@ const AddLeadModal = ({
               {users.map((user) => (
                 <option key={user.id} value={user.id}>
                   {user.name} - {user.designation}
+                </option>
+              ))}
+            </Form.Control>
+          </Form.Group>
+          {/* Status Selection */}
+          <Form.Group className="mb-3" controlId="formStatus">
+            <Form.Label>Select Status</Form.Label>
+            <Form.Control
+              as="select"
+              value={newLead.status}
+              onChange={(e) =>
+                setNewLead({ ...newLead, status: e.target.value })
+              }
+              disabled={loadingStatuses}
+            >
+              <option value="">Select Status</option>
+              {statuses.map((status) => (
+                <option key={status.id} value={status.id}>
+                  {status.title}
                 </option>
               ))}
             </Form.Control>

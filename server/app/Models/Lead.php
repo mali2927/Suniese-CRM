@@ -27,11 +27,18 @@ class Lead extends Model
         'quoted_price',
         'meeting_time',
         'best_time_to_call',
+        'status',  // Add status here
     ];
 
     // Define relationship to User
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Define relationship to LeadStatus
+    public function status()
+    {
+        return $this->belongsTo(LeadStatus::class, 'status', 'id');
     }
 }

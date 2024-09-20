@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\LeadStatusController;
 
 
 Route::get('/user', function (Request $request) {
@@ -25,5 +26,7 @@ Route::put('/updateUser', [UserController::class, 'updateUser']);
 Route::post('/leads', [LeadController::class, 'store']);
 Route::get('/leads', [LeadController::class, 'index']);
 
+//Leads Statuses
+Route::get('/lead-statuses', [LeadStatusController::class, 'index']);
 
 

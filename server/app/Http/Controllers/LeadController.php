@@ -19,7 +19,7 @@ class LeadController extends Controller
      public function index()
      {
          try {
-             $leads = Lead::with('user')->get(); // Retrieve all leads with related user data
+            $leads = Lead::with(['user', 'status'])->get();
              return response()->json([
                  'success' => true,
                  'data' => $leads
@@ -57,6 +57,7 @@ class LeadController extends Controller
             'quotedPrice' => 'required|numeric',
             'meetingTime' => 'required|date',
             'bestTimeToCall' => 'nullable|string|max:255',
+            'status' => 'required|exists:lead_statuses,id', // Validate status_id
         ]);
 
         // Map camelCase fields to snake_case fields
@@ -76,6 +77,7 @@ class LeadController extends Controller
             'quoted_price' => $validatedData['quotedPrice'],
             'meeting_time' => $validatedData['meetingTime'],
             'best_time_to_call' => $validatedData['bestTimeToCall'],
+            'status' => $validatedData['status'], // Add status_id
         ];
         log::debug($mappedData);
 

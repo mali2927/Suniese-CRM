@@ -83,6 +83,7 @@ const Leads = () => {
     meetingTime: "",
     bestTimeToCall: "",
     consultantId: 1, // Default consultantId
+    status: "",
   });
 
   const [activeSection, setActiveSection] = useState(null);
