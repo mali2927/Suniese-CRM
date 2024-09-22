@@ -20,6 +20,7 @@ Route::post('/editUser', [UserController::class, 'editUser']);
 Route::post('/showUsers', [UserController::class, 'showUsers']);
 Route::post('/showAllUsers', [UserController::class, 'showAllUsers']);
 Route::put('/updateUser', [UserController::class, 'updateUser']);
+Route::get('/showUsersForReportInLeads', [UserController::class, 'showUsersForReportInLeads']);
 
 //Leads APIS
 

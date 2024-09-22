@@ -221,6 +221,20 @@ class UserController extends Controller
             'data' => $users
         ]);
     }
+
+    public function showUsersForReportInLeads(){
+
+
+        $users = User::whereNotIn('role', ['SuperAdmin', 'Admin'])
+                     ->select('id','name', 'role', 'status')
+                     ->get();
+    
+        // Return the result as a JSON response
+        return response()->json([
+            'success' => true,
+            'data' => $users
+        ]);
+    }
     
 
 

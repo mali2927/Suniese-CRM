@@ -1,72 +1,23 @@
+// src/Leads.js
+
 import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar";
 import Sidebar from "../SideBar";
 import { styles } from "../../Styles/dashboardStyles";
-import { ListGroup, Button } from "react-bootstrap";
+import { ListGroup, Button, Form } from "react-bootstrap";
 import LeadsTable from "../AdminComponents/LeadsTable";
 import LeadActions from "../AdminComponents/LeadAction";
 import AddLeadModal from "../AdminComponents/AddLeadModel";
 import ReportModal from "../AdminComponents/ReportModal";
 import config from "../../config";
 
-// Dummy data for leads
-const dummyLeads = [
-  {
-    id: 1,
-    name: "John Doe",
-    status: "cold",
-    details: "Lead 1 details",
-    consultantId: 1,
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    status: "warm",
-    details: "Lead 2 details",
-    consultantId: 2,
-  },
-  {
-    id: 3,
-    name: "Mike Johnson",
-    status: "hot",
-    details: "Lead 3 details",
-    consultantId: 3,
-  },
-  {
-    id: 4,
-    name: "Emily Davis",
-    status: "hot",
-    details: "Lead 4 details",
-    consultantId: 1,
-  },
-];
-
-// Dummy data for sales consultants
-const dummyConsultants = [
-  {
-    id: 1,
-    name: "Alice Brown",
-    email: "alice.brown@example.com",
-    designation: "Senior Consultant",
-  },
-  {
-    id: 2,
-    name: "Bob White",
-    email: "bob.white@example.com",
-    designation: "Junior Consultant",
-  },
-  {
-    id: 3,
-    name: "Carol Green",
-    email: "carol.green@example.com",
-    designation: "Lead Consultant",
-  },
-];
-
 const Leads = () => {
-  const [leads, setLeads] = useState(dummyLeads);
+  const [leads, setLeads] = useState([]);
+  const [consultants, setConsultants] = useState([]);
+  const [loadingConsultants, setLoadingConsultants] = useState(true);
+  const [errorConsultants, setErrorConsultants] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showReport, setShowReport] = useState(false); // New state to handle report modal
+  const [showReport, setShowReport] = useState(false);
   const [newLead, setNewLead] = useState({
     title: "",
     firstName: "",
@@ -77,23 +28,29 @@ const Leads = () => {
     streetName: "",
     townCity: "",
     postalCode: "",
-    homeownershipStatus: "Owner", // Default value
-    systemQuoted: "10 panels with battery", // Default value
+    homeownershipStatus: "Owner",
+    systemQuoted: "10 panels with battery",
     quotedPrice: "",
     meetingTime: "",
     bestTimeToCall: "",
-    consultantId: 1, // Default consultantId
+    consultantId: "", // Initially empty
     status: "",
   });
 
   const [activeSection, setActiveSection] = useState(null);
+  const [selectedConsultantId, setSelectedConsultantId] = useState("");
+
   useEffect(() => {
+    // Fetch Leads
     const fetchLeads = async () => {
       try {
         const response = await fetch(`${config.baseURL}/leads`);
         const result = await response.json();
+        console.log("Leads API Response:", result); // Debugging Log
+
         if (result.success) {
           setLeads(result.data);
+          console.log("Leads Data Set:", result.data); // Debugging Log
         } else {
           alert("Failed to fetch leads");
         }
@@ -103,8 +60,32 @@ const Leads = () => {
       }
     };
 
+    // Fetch Consultants
+    const fetchConsultants = async () => {
+      try {
+        const response = await fetch(`${config.baseURL}/showUsersForReportInLeads`);
+        const result = await response.json();
+        console.log("Consultants API Response:", result); // Debugging Log
+
+        if (result.success) {
+          setConsultants(result.data);
+          console.log("Consultants Data Set:", result.data); // Debugging Log
+        } else {
+          console.warn("Failed to fetch consultants");
+          setErrorConsultants("Failed to fetch consultants");
+        }
+      } catch (error) {
+        console.error("Error fetching consultants:", error);
+        setErrorConsultants("An error occurred while fetching consultants.");
+      } finally {
+        setLoadingConsultants(false);
+      }
+    };
+
     fetchLeads();
+    fetchConsultants();
   }, []);
+
   const handleStatusChange = (id, newStatus) => {
     setLeads(
       leads.map((lead) =>
@@ -118,11 +99,12 @@ const Leads = () => {
       window.confirm("Are you sure you want to convert this lead to a sale?")
     ) {
       setLeads(leads.filter((lead) => lead.id !== id));
+      // Additional logic to handle sale conversion can be added here
     }
   };
 
   const addLead = async () => {
-    console.log(newLead);
+    console.log("Adding New Lead:", newLead); // Debugging Log
     try {
       const response = await fetch(`${config.baseURL}/leads`, {
         method: "POST",
@@ -136,9 +118,11 @@ const Leads = () => {
       });
 
       const result = await response.json();
+      console.log("Add Lead API Response:", result); // Debugging Log
 
       if (result.success) {
         alert("Lead added successfully");
+        setLeads([...leads, result.data]); // Update leads with the new lead
         setShowModal(false); // Close the modal
       } else {
         alert("Failed to add lead");
@@ -147,6 +131,10 @@ const Leads = () => {
       console.error("Error adding lead:", error);
       alert("An error occurred while adding the lead.");
     }
+  };
+
+  const handleConsultantChange = (e) => {
+    setSelectedConsultantId(Number(e.target.value));
   };
 
   const renderSectionContent = (section) => {
@@ -158,15 +146,89 @@ const Leads = () => {
           </ListGroup>
         );
       case "individualLeads":
+        // Ensure a consultant is selected
+        if (!selectedConsultantId) {
+          return (
+            <div>
+              <Form.Group controlId="consultantSelect" className="mb-3">
+                <Form.Label>Select Consultant</Form.Label>
+                {loadingConsultants ? (
+                  <p>Loading consultants...</p>
+                ) : errorConsultants ? (
+                  <p className="text-danger">{errorConsultants}</p>
+                ) : consultants.length > 0 ? (
+                  <Form.Control
+                    as="select"
+                    value={selectedConsultantId}
+                    onChange={handleConsultantChange}
+                  >
+                    <option value="">-- Select Consultant --</option>
+                    {consultants.map((consultant) => (
+                      <option key={consultant.id} value={consultant.id}>
+                        {consultant.name} - {consultant.role}
+                      </option>
+                    ))}
+                  </Form.Control>
+                ) : (
+                  <p>No consultants available.</p>
+                )}
+              </Form.Group>
+              <p>Please select a consultant to view their leads.</p>
+            </div>
+          );
+        }
+
+        const consultantLeads = leads.filter(
+          (lead) => lead.consultantId === selectedConsultantId
+        );
+
+        const selectedConsultant = consultants.find(
+          (consultant) => consultant.id === selectedConsultantId
+        );
+
         return (
-          <LeadsTable
-            leads={leads}
-            handleStatusChange={handleStatusChange}
-            convertToSale={convertToSale}
-            type="individualLeads"
-            onViewReport={() => setShowReport(true)}
-            salesConsultants={dummyConsultants} // Pass the dummy consultants data
-          />
+          <div>
+            <Form.Group controlId="consultantSelect" className="mb-3">
+              <Form.Label>Select Consultant</Form.Label>
+              {loadingConsultants ? (
+                <p>Loading consultants...</p>
+              ) : errorConsultants ? (
+                <p className="text-danger">{errorConsultants}</p>
+              ) : consultants.length > 0 ? (
+                <Form.Control
+                  as="select"
+                  value={selectedConsultantId}
+                  onChange={handleConsultantChange}
+                >
+                  <option value="">-- Select Consultant --</option>
+                  {consultants.map((consultant) => (
+                    <option key={consultant.id} value={consultant.id}>
+                      {consultant.name} - {consultant.role}
+                    </option>
+                  ))}
+                </Form.Control>
+              ) : (
+                <p>No consultants available.</p>
+              )}
+            </Form.Group>
+            {selectedConsultant && (
+              <h4>
+                Leads for: {selectedConsultant.name} ({selectedConsultant.role})
+              </h4>
+            )}
+            {consultantLeads.length > 0 ? (
+              <LeadsTable
+                leads={consultantLeads}
+                handleStatusChange={handleStatusChange}
+                convertToSale={convertToSale}
+                type="individualLeads"
+                onViewReport={() => setShowReport(true)}
+                salesConsultants={consultants}
+              />
+            ) : (
+              <p>No leads available for this consultant.</p>
+            )}
+          </div>
         );
       case "transferLeads":
         return (
@@ -174,7 +236,7 @@ const Leads = () => {
             leads={leads}
             handleStatusChange={handleStatusChange}
             type="transferLeads"
-            salesConsultants={dummyConsultants} // Pass the dummy consultants data if needed
+            salesConsultants={consultants}
           />
         );
       default:
