@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Lead;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+
 
 class LeadController extends Controller
 {
@@ -56,7 +58,7 @@ class LeadController extends Controller
             'systemQuoted' => 'required|string|max:255',
             'quotedPrice' => 'required|numeric',
             'meetingTime' => 'required|date',
-            'bestTimeToCall' => 'nullable|string|max:255',
+            'bestTimeToCall' => 'nullable|date',
             'status' => 'required|exists:lead_statuses,id', // Validate status_id
         ]);
 
@@ -126,6 +128,140 @@ class LeadController extends Controller
             'data' => $leads
         ], 200);
     }
+
+    public function update(Request $request, $id)
+    {
+        Log::debug($request->all()); // Log all request data for easier debugging
+        try {
+            // Map incoming data to snake_case, matching your DB column names
+            $mappedData = [
+                'user_id' => $request->input('user_id'),
+                'title' => $request->input('title'),
+                'first_name' => $request->input('first_name'),
+                'surname' => $request->input('surname'),
+                'email' => $request->input('email'),
+                'phone_number' => $request->input('phone_number'),
+                'house_number' => $request->input('house_number'),
+                'street_name' => $request->input('street_name'),
+                'town_city' => $request->input('town_city'),
+                'postal_code' => $request->input('postal_code'),
+                'homeownership_status' => $request->input('homeownership_status'),
+                'system_quoted' => $request->input('system_quoted'),
+                'quoted_price' => $request->input('quoted_price'),
+                'meeting_time' => $request->input('meeting_time'),
+                'best_time_to_call' => $request->input('best_time_to_call'),
+            ];
+    
+            // Validate the data
+            $validator = Validator::make($mappedData, [
+                'user_id' => 'required|exists:users,id',
+                'title' => 'required|string|max:255',
+                'first_name' => 'required|string|max:255',
+                'surname' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'phone_number' => 'required|string|max:20',
+                'house_number' => 'required|string|max:255',
+                'street_name' => 'required|string|max:255',
+                'town_city' => 'required|string|max:255',
+                'postal_code' => 'required|string|max:10',
+                'homeownership_status' => 'required|string|in:Owner,Tenant',
+                'system_quoted' => 'required|string|max:255',
+                'quoted_price' => 'required|numeric',
+                'meeting_time' => 'required|date',
+                'best_time_to_call' => 'nullable|date',
+            ]);
+    
+            // Validate the mapped data
+            $validatedData = $validator->validate();
+    
+            // Find the lead and update it
+            $lead = Lead::findOrFail($id);
+            $lead->update($validatedData);
+    
+            // If 'status' is included in the request, update the lead status separately
+            if ($request->has('status')) {
+                $lead->status()->associate($request->input('status.id'));
+                $lead->save();
+            }
+    
+            // Return a success response
+            return response()->json([
+                'success' => true,
+                'message' => 'Lead updated successfully',
+                'data' => $lead
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating lead: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating the lead.',
+            ], 500);
+        }
+    }
+
+
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            // Validate the incoming request data
+            $validatedData = $request->validate([
+                'statusId' => 'required|exists:lead_statuses,id', // Validate statusId
+            ]);
+    
+            // Find the lead by ID
+            $lead = Lead::findOrFail($id);
+    
+            // Update the lead's status
+            $lead->status()->associate($validatedData['statusId']); // Use statusId
+            $lead->save();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Lead status updated successfully',
+                'data' => $lead,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error updating lead status: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating the lead status.',
+            ], 500);
+        }
+    }
+    
+
+    public function updatePayment(Request $request, $id)
+{
+    try {
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'total_payment' => 'required|numeric|min:0', // Validate total_payment
+        ]);
+
+        // Find the lead by ID
+        $lead = Lead::findOrFail($id);
+
+        // Update the total_payment field
+        $lead->total_payment = $validatedData['total_payment'];
+        $lead->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Total payment updated successfully',
+            'data' => $lead,
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error updating total payment: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred while updating the total payment.',
+        ], 500);
+    }
+}
+
+    
+    
+
 }
     
 

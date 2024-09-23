@@ -18,7 +18,7 @@ const ConvertLeadToSaleModal = ({
           <Form.Group controlId="formPaymentAmount">
             <Form.Label>Payment Amount</Form.Label>
             <Form.Control
-              type="text"
+              type="number"
               placeholder="Enter amount"
               value={paymentAmount}
               onChange={(e) => setPaymentAmount(e.target.value)}

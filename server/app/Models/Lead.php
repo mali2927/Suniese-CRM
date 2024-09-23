@@ -28,6 +28,7 @@ class Lead extends Model
         'meeting_time',
         'best_time_to_call',
         'status',  // Add status here
+        'total_payment',
     ];
 
     // Define relationship to User

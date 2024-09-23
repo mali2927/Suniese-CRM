@@ -26,6 +26,10 @@ Route::get('/showUsersForReportInLeads', [UserController::class, 'showUsersForRe
 
 Route::post('/leads', [LeadController::class, 'store']);
 Route::get('/leads', [LeadController::class, 'index']);
+Route::put('/update-lead/{id}', [LeadController::class, 'update']);
+Route::put('/leads/{id}/status', [LeadController::class, 'updateStatus']);
+Route::put('/leads/{id}/payment', [LeadController::class, 'updatePayment']);
+
 
 //Leads Statuses
 Route::get('/lead-statuses', [LeadStatusController::class, 'index']);
