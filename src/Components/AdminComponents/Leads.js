@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar";
 import Sidebar from "../SideBar";
 import { styles } from "../../Styles/dashboardStyles";
-import { ListGroup, Button, Form } from "react-bootstrap";
+import { ListGroup, Button, Form, Spinner, Alert } from "react-bootstrap";
 import LeadsTable from "../AdminComponents/LeadsTable";
 import LeadActions from "../AdminComponents/LeadAction";
 import AddLeadModal from "../AdminComponents/AddLeadModel";
@@ -40,8 +40,13 @@ const Leads = () => {
   const [activeSection, setActiveSection] = useState(null);
   const [selectedConsultantId, setSelectedConsultantId] = useState("");
 
+  // New State Variables for Selected Consultant's Leads
+  const [selectedLeads, setSelectedLeads] = useState([]);
+  const [loadingSelectedLeads, setLoadingSelectedLeads] = useState(false);
+  const [errorSelectedLeads, setErrorSelectedLeads] = useState(null);
+
   useEffect(() => {
-    // Fetch Leads
+    // Fetch All Leads
     const fetchLeads = async () => {
       try {
         const response = await fetch(`${config.baseURL}/leads`);
@@ -85,6 +90,39 @@ const Leads = () => {
     fetchLeads();
     fetchConsultants();
   }, []);
+
+  // Fetch Leads for Selected Consultant
+  useEffect(() => {
+    if (selectedConsultantId) {
+      const fetchSelectedLeads = async () => {
+        setLoadingSelectedLeads(true);
+        setErrorSelectedLeads(null);
+        try {
+          const response = await fetch(
+            `${config.baseURL}/searchLeadByConsultantId?user_id=${selectedConsultantId}`
+          );
+          const result = await response.json();
+          console.log("Selected Consultant Leads API Response:", result); // Debugging Log
+
+          if (result.data && result.data.length > 0) {
+            setSelectedLeads(result.data);
+            console.log("Selected Leads:", result.data); // Debugging Log
+          } else {
+            setErrorSelectedLeads("No leads found for this consultant.");
+          }
+        } catch (error) {
+          console.error("Error fetching selected leads:", error);
+          setErrorSelectedLeads("An error occurred while fetching leads.");
+        } finally {
+          setLoadingSelectedLeads(false);
+        }
+      };
+
+      fetchSelectedLeads();
+    } else {
+      setSelectedLeads([]); // Reset if no consultant is selected
+    }
+  }, [selectedConsultantId]);
 
   const handleStatusChange = (id, newStatus) => {
     setLeads(
@@ -134,10 +172,11 @@ const Leads = () => {
   };
 
   const handleConsultantChange = (e) => {
-    setSelectedConsultantId(Number(e.target.value));
+    setSelectedConsultantId(e.target.value);
   };
 
   const renderSectionContent = (section) => {
+    console.log("Selected Leads at render:", selectedLeads); // Debugging Log
     switch (section) {
       case "totalLeads":
         return (
@@ -146,54 +185,16 @@ const Leads = () => {
           </ListGroup>
         );
       case "individualLeads":
-        // Ensure a consultant is selected
-        if (!selectedConsultantId) {
-          return (
-            <div>
-              <Form.Group controlId="consultantSelect" className="mb-3">
-                <Form.Label>Select Consultant</Form.Label>
-                {loadingConsultants ? (
-                  <p>Loading consultants...</p>
-                ) : errorConsultants ? (
-                  <p className="text-danger">{errorConsultants}</p>
-                ) : consultants.length > 0 ? (
-                  <Form.Control
-                    as="select"
-                    value={selectedConsultantId}
-                    onChange={handleConsultantChange}
-                  >
-                    <option value="">-- Select Consultant --</option>
-                    {consultants.map((consultant) => (
-                      <option key={consultant.id} value={consultant.id}>
-                        {consultant.name} - {consultant.role}
-                      </option>
-                    ))}
-                  </Form.Control>
-                ) : (
-                  <p>No consultants available.</p>
-                )}
-              </Form.Group>
-              <p>Please select a consultant to view their leads.</p>
-            </div>
-          );
-        }
-
-        const consultantLeads = leads.filter(
-          (lead) => lead.consultantId === selectedConsultantId
-        );
-
-        const selectedConsultant = consultants.find(
-          (consultant) => consultant.id === selectedConsultantId
-        );
-
         return (
           <div>
             <Form.Group controlId="consultantSelect" className="mb-3">
               <Form.Label>Select Consultant</Form.Label>
               {loadingConsultants ? (
-                <p>Loading consultants...</p>
+                <div>
+                  <Spinner animation="border" size="sm" /> Loading consultants...
+                </div>
               ) : errorConsultants ? (
-                <p className="text-danger">{errorConsultants}</p>
+                <Alert variant="danger">{errorConsultants}</Alert>
               ) : consultants.length > 0 ? (
                 <Form.Control
                   as="select"
@@ -211,22 +212,75 @@ const Leads = () => {
                 <p>No consultants available.</p>
               )}
             </Form.Group>
-            {selectedConsultant && (
-              <h4>
-                Leads for: {selectedConsultant.name} ({selectedConsultant.role})
-              </h4>
-            )}
-            {consultantLeads.length > 0 ? (
-              <LeadsTable
-                leads={consultantLeads}
-                handleStatusChange={handleStatusChange}
-                convertToSale={convertToSale}
-                type="individualLeads"
-                onViewReport={() => setShowReport(true)}
-                salesConsultants={consultants}
-              />
-            ) : (
-              <p>No leads available for this consultant.</p>
+
+            {selectedConsultantId && (
+              <div>
+                {loadingSelectedLeads ? (
+                  <div>
+                    <Spinner animation="border" size="sm" /> Loading leads...
+                  </div>
+                ) : errorSelectedLeads ? (
+                  <Alert variant="danger">{errorSelectedLeads}</Alert>
+                ) : selectedLeads.length > 0 ? (
+                  <div>
+                    <h4 className="mt-4">
+                      Leads for:{" "}
+                      {
+                        consultants.find(
+                          (consultant) =>
+                            consultant.id === Number(selectedConsultantId)
+                        )?.name
+                      }{" "}
+                      (
+                      {
+                        consultants.find(
+                          (consultant) =>
+                            consultant.id === Number(selectedConsultantId)
+                        )?.role
+                      }
+                      )
+                    </h4>
+
+                    {/* Leads Table */}
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>Title</th>
+                          <th>First Name</th>
+                          <th>Surname</th>
+                          <th>Email</th>
+                          <th>Phone Number</th>
+                          <th>Address</th>
+                          <th>System Quoted</th>
+                          <th>Quoted Price</th>
+                          <th>Meeting Time</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedLeads.map((lead) => (
+                          <tr key={lead.id}>
+                            <td>{lead.title}</td>
+                            <td>{lead.first_name}</td>
+                            <td>{lead.surname}</td>
+                            <td>{lead.email}</td>
+                            <td>{lead.phone_number}</td>
+                            <td>
+                              {lead.house_number} {lead.street_name}, {lead.town_city}, {lead.postal_code}
+                            </td>
+                            <td>{lead.system_quoted}</td>
+                            <td>{lead.quoted_price}</td>
+                            <td>{new Date(lead.meeting_time).toLocaleString()}</td>
+                            <td>{lead.status || "Pending"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p>No leads available for this consultant.</p>
+                )}
+              </div>
             )}
           </div>
         );
