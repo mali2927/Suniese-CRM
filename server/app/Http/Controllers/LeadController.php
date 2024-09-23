@@ -98,4 +98,35 @@ class LeadController extends Controller
         ], 500);
     }
     }
+
+    public function searchLeadByConsultantId(Request $request)
+    {
+        // Validate the incoming request data
+        $validatedData = $request->validate([
+            'user_id' => 'required|integer|exists:users,id', // Assumes there's a users table
+        ]);
+
+        // Retrieve the user_id from the validated data
+        $userId = $validatedData['user_id'];
+
+        // Fetch all leads associated with the given user_id
+        $leads = Lead::where('user_id', $userId)->get();
+
+        // Check if any leads were found
+        if ($leads->isEmpty()) {
+            return response()->json([
+                'message' => 'No leads found for the provided user_id.',
+                'data' => []
+            ], 404);
+        }
+
+        // Return the leads as a JSON response
+        return response()->json([
+            'message' => 'Leads retrieved successfully.',
+            'data' => $leads
+        ], 200);
+    }
 }
+    
+
+

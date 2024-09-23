@@ -29,5 +29,5 @@ Route::get('/leads', [LeadController::class, 'index']);
 
 //Leads Statuses
 Route::get('/lead-statuses', [LeadStatusController::class, 'index']);
-
+Route::get('/searchLeadByConsultantId', [LeadController::class, 'searchLeadByConsultantId']);
 
