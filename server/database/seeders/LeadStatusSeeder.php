@@ -13,15 +13,19 @@ class LeadStatusSeeder extends Seeder
      * @return void
      */
     public function run()
-    {
-        $statuses = ['Hot', 'Cold', 'Warm', 'Lost', 'Won'];
+{
+    // Truncate the table
+    DB::table('lead_statuses')->truncate();
 
-        foreach ($statuses as $status) {
-            DB::table('lead_statuses')->insert([
-                'title' => ucfirst($status),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+    $statuses = ['Hot', 'Cold', 'Warm', 'Lost', 'Won'];
+
+    foreach ($statuses as $status) {
+        DB::table('lead_statuses')->insert([
+            'title' => ucfirst($status),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
+}
+
 }
