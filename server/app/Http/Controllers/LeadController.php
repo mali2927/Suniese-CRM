@@ -243,6 +243,7 @@ class LeadController extends Controller
 
         // Update the total_payment field
         $lead->total_payment = $validatedData['total_payment'];
+        $lead->status = 5; // Set the status to 5
         $lead->save();
 
         return response()->json([
