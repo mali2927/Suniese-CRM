@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LeadStatusController;
+use App\Http\Controllers\LeadReportController;
 
 
 Route::get('/user', function (Request $request) {
@@ -35,3 +36,6 @@ Route::put('/leads/{id}/payment', [LeadController::class, 'updatePayment']);
 Route::get('/lead-statuses', [LeadStatusController::class, 'index']);
 Route::get('/searchLeadByConsultantId', [LeadController::class, 'searchLeadByConsultantId']);
 
+// Lead Pdf
+
+Route::get('/leads/{id}/report', [LeadReportController::class, 'generateReport']);

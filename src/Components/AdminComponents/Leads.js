@@ -68,7 +68,9 @@ const Leads = () => {
     // Fetch Consultants
     const fetchConsultants = async () => {
       try {
-        const response = await fetch(`${config.baseURL}/showUsersForReportInLeads`);
+        const response = await fetch(
+          `${config.baseURL}/showUsersForReportInLeads`
+        );
         const result = await response.json();
         console.log("Consultants API Response:", result); // Debugging Log
 
@@ -191,7 +193,8 @@ const Leads = () => {
               <Form.Label>Select Consultant</Form.Label>
               {loadingConsultants ? (
                 <div>
-                  <Spinner animation="border" size="sm" /> Loading consultants...
+                  <Spinner animation="border" size="sm" /> Loading
+                  consultants...
                 </div>
               ) : errorConsultants ? (
                 <Alert variant="danger">{errorConsultants}</Alert>
@@ -266,12 +269,15 @@ const Leads = () => {
                             <td>{lead.email}</td>
                             <td>{lead.phone_number}</td>
                             <td>
-                              {lead.house_number} {lead.street_name}, {lead.town_city}, {lead.postal_code}
+                              {lead.house_number} {lead.street_name},{" "}
+                              {lead.town_city}, {lead.postal_code}
                             </td>
                             <td>{lead.system_quoted}</td>
                             <td>{lead.quoted_price}</td>
-                            <td>{new Date(lead.meeting_time).toLocaleString()}</td>
-                            <td>{lead.status || "Pending"}</td>
+                            <td>
+                              {new Date(lead.meeting_time).toLocaleString()}
+                            </td>
+                            <td>{lead.status.title || "Pending"}</td>
                           </tr>
                         ))}
                       </tbody>

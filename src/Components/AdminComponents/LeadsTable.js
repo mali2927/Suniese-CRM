@@ -13,6 +13,7 @@ import {
 
 import ConvertLeadToSaleModal from "./Modals/ConvertLeadToSaleModal";
 import EditLeadModal from "./Modals/EditLeadModal";
+import ViewLeadModal from "./Modals/ViewLeadModal"; // Import the new modal
 
 const LeadsTable = ({
   type,
@@ -21,6 +22,8 @@ const LeadsTable = ({
   onViewReport,
   salesConsultants,
 }) => {
+  const [showViewModal, setShowViewModal] = useState(false); // State to control the view modal
+  const [selectedLead, setSelectedLead] = useState(null); // State to hold the selected lead data
   const [leads, setLeads] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedLeadId, setSelectedLeadId] = useState(null);
@@ -37,7 +40,10 @@ const LeadsTable = ({
   });
   const [statuses, setStatuses] = useState([]); // State for statuses
   const [loadingStatuses, setLoadingStatuses] = useState(true); // Loading state
-
+  const handleViewLead = (lead) => {
+    setSelectedLead(lead);
+    setShowViewModal(true);
+  };
   const fetchLeads = async () => {
     try {
       const response = await fetch(`${config.baseURL}/leads`);
@@ -231,6 +237,14 @@ const LeadsTable = ({
                       </Button>
                     </Col>
                     <Col>
+                      <Button
+                        variant="outline-success"
+                        onClick={() => handleViewLead(lead)} // Handle view lead
+                      >
+                        View
+                      </Button>
+                    </Col>
+                    <Col>
                       <DropdownButton
                         id={`dropdown-action-${lead.id}`}
                         title="Change Status"
@@ -280,6 +294,11 @@ const LeadsTable = ({
         editingLead={editingLead}
         setEditingLead={setEditingLead}
         handleSave={handleEditSave}
+      />
+      <ViewLeadModal
+        show={showViewModal}
+        handleClose={() => setShowViewModal(false)}
+        lead={selectedLead} // Pass the selected lead to the modal
       />
     </>
   );
