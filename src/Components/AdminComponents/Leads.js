@@ -4,20 +4,45 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar";
 import Sidebar from "../SideBar";
 import { styles } from "../../Styles/dashboardStyles";
-import { ListGroup, Button, Form, Spinner, Alert, Table } from "react-bootstrap";
+import {
+  ListGroup,
+  Button,
+  Form,
+  Spinner,
+  Alert,
+  Table,
+  Modal,
+  Row,
+  Col,
+} from "react-bootstrap";
 import LeadsTable from "../AdminComponents/LeadsTable";
 import LeadActions from "../AdminComponents/LeadAction";
-import AddLeadModal from "../AdminComponents/AddLeadModel";
 import ReportModal from "../AdminComponents/ReportModal";
 import config from "../../config";
 
 const Leads = () => {
+  // State for leads and consultants
   const [leads, setLeads] = useState([]);
   const [consultants, setConsultants] = useState([]);
   const [loadingConsultants, setLoadingConsultants] = useState(true);
   const [errorConsultants, setErrorConsultants] = useState(null);
+
+  // State for selected consultant's leads
+  const [selectedLeads, setSelectedLeads] = useState([]);
+  const [loadingSelectedLeads, setLoadingSelectedLeads] = useState(false);
+  const [errorSelectedLeads, setErrorSelectedLeads] = useState(null);
+
+  // State for modals
   const [showModal, setShowModal] = useState(false);
   const [showReport, setShowReport] = useState(false);
+
+  // State for active section
+  const [activeSection, setActiveSection] = useState(null);
+
+  // State for selected consultant
+  const [selectedConsultantId, setSelectedConsultantId] = useState("");
+
+  // State for new lead form
   const [newLead, setNewLead] = useState({
     title: "",
     firstName: "",
@@ -37,14 +62,10 @@ const Leads = () => {
     status: "",
   });
 
-  const [activeSection, setActiveSection] = useState(null);
-  const [selectedConsultantId, setSelectedConsultantId] = useState("");
+  // State for validation errors
+  const [errors, setErrors] = useState({});
 
-  // New State Variables for Selected Consultant's Leads
-  const [selectedLeads, setSelectedLeads] = useState([]);
-  const [loadingSelectedLeads, setLoadingSelectedLeads] = useState(false);
-  const [errorSelectedLeads, setErrorSelectedLeads] = useState(null);
-
+  // Fetch leads and consultants on component mount
   useEffect(() => {
     // Fetch All Leads
     const fetchLeads = async () => {
@@ -126,6 +147,7 @@ const Leads = () => {
     }
   }, [selectedConsultantId]);
 
+  // Handle status change for leads
   const handleStatusChange = (id, newStatus) => {
     setLeads(
       leads.map((lead) =>
@@ -134,6 +156,7 @@ const Leads = () => {
     );
   };
 
+  // Handle converting a lead to a sale
   const convertToSale = (id, paymentAmount) => {
     if (
       window.confirm("Are you sure you want to convert this lead to a sale?")
@@ -143,6 +166,7 @@ const Leads = () => {
     }
   };
 
+  // Function to add a new lead
   const addLead = async () => {
     console.log("Adding New Lead:", newLead); // Debugging Log
     try {
@@ -164,6 +188,26 @@ const Leads = () => {
         alert("Lead added successfully");
         setLeads([...leads, result.data]); // Update leads with the new lead
         setShowModal(false); // Close the modal
+        // Reset the newLead state
+        setNewLead({
+          title: "",
+          firstName: "",
+          surname: "",
+          email: "",
+          phoneNumber: "",
+          houseNumber: "",
+          streetName: "",
+          townCity: "",
+          postalCode: "",
+          homeownershipStatus: "Owner",
+          systemQuoted: "10 panels with battery",
+          quotedPrice: "",
+          meetingTime: "",
+          bestTimeToCall: "",
+          consultantId: "",
+          status: "",
+        });
+        setErrors({}); // Reset errors
       } else {
         alert("Failed to add lead");
       }
@@ -173,6 +217,7 @@ const Leads = () => {
     }
   };
 
+  // Handle consultant selection change
   const handleConsultantChange = (e) => {
     setSelectedConsultantId(e.target.value);
   };
@@ -189,6 +234,7 @@ const Leads = () => {
     return statusMap[statusId] || "Pending";
   };
 
+  // Function to render section content based on active section
   const renderSectionContent = (section) => {
     console.log("Selected Leads at render:", selectedLeads); // Debugging Log
     switch (section) {
@@ -205,8 +251,7 @@ const Leads = () => {
               <Form.Label>Select Consultant</Form.Label>
               {loadingConsultants ? (
                 <div>
-                  <Spinner animation="border" size="sm" /> Loading
-                  consultants...
+                  <Spinner animation="border" size="sm" /> Loading consultants...
                 </div>
               ) : errorConsultants ? (
                 <Alert variant="danger">{errorConsultants}</Alert>
@@ -355,6 +400,126 @@ const Leads = () => {
     }
   };
 
+  // Validation Function
+  const validate = () => {
+    const newErrors = {};
+
+    // Title Validation
+    if (!newLead.title.trim()) {
+      newErrors.title = "Title is required.";
+    }
+
+    // First Name Validation
+    if (!newLead.firstName.trim()) {
+      newErrors.firstName = "First name is required.";
+    }
+
+    // Surname Validation
+    if (!newLead.surname.trim()) {
+      newErrors.surname = "Surname is required.";
+    }
+
+    // Email Validation
+    if (!newLead.email.trim()) {
+      newErrors.email = "Email is required.";
+    } else if (!/\S+@\S+\.\S+/.test(newLead.email)) {
+      newErrors.email = "Email is invalid.";
+    }
+
+    // Phone Number Validation
+    if (!newLead.phoneNumber.trim()) {
+      newErrors.phoneNumber = "Phone number is required.";
+    } else if (!/^\+?[0-9]{7,15}$/.test(newLead.phoneNumber)) {
+      newErrors.phoneNumber = "Phone number is invalid.";
+    }
+
+    // House Number Validation
+    if (!newLead.houseNumber.trim()) {
+      newErrors.houseNumber = "House number is required.";
+    }
+
+    // Street Name Validation
+    if (!newLead.streetName.trim()) {
+      newErrors.streetName = "Street name is required.";
+    }
+
+    // Town/City Validation
+    if (!newLead.townCity.trim()) {
+      newErrors.townCity = "Town/City is required.";
+    }
+
+    // Postal Code Validation
+    if (!newLead.postalCode.trim()) {
+      newErrors.postalCode = "Postal code is required.";
+    } else if (!/^[A-Za-z0-9\s\-]{3,10}$/.test(newLead.postalCode)) {
+      newErrors.postalCode = "Postal code is invalid.";
+    }
+
+    // Homeownership Status Validation
+    if (!["Owner", "Tenant"].includes(newLead.homeownershipStatus)) {
+      newErrors.homeownershipStatus = "Invalid homeownership status.";
+    }
+
+    // System Quoted Validation
+    if (!newLead.systemQuoted.trim()) {
+      newErrors.systemQuoted = "System quoted is required.";
+    }
+
+    // Quoted Price Validation
+    if (!newLead.quotedPrice) {
+      newErrors.quotedPrice = "Quoted price is required.";
+    } else if (isNaN(newLead.quotedPrice) || Number(newLead.quotedPrice) <= 0) {
+      newErrors.quotedPrice = "Quoted price must be a positive number.";
+    }
+
+    // Meeting Time Validation
+    if (!newLead.meetingTime) {
+      newErrors.meetingTime = "Meeting time is required.";
+    }
+
+    // Best Time To Call Validation (Optional)
+    if (
+      newLead.bestTimeToCall &&
+      isNaN(Date.parse(newLead.bestTimeToCall))
+    ) {
+      newErrors.bestTimeToCall = "Best time to call is invalid.";
+    }
+
+    // Consultant ID Validation
+    if (!newLead.consultantId) {
+      newErrors.consultantId = "Consultant must be selected.";
+    }
+
+    // Status Validation
+    if (!newLead.status) {
+      newErrors.status = "Status is required.";
+    }
+
+    return newErrors;
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validationErrors = validate();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+    } else {
+      setErrors({});
+      addLead();
+    }
+  };
+
+  // Handle input change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewLead((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   return (
     <div style={styles.container}>
       <Sidebar />
@@ -362,22 +527,366 @@ const Leads = () => {
         <Navbar />
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2>Leads</h2>
-          <Button
-            variant="primary"
-            onClick={() => setShowModal(true)}
-          >
+          <Button variant="primary" onClick={() => setShowModal(true)}>
             Add New Lead
           </Button>
         </div>
         <LeadActions setActiveSection={setActiveSection} />
         <div className="section-content">{renderSectionContent(activeSection)}</div>
-        <AddLeadModal
-          showModal={showModal}
-          setShowModal={setShowModal}
-          newLead={newLead}
-          setNewLead={setNewLead}
-          addLead={addLead}
-        />
+
+        {/* Add Lead Modal */}
+        <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+          <Modal.Header closeButton>
+            <Modal.Title>Add New Lead</Modal.Title>
+          </Modal.Header>
+          <Form onSubmit={handleSubmit}>
+            <Modal.Body>
+              {/* Display General Errors */}
+              {Object.keys(errors).length > 0 && (
+                <Alert variant="danger">
+                  Please fix the following errors before submitting:
+                  <ul>
+                    {Object.values(errors).map((error, idx) => (
+                      <li key={idx}>{error}</li>
+                    ))}
+                  </ul>
+                </Alert>
+              )}
+
+              {/* Use Row and Col for two-column layout */}
+              <Row>
+                {/* Title */}
+                <Col md={6}>
+                  <Form.Group controlId="formTitle" className="mb-3">
+                    <Form.Label>Title</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="title"
+                      value={newLead.title}
+                      onChange={handleChange}
+                      isInvalid={!!errors.title}
+                      placeholder="Enter title"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.title}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+
+                {/* First Name */}
+                <Col md={6}>
+                  <Form.Group controlId="formFirstName" className="mb-3">
+                    <Form.Label>First Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="firstName"
+                      value={newLead.firstName}
+                      onChange={handleChange}
+                      isInvalid={!!errors.firstName}
+                      placeholder="Enter first name"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.firstName}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                {/* Surname */}
+                <Col md={6}>
+                  <Form.Group controlId="formSurname" className="mb-3">
+                    <Form.Label>Surname</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="surname"
+                      value={newLead.surname}
+                      onChange={handleChange}
+                      isInvalid={!!errors.surname}
+                      placeholder="Enter surname"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.surname}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+
+                {/* Email */}
+                <Col md={6}>
+                  <Form.Group controlId="formEmail" className="mb-3">
+                    <Form.Label>Email</Form.Label>
+                    <Form.Control
+                      type="email"
+                      name="email"
+                      value={newLead.email}
+                      onChange={handleChange}
+                      isInvalid={!!errors.email}
+                      placeholder="Enter email"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.email}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                {/* Phone Number */}
+                <Col md={6}>
+                  <Form.Group controlId="formPhoneNumber" className="mb-3">
+                    <Form.Label>Phone Number</Form.Label>
+                    <Form.Control
+                      type="tel"
+                      name="phoneNumber"
+                      value={newLead.phoneNumber}
+                      onChange={handleChange}
+                      isInvalid={!!errors.phoneNumber}
+                      placeholder="Enter phone number"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.phoneNumber}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+
+                {/* House Number */}
+                <Col md={6}>
+                  <Form.Group controlId="formHouseNumber" className="mb-3">
+                    <Form.Label>House Number</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="houseNumber"
+                      value={newLead.houseNumber}
+                      onChange={handleChange}
+                      isInvalid={!!errors.houseNumber}
+                      placeholder="Enter house number"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.houseNumber}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                {/* Street Name */}
+                <Col md={6}>
+                  <Form.Group controlId="formStreetName" className="mb-3">
+                    <Form.Label>Street Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="streetName"
+                      value={newLead.streetName}
+                      onChange={handleChange}
+                      isInvalid={!!errors.streetName}
+                      placeholder="Enter street name"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.streetName}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+
+                {/* Town/City */}
+                <Col md={6}>
+                  <Form.Group controlId="formTownCity" className="mb-3">
+                    <Form.Label>Town/City</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="townCity"
+                      value={newLead.townCity}
+                      onChange={handleChange}
+                      isInvalid={!!errors.townCity}
+                      placeholder="Enter town or city"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.townCity}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                {/* Postal Code */}
+                <Col md={6}>
+                  <Form.Group controlId="formPostalCode" className="mb-3">
+                    <Form.Label>Postal Code</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="postalCode"
+                      value={newLead.postalCode}
+                      onChange={handleChange}
+                      isInvalid={!!errors.postalCode}
+                      placeholder="Enter postal code"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.postalCode}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+
+                {/* Homeownership Status */}
+                <Col md={6}>
+                  <Form.Group
+                    controlId="formHomeownershipStatus"
+                    className="mb-3"
+                  >
+                    <Form.Label>Homeownership Status</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="homeownershipStatus"
+                      value={newLead.homeownershipStatus}
+                      onChange={handleChange}
+                      isInvalid={!!errors.homeownershipStatus}
+                    >
+                      <option value="Owner">Owner</option>
+                      <option value="Tenant">Tenant</option>
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.homeownershipStatus}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                {/* System Quoted */}
+                <Col md={6}>
+                  <Form.Group controlId="formSystemQuoted" className="mb-3">
+                    <Form.Label>System Quoted</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="systemQuoted"
+                      value={newLead.systemQuoted}
+                      onChange={handleChange}
+                      isInvalid={!!errors.systemQuoted}
+                      placeholder="Enter system quoted"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.systemQuoted}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+
+                {/* Quoted Price */}
+                <Col md={6}>
+                  <Form.Group controlId="formQuotedPrice" className="mb-3">
+                    <Form.Label>Quoted Price (£)</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="quotedPrice"
+                      value={newLead.quotedPrice}
+                      onChange={handleChange}
+                      isInvalid={!!errors.quotedPrice}
+                      placeholder="Enter quoted price"
+                      min="0"
+                      step="0.01"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.quotedPrice}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                {/* Meeting Time */}
+                <Col md={6}>
+                  <Form.Group controlId="formMeetingTime" className="mb-3">
+                    <Form.Label>Meeting Time</Form.Label>
+                    <Form.Control
+                      type="datetime-local"
+                      name="meetingTime"
+                      value={newLead.meetingTime}
+                      onChange={handleChange}
+                      isInvalid={!!errors.meetingTime}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.meetingTime}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+
+                {/* Best Time To Call */}
+                <Col md={6}>
+                  <Form.Group controlId="formBestTimeToCall" className="mb-3">
+                    <Form.Label>Best Time To Call</Form.Label>
+                    <Form.Control
+                      type="datetime-local"
+                      name="bestTimeToCall"
+                      value={newLead.bestTimeToCall}
+                      onChange={handleChange}
+                      isInvalid={!!errors.bestTimeToCall}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.bestTimeToCall}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                {/* Consultant Selection */}
+                <Col md={6}>
+                  <Form.Group controlId="formConsultant" className="mb-3">
+                    <Form.Label>Consultant</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="consultantId"
+                      value={newLead.consultantId}
+                      onChange={handleChange}
+                      isInvalid={!!errors.consultantId}
+                    >
+                      <option value="">-- Select Consultant --</option>
+                      {consultants.map((consultant) => (
+                        <option key={consultant.id} value={consultant.id}>
+                          {consultant.name} - {consultant.role}
+                        </option>
+                      ))}
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.consultantId}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+
+                {/* Status Selection */}
+                <Col md={6}>
+                  <Form.Group controlId="formStatus" className="mb-3">
+                    <Form.Label>Status</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="status"
+                      value={newLead.status}
+                      onChange={handleChange}
+                      isInvalid={!!errors.status}
+                    >
+                      <option value="">-- Select Status --</option>
+                      <option value="1">Hot</option>
+                      <option value="2">Cold</option>
+                      <option value="3">Warm</option>
+                      <option value="4">Lost</option>
+                      <option value="5">Won</option>
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.status}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowModal(false)}>
+                Cancel
+              </Button>
+              <Button variant="primary" type="submit">
+                Add Lead
+              </Button>
+            </Modal.Footer>
+          </Form>
+        </Modal>
+
+        {/* Report Modal */}
         <ReportModal
           show={showReport}
           onHide={() => setShowReport(false)}
