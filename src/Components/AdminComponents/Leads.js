@@ -275,6 +275,8 @@ const Leads = () => {
                             <th style={{ width: "20%" }}>Address</th>
                             <th style={{ width: "10%" }}>System Quoted</th>
                             <th style={{ width: "8%" }}>Quoted Price</th>
+                            {/* New Total Payment Column */}
+                            <th style={{ width: "10%" }}>Total Payment</th>
                             <th style={{ width: "10%" }}>Meeting Time</th>
                             <th style={{ width: "10%" }}>Homeowner Status</th>
                             <th style={{ width: "10%" }}>Status</th>
@@ -304,6 +306,16 @@ const Leads = () => {
                               <td>{lead.system_quoted}</td>
                               <td>
                                 £{parseFloat(lead.quoted_price).toLocaleString(
+                                  undefined,
+                                  {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }
+                                )}
+                              </td>
+                              {/* New Total Payment Cell */}
+                              <td>
+                                £{parseFloat(lead.total_payment).toLocaleString(
                                   undefined,
                                   {
                                     minimumFractionDigits: 2,
