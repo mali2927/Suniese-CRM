@@ -2,12 +2,19 @@
 
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col, Spinner, Alert } from "react-bootstrap";
-import { Pie } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Pie, Bar } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
 import config from "../../../config";
 
-// Register chart elements
-ChartJS.register(ArcElement, Tooltip, Legend);
+// Register chart elements and scales
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement
+);
 
 const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) => {
   // Replace comparisonMode with mode
@@ -27,6 +34,7 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
   const [leadsAll, setLeadsAll] = useState({});
   const [loadingAll, setLoadingAll] = useState(false);
   const [errorAll, setErrorAll] = useState(null);
+  const [allChartType, setAllChartType] = useState("Bar"); // Options: "Bar", "Pie"
 
   // Function to map status IDs to labels
   const getStatusLabel = (statusId) => {
@@ -77,6 +85,7 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
     setError1(null);
     setError2(null);
     setErrorAll(null);
+    setAllChartType("Bar"); // Reset chart type to Bar when mode changes
   };
 
   // Effect to fetch leads1 when selectedConsultant1 changes
@@ -193,6 +202,30 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
     };
   };
 
+  // Prepare data for the Bar chart in "All Consultants" mode
+  const prepareBarChartData = () => {
+    const labels = consultants.map((consultant) => consultant.name);
+    const statuses = ["Hot", "Cold", "Warm", "Lost", "Won", "Pending"];
+
+    const datasets = statuses.map((status) => {
+      return {
+        label: status,
+        data: consultants.map((consultant) => {
+          const leads = leadsAll[consultant.id] || [];
+          return leads.filter((lead) => getStatusLabel(lead.status) === status).length;
+        }),
+        backgroundColor: colorMap[status]?.background || 'rgba(0,0,0,0.1)',
+        borderColor: colorMap[status]?.border || 'rgba(0,0,0,1)',
+        borderWidth: 1,
+      };
+    });
+
+    return {
+      labels,
+      datasets,
+    };
+  };
+
   // Define chart options to control size and responsiveness
   const options = {
     responsive: true,
@@ -201,7 +234,22 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
       legend: {
         position: 'bottom',
       },
+      title: {
+        display: false,
+        text: 'Leads Status',
+      },
     },
+    // Add default scales configuration if needed
+  };
+
+  // Prepare data for the Bar chart and Pie charts
+  const barChartData = prepareBarChartData();
+
+  // Function to prepare Pie chart data for a single consultant
+  const preparePieChartData = (consultantId) => {
+    const leads = leadsAll[consultantId] || [];
+    const statusCounts = computeStatusCounts(leads);
+    return prepareChartData(statusCounts);
   };
 
   return (
@@ -323,6 +371,19 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
         ) : mode === "all" ? (
           /* All Consultants Mode */
           <div>
+            {/* Dropdown to select chart type */}
+            <Form.Group controlId="allChartTypeSelect" className="mb-3">
+              <Form.Label>Select Chart Type</Form.Label>
+              <Form.Control
+                as="select"
+                value={allChartType}
+                onChange={(e) => setAllChartType(e.target.value)}
+              >
+                <option value="Bar">Bar Chart</option>
+                <option value="Pie">Pie Chart</option>
+              </Form.Control>
+            </Form.Group>
+
             {loadingAll ? (
               <div className="text-center">
                 <Spinner animation="border" /> Loading leads for all consultants...
@@ -330,23 +391,65 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
             ) : errorAll ? (
               <Alert variant="danger">{errorAll}</Alert>
             ) : (
-              consultants.map((consultant) => {
-                const leads = leadsAll[consultant.id] || [];
-                const statusCounts = computeStatusCounts(leads);
-                const chartData = prepareChartData(statusCounts);
-                return (
-                  <div key={consultant.id} style={{ marginBottom: "30px" }}>
-                    <h5>{consultant.name}'s Leads</h5>
-                    {leads.length > 0 ? (
-                      <div style={{ position: 'relative', height: '300px', width: '100%' }}>
-                        <Pie data={chartData} options={options} />
-                      </div>
-                    ) : (
-                      <p>No leads available for this consultant.</p>
-                    )}
-                  </div>
-                );
-              })
+              leadsAll && consultants.length > 0 ? (
+                <>
+                  {allChartType === "Bar" ? (
+                    /* Render Bar Chart */
+                    <div style={{ position: 'relative', height: '500px', width: '100%' }}>
+                      <Bar
+                        data={barChartData}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false, // Allows custom height and width
+                          plugins: {
+                            legend: {
+                              position: 'top',
+                            },
+                            title: {
+                              display: true,
+                              text: 'Leads Status Across All Consultants',
+                            },
+                          },
+                          scales: {
+                            x: {
+                              stacked: true,
+                            },
+                            y: {
+                              stacked: true,
+                              beginAtZero: true,
+                              title: {
+                                display: true,
+                                text: 'Number of Leads',
+                              },
+                            },
+                          },
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    /* Render Pie Charts for Each Consultant */
+                    <Row>
+                      {consultants.map((consultant) => {
+                        const pieChartData = preparePieChartData(consultant.id);
+                        return (
+                          <Col md={6} key={consultant.id} className="mb-4">
+                            <h5>{consultant.name}'s Leads</h5>
+                            {leadsAll[consultant.id] && leadsAll[consultant.id].length > 0 ? (
+                              <div style={{ position: 'relative', height: '300px', width: '100%' }}>
+                                <Pie data={pieChartData} options={options} />
+                              </div>
+                            ) : (
+                              <p>No leads available for this consultant.</p>
+                            )}
+                          </Col>
+                        );
+                      })}
+                    </Row>
+                  )}
+                </>
+              ) : (
+                <p>No leads available for any consultants.</p>
+              )
             )}
           </div>
         ) : (
