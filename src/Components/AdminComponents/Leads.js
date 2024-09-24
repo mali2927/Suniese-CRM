@@ -128,7 +128,10 @@ const Leads = () => {
             `${config.baseURL}/searchLeadByConsultantId?user_id=${selectedConsultantId}`
           );
           const result = await response.json();
-          console.log("Selected Consultant Leads API Response:", result); // Debugging Log
+          console.log(
+            "Selected Consultant Leads API Response:",
+            result
+          ); // Debugging Log
 
           if (result.data && result.data.length > 0) {
             setSelectedLeads(result.data);
@@ -910,6 +913,7 @@ const Leads = () => {
         <ReportModal
           show={showReport}
           onHide={() => setShowReport(false)}
+          consultants={consultants} // Pass consultants list
           leadData={selectedLeads}
           consultantName={selectedConsultantName}
         />
