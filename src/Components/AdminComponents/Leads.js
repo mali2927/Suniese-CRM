@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar";
 import Sidebar from "../SideBar";
 import { styles } from "../../Styles/dashboardStyles";
-import { ListGroup, Button, Form, Spinner, Alert } from "react-bootstrap";
+import { ListGroup, Button, Form, Spinner, Alert, Table } from "react-bootstrap";
 import LeadsTable from "../AdminComponents/LeadsTable";
 import LeadActions from "../AdminComponents/LeadAction";
 import AddLeadModal from "../AdminComponents/AddLeadModel";
@@ -177,6 +177,18 @@ const Leads = () => {
     setSelectedConsultantId(e.target.value);
   };
 
+  // Mapping status IDs to status labels
+  const getStatusLabel = (statusId) => {
+    const statusMap = {
+      1: "Hot",
+      2: "Cold",
+      3: "Warm",
+      4: "Lost",
+      5: "Won",
+    };
+    return statusMap[statusId] || "Pending";
+  };
+
   const renderSectionContent = (section) => {
     console.log("Selected Leads at render:", selectedLeads); // Debugging Log
     switch (section) {
@@ -243,45 +255,72 @@ const Leads = () => {
                       }
                       )
                     </h4>
-
-                    {/* Leads Table */}
-                    <table className="table">
-                      <thead>
-                        <tr>
-                          <th>Title</th>
-                          <th>First Name</th>
-                          <th>Surname</th>
-                          <th>Email</th>
-                          <th>Phone Number</th>
-                          <th>Address</th>
-                          <th>System Quoted</th>
-                          <th>Quoted Price</th>
-                          <th>Meeting Time</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedLeads.map((lead) => (
-                          <tr key={lead.id}>
-                            <td>{lead.title}</td>
-                            <td>{lead.first_name}</td>
-                            <td>{lead.surname}</td>
-                            <td>{lead.email}</td>
-                            <td>{lead.phone_number}</td>
-                            <td>
-                              {lead.house_number} {lead.street_name},{" "}
-                              {lead.town_city}, {lead.postal_code}
-                            </td>
-                            <td>{lead.system_quoted}</td>
-                            <td>{lead.quoted_price}</td>
-                            <td>
-                              {new Date(lead.meeting_time).toLocaleString()}
-                            </td>
-                            <td>{lead.status.title || "Pending"}</td>
+                    {/* Responsive Table */}
+                    <div className="table-responsive">
+                      <Table
+                        striped
+                        bordered
+                        hover
+                        size="sm"
+                        className="mt-3"
+                      >
+                        <thead className="thead-dark">
+                          <tr>
+                            <th style={{ width: "5%" }}>#</th>
+                            <th style={{ width: "8%" }}>Title</th>
+                            <th style={{ width: "12%" }}>First Name</th>
+                            <th style={{ width: "12%" }}>Surname</th>
+                            <th style={{ width: "15%" }}>Email</th>
+                            <th style={{ width: "10%" }}>Phone Number</th>
+                            <th style={{ width: "20%" }}>Address</th>
+                            <th style={{ width: "10%" }}>System Quoted</th>
+                            <th style={{ width: "8%" }}>Quoted Price</th>
+                            <th style={{ width: "10%" }}>Meeting Time</th>
+                            <th style={{ width: "10%" }}>Homeowner Status</th>
+                            <th style={{ width: "10%" }}>Status</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          {selectedLeads.map((lead, index) => (
+                            <tr key={lead.id}>
+                              <td>{index + 1}</td>
+                              <td>{lead.title}</td>
+                              <td>{lead.first_name}</td>
+                              <td>{lead.surname}</td>
+                              <td>
+                                <a href={`mailto:${lead.email}`}>
+                                  {lead.email}
+                                </a>
+                              </td>
+                              <td>
+                                <a href={`tel:${lead.phone_number}`}>
+                                  {lead.phone_number}
+                                </a>
+                              </td>
+                              <td>
+                                {lead.house_number} {lead.street_name},{" "}
+                                {lead.town_city}, {lead.postal_code}
+                              </td>
+                              <td>{lead.system_quoted}</td>
+                              <td>
+                                £{parseFloat(lead.quoted_price).toLocaleString(
+                                  undefined,
+                                  {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                  }
+                                )}
+                              </td>
+                              <td>
+                                {new Date(lead.meeting_time).toLocaleString()}
+                              </td>
+                              <td>{lead.homeownership_status}</td>
+                              <td>{getStatusLabel(lead.status)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                    </div>
                   </div>
                 ) : (
                   <p>No leads available for this consultant.</p>
@@ -309,18 +348,17 @@ const Leads = () => {
       <Sidebar />
       <main style={styles.mainContent}>
         <Navbar />
-        <h2 className="mb-4">Leads</h2>
-        <Button
-          variant="primary"
-          className="mb-3"
-          onClick={() => setShowModal(true)}
-        >
-          Add New Lead
-        </Button>
-        <LeadActions setActiveSection={setActiveSection} />
-        <div className="section-content">
-          {renderSectionContent(activeSection)}
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2>Leads</h2>
+          <Button
+            variant="primary"
+            onClick={() => setShowModal(true)}
+          >
+            Add New Lead
+          </Button>
         </div>
+        <LeadActions setActiveSection={setActiveSection} />
+        <div className="section-content">{renderSectionContent(activeSection)}</div>
         <AddLeadModal
           showModal={showModal}
           setShowModal={setShowModal}
