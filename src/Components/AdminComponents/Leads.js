@@ -17,7 +17,7 @@ import {
 } from "react-bootstrap";
 import LeadsTable from "../AdminComponents/LeadsTable";
 import LeadActions from "../AdminComponents/LeadAction";
-import ReportModal from "../AdminComponents/ReportModal";
+import ReportModal from "../AdminComponents/Modals/ReportModal"; // Ensure this is updated
 import config from "../../config";
 
 const Leads = () => {
@@ -41,6 +41,9 @@ const Leads = () => {
 
   // State for selected consultant
   const [selectedConsultantId, setSelectedConsultantId] = useState("");
+
+  // State for selected consultant's name (for display in ReportModal)
+  const [selectedConsultantName, setSelectedConsultantName] = useState("");
 
   // State for new lead form
   const [newLead, setNewLead] = useState({
@@ -129,8 +132,17 @@ const Leads = () => {
 
           if (result.data && result.data.length > 0) {
             setSelectedLeads(result.data);
+            // Set the consultant's name for the report
+            const consultant = consultants.find(
+              (c) => c.id === Number(selectedConsultantId)
+            );
+            setSelectedConsultantName(
+              consultant ? consultant.name : "Unknown Consultant"
+            );
             console.log("Selected Leads:", result.data); // Debugging Log
           } else {
+            setSelectedLeads([]); // Reset if no leads found
+            setSelectedConsultantName("");
             setErrorSelectedLeads("No leads found for this consultant.");
           }
         } catch (error) {
@@ -144,8 +156,9 @@ const Leads = () => {
       fetchSelectedLeads();
     } else {
       setSelectedLeads([]); // Reset if no consultant is selected
+      setSelectedConsultantName("");
     }
-  }, [selectedConsultantId]);
+  }, [selectedConsultantId, consultants]);
 
   // Handle status change for leads
   const handleStatusChange = (id, newStatus) => {
@@ -275,6 +288,13 @@ const Leads = () => {
 
             {selectedConsultantId && (
               <div>
+                {/* Add the 'View Report' button */}
+                <div className="mb-3">
+                  <Button variant="info" onClick={() => setShowReport(true)}>
+                    View Report
+                  </Button>
+                </div>
+
                 {loadingSelectedLeads ? (
                   <div>
                     <Spinner animation="border" size="sm" /> Loading leads...
@@ -890,7 +910,8 @@ const Leads = () => {
         <ReportModal
           show={showReport}
           onHide={() => setShowReport(false)}
-          leadData={leads}
+          leadData={selectedLeads}
+          consultantName={selectedConsultantName}
         />
       </main>
     </div>
