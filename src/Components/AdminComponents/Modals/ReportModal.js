@@ -10,7 +10,10 @@ import config from "../../../config";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) => {
-  const [comparisonMode, setComparisonMode] = useState(false);
+  // Replace comparisonMode with mode
+  const [mode, setMode] = useState("single"); // Modes: "single", "comparison", "all"
+
+  // State for comparison mode
   const [selectedConsultant1, setSelectedConsultant1] = useState("");
   const [selectedConsultant2, setSelectedConsultant2] = useState("");
   const [leads1, setLeads1] = useState([]);
@@ -19,6 +22,11 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
   const [loading2, setLoading2] = useState(false);
   const [error1, setError1] = useState(null);
   const [error2, setError2] = useState(null);
+
+  // State for "All Consultants" mode
+  const [leadsAll, setLeadsAll] = useState({});
+  const [loadingAll, setLoadingAll] = useState(false);
+  const [errorAll, setErrorAll] = useState(null);
 
   // Function to map status IDs to labels
   const getStatusLabel = (statusId) => {
@@ -55,45 +63,78 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
     }
   };
 
-  // Handle change for comparison mode
+  // Handle change for mode selection
   const handleModeChange = (e) => {
-    const mode = e.target.value;
-    if (mode === "single") {
-      setComparisonMode(false);
-      setSelectedConsultant1("");
-      setSelectedConsultant2("");
-      setLeads1([]);
-      setLeads2([]);
-      setError1(null);
-      setError2(null);
-    } else if (mode === "comparison") {
-      setComparisonMode(true);
-      setLeads1([]);
-      setLeads2([]);
-      setError1(null);
-      setError2(null);
-    }
+    const selectedMode = e.target.value;
+    setMode(selectedMode);
+    
+    // Reset other states
+    setSelectedConsultant1("");
+    setSelectedConsultant2("");
+    setLeads1([]);
+    setLeads2([]);
+    setLeadsAll({});
+    setError1(null);
+    setError2(null);
+    setErrorAll(null);
   };
 
   // Effect to fetch leads1 when selectedConsultant1 changes
   useEffect(() => {
-    if (comparisonMode && selectedConsultant1) {
+    if (mode === "comparison" && selectedConsultant1) {
       fetchLeadsForConsultant(selectedConsultant1, setLeads1, setLoading1, setError1);
     } else {
       setLeads1([]);
       setError1(null);
     }
-  }, [selectedConsultant1, comparisonMode]);
+  }, [selectedConsultant1, mode]);
 
   // Effect to fetch leads2 when selectedConsultant2 changes
   useEffect(() => {
-    if (comparisonMode && selectedConsultant2) {
+    if (mode === "comparison" && selectedConsultant2) {
       fetchLeadsForConsultant(selectedConsultant2, setLeads2, setLoading2, setError2);
     } else {
       setLeads2([]);
       setError2(null);
     }
-  }, [selectedConsultant2, comparisonMode]);
+  }, [selectedConsultant2, mode]);
+
+  // Effect to fetch leads for all consultants when mode is "all"
+  useEffect(() => {
+    if (mode === "all") {
+      fetchAllLeads();
+    } else {
+      setLeadsAll({});
+      setErrorAll(null);
+    }
+  }, [mode, consultants]);
+
+  const fetchAllLeads = async () => {
+    setLoadingAll(true);
+    setErrorAll(null);
+    try {
+      const fetchPromises = consultants.map((consultant) =>
+        fetch(`${config.baseURL}/searchLeadByConsultantId?user_id=${consultant.id}`)
+          .then((response) => response.json())
+          .then((result) => ({
+            consultantId: consultant.id,
+            data: result.data || [],
+          }))
+      );
+
+      const results = await Promise.all(fetchPromises);
+      const allLeads = {};
+      results.forEach(({ consultantId, data }) => {
+        allLeads[consultantId] = data;
+      });
+      setLeadsAll(allLeads);
+    } catch (error) {
+      console.error("Error fetching all leads:", error);
+      setErrorAll("An error occurred while fetching leads for all consultants.");
+    } finally {
+      setLoadingAll(false);
+    }
+  };
 
   // Compute status counts for a given leads array
   const computeStatusCounts = (leads) => {
@@ -167,20 +208,22 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
     <Modal show={show} onHide={onHide} size="lg" centered>
       <Modal.Header closeButton>
         <Modal.Title>
-          Lead Status Report {consultantName ? `- ${consultantName}` : ''}
+          Lead Status Report {mode === "single" && consultantName ? `- ${consultantName}` : ''}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {/* Mode Selection */}
         <Form.Group controlId="modeSelect" className="mb-3">
           <Form.Label>Select Report Mode</Form.Label>
-          <Form.Control as="select" value={comparisonMode ? "comparison" : "single"} onChange={handleModeChange}>
+          <Form.Control as="select" value={mode} onChange={handleModeChange}>
             <option value="single">Single Consultant Report</option>
             <option value="comparison">Compare Two Consultants</option>
+            <option value="all">All Consultants Report</option>
           </Form.Control>
         </Form.Group>
 
-        {comparisonMode ? (
+        {mode === "comparison" ? (
+          /* Comparison Mode */
           <div>
             {/* Selection of two consultants */}
             <Row>
@@ -223,51 +266,91 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
             {/* Display the charts if both consultants are selected */}
             {selectedConsultant1 && selectedConsultant2 && (
               <div>
-                {selectedConsultant1 === selectedConsultant2 && (
-                  <Alert variant="warning">Please select two different consultants for comparison.</Alert>
-                )}
-                {selectedConsultant1 !== selectedConsultant2 && (
-                  <div>
-                    <Row>
-                      <Col md={6}>
-                        <h5>
-                          {consultants.find(c => c.id === Number(selectedConsultant1))?.name || 'Consultant 1'}'s Leads
-                        </h5>
-                        {loading1 ? (
-                          <Spinner animation="border" size="sm" />
-                        ) : error1 ? (
-                          <Alert variant="danger">{error1}</Alert>
-                        ) : leads1.length > 0 ? (
-                          <div style={{ position: 'relative', height: '300px', width: '100%' }}>
-                            <Pie data={prepareChartData(computeStatusCounts(leads1))} options={options} />
-                          </div>
-                        ) : (
-                          <p>No leads available for this consultant.</p>
-                        )}
-                      </Col>
-                      <Col md={6}>
-                        <h5>
-                          {consultants.find(c => c.id === Number(selectedConsultant2))?.name || 'Consultant 2'}'s Leads
-                        </h5>
-                        {loading2 ? (
-                          <Spinner animation="border" size="sm" />
-                        ) : error2 ? (
-                          <Alert variant="danger">{error2}</Alert>
-                        ) : leads2.length > 0 ? (
-                          <div style={{ position: 'relative', height: '300px', width: '100%' }}>
-                            <Pie data={prepareChartData(computeStatusCounts(leads2))} options={options} />
-                          </div>
-                        ) : (
-                          <p>No leads available for this consultant.</p>
-                        )}
-                      </Col>
-                    </Row>
-                  </div>
+                {selectedConsultant1 === selectedConsultant2 ? (
+                  <Alert variant="warning">
+                    Please select two different consultants for comparison.
+                  </Alert>
+                ) : (
+                  <Row>
+                    {/* Consultant 1 Chart */}
+                    <Col md={6}>
+                      <h5>
+                        {
+                          consultants.find(
+                            (c) => c.id === Number(selectedConsultant1)
+                          )?.name || 'Consultant 1'
+                        }'s Leads
+                      </h5>
+                      {loading1 ? (
+                        <Spinner animation="border" size="sm" />
+                      ) : error1 ? (
+                        <Alert variant="danger">{error1}</Alert>
+                      ) : leads1.length > 0 ? (
+                        <div style={{ position: 'relative', height: '300px', width: '100%' }}>
+                          <Pie data={prepareChartData(computeStatusCounts(leads1))} options={options} />
+                        </div>
+                      ) : (
+                        <p>No leads available for this consultant.</p>
+                      )}
+                    </Col>
+
+                    {/* Consultant 2 Chart */}
+                    <Col md={6}>
+                      <h5>
+                        {
+                          consultants.find(
+                            (c) => c.id === Number(selectedConsultant2)
+                          )?.name || 'Consultant 2'
+                        }'s Leads
+                      </h5>
+                      {loading2 ? (
+                        <Spinner animation="border" size="sm" />
+                      ) : error2 ? (
+                        <Alert variant="danger">{error2}</Alert>
+                      ) : leads2.length > 0 ? (
+                        <div style={{ position: 'relative', height: '300px', width: '100%' }}>
+                          <Pie data={prepareChartData(computeStatusCounts(leads2))} options={options} />
+                        </div>
+                      ) : (
+                        <p>No leads available for this consultant.</p>
+                      )}
+                    </Col>
+                  </Row>
                 )}
               </div>
             )}
           </div>
+        ) : mode === "all" ? (
+          /* All Consultants Mode */
+          <div>
+            {loadingAll ? (
+              <div className="text-center">
+                <Spinner animation="border" /> Loading leads for all consultants...
+              </div>
+            ) : errorAll ? (
+              <Alert variant="danger">{errorAll}</Alert>
+            ) : (
+              consultants.map((consultant) => {
+                const leads = leadsAll[consultant.id] || [];
+                const statusCounts = computeStatusCounts(leads);
+                const chartData = prepareChartData(statusCounts);
+                return (
+                  <div key={consultant.id} style={{ marginBottom: "30px" }}>
+                    <h5>{consultant.name}'s Leads</h5>
+                    {leads.length > 0 ? (
+                      <div style={{ position: 'relative', height: '300px', width: '100%' }}>
+                        <Pie data={chartData} options={options} />
+                      </div>
+                    ) : (
+                      <p>No leads available for this consultant.</p>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
         ) : (
+          /* Single Consultant Mode */
           <div>
             {/* Single Consultant Report */}
             {leadData.length > 0 ? (
