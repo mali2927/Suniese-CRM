@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col, Spinner, Alert } from "react-bootstrap";
-import { Pie, Bar } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
+import { Pie, Bar, Doughnut, Radar, PolarArea } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, RadialLinearScale } from 'chart.js';
 import config from "../../../config";
 
 // Register chart elements and scales
@@ -13,7 +13,8 @@ ChartJS.register(
   Legend,
   CategoryScale,
   LinearScale,
-  BarElement
+  BarElement,
+  RadialLinearScale
 );
 
 const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) => {
@@ -34,7 +35,7 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
   const [leadsAll, setLeadsAll] = useState({});
   const [loadingAll, setLoadingAll] = useState(false);
   const [errorAll, setErrorAll] = useState(null);
-  const [allChartType, setAllChartType] = useState("Bar"); // Options: "Bar", "Pie"
+  const [allChartType, setAllChartType] = useState("Bar"); // Options: "Bar", "Pie", "Doughnut", "Radar", "PolarArea"
 
   // Function to map status IDs to labels
   const getStatusLabel = (statusId) => {
@@ -226,6 +227,93 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
     };
   };
 
+  // Prepare data for Doughnut chart
+  const prepareDoughnutChartData = () => {
+    const labels = ["Hot", "Cold", "Warm", "Lost", "Won", "Pending"];
+    const datasets = [
+      {
+        label: 'Leads Status',
+        data: labels.map(label => {
+          let total = 0;
+          consultants.forEach(consultant => {
+            const leads = leadsAll[consultant.id] || [];
+            total += leads.filter(lead => getStatusLabel(lead.status) === label).length;
+          });
+          return total;
+        }),
+        backgroundColor: labels.map(label => colorMap[label]?.background || 'rgba(0,0,0,0.1)'),
+        borderColor: labels.map(label => colorMap[label]?.border || 'rgba(0,0,0,1)'),
+        borderWidth: 1,
+      },
+    ];
+    
+    return {
+      labels,
+      datasets,
+    };
+  };
+
+  // Prepare data for Radar chart
+  const prepareRadarChartData = () => {
+    const labels = ["Hot", "Cold", "Warm", "Lost", "Won", "Pending"];
+    const datasets = consultants.map(consultant => {
+      const leads = leadsAll[consultant.id] || [];
+      const data = labels.map(label => leads.filter(lead => getStatusLabel(lead.status) === label).length);
+      const color = getRandomColor(); // Function to assign a unique color to each consultant
+      
+      return {
+        label: consultant.name,
+        data: data,
+        backgroundColor: color.background,
+        borderColor: color.border,
+        borderWidth: 1,
+        fill: true,
+      };
+    });
+    
+    return {
+      labels,
+      datasets,
+    };
+  };
+
+  // Prepare data for Polar Area chart
+  const preparePolarAreaChartData = () => {
+    const labels = ["Hot", "Cold", "Warm", "Lost", "Won", "Pending"];
+    const datasets = [
+      {
+        label: 'Leads Status',
+        data: labels.map(label => {
+          let total = 0;
+          consultants.forEach(consultant => {
+            const leads = leadsAll[consultant.id] || [];
+            total += leads.filter(lead => getStatusLabel(lead.status) === label).length;
+          });
+          return total;
+        }),
+        backgroundColor: labels.map(label => colorMap[label]?.background || 'rgba(0,0,0,0.1)'),
+        borderColor: labels.map(label => colorMap[label]?.border || 'rgba(0,0,0,1)'),
+        borderWidth: 1,
+      },
+    ];
+    
+    return {
+      labels,
+      datasets,
+    };
+  };
+
+  // Utility function to generate random colors for Radar chart
+  const getRandomColor = () => {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    return {
+      background: `rgba(${r}, ${g}, ${b}, 0.2)`,
+      border: `rgba(${r}, ${g}, ${b}, 1)`,
+    };
+  };
+
   // Define chart options to control size and responsiveness
   const options = {
     responsive: true,
@@ -242,7 +330,7 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
     // Add default scales configuration if needed
   };
 
-  // Prepare data for the Bar chart and Pie charts
+  // Prepare data for the Bar chart
   const barChartData = prepareBarChartData();
 
   // Function to prepare Pie chart data for a single consultant
@@ -381,6 +469,9 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
               >
                 <option value="Bar">Bar Chart</option>
                 <option value="Pie">Pie Chart</option>
+                <option value="Doughnut">Doughnut Chart</option>
+                <option value="Radar">Radar Chart</option>
+                <option value="PolarArea">Polar Area Chart</option>
               </Form.Control>
             </Form.Group>
 
@@ -426,26 +517,99 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
                         }}
                       />
                     </div>
-                  ) : (
-                    /* Render Pie Charts for Each Consultant */
-                    <Row>
-                      {consultants.map((consultant) => {
-                        const pieChartData = preparePieChartData(consultant.id);
-                        return (
-                          <Col md={6} key={consultant.id} className="mb-4">
-                            <h5>{consultant.name}'s Leads</h5>
-                            {leadsAll[consultant.id] && leadsAll[consultant.id].length > 0 ? (
-                              <div style={{ position: 'relative', height: '300px', width: '100%' }}>
-                                <Pie data={pieChartData} options={options} />
-                              </div>
-                            ) : (
-                              <p>No leads available for this consultant.</p>
-                            )}
-                          </Col>
-                        );
-                      })}
-                    </Row>
-                  )}
+                  ) : allChartType === "Pie" ? (
+                    /* Render Pie Chart */
+                    <div style={{ position: 'relative', height: '500px', width: '100%' }}>
+                      <Pie
+                        data={prepareDoughnutChartData()} // Reusing Doughnut data for Pie
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              position: 'bottom',
+                            },
+                            title: {
+                              display: true,
+                              text: 'Leads Status Distribution Across All Consultants',
+                            },
+                          },
+                        }}
+                      />
+                    </div>
+                  ) : allChartType === "Doughnut" ? (
+                    /* Render Doughnut Chart */
+                    <div style={{ position: 'relative', height: '500px', width: '100%' }}>
+                      <Doughnut
+                        data={prepareDoughnutChartData()}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              position: 'bottom',
+                            },
+                            title: {
+                              display: true,
+                              text: 'Leads Status Distribution (Doughnut)',
+                            },
+                          },
+                        }}
+                      />
+                    </div>
+                  ) : allChartType === "Radar" ? (
+                    /* Render Radar Chart */
+                    <div style={{ position: 'relative', height: '500px', width: '100%' }}>
+                      <Radar
+                        data={prepareRadarChartData()}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              position: 'top',
+                            },
+                            title: {
+                              display: true,
+                              text: 'Leads Status Comparison Across Consultants',
+                            },
+                          },
+                          scales: {
+                            r: {
+                              angleLines: {
+                                display: true,
+                              },
+                              suggestedMin: 0,
+                              suggestedMax: Math.max(...consultants.map(c => {
+                                const leads = leadsAll[c.id] || [];
+                                return leads.length;
+                              })) + 5,
+                            },
+                          },
+                        }}
+                      />
+                    </div>
+                  ) : allChartType === "PolarArea" ? (
+                    /* Render Polar Area Chart */
+                    <div style={{ position: 'relative', height: '500px', width: '100%' }}>
+                      <PolarArea
+                        data={preparePolarAreaChartData()}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: {
+                            legend: {
+                              position: 'right',
+                            },
+                            title: {
+                              display: true,
+                              text: 'Leads Status Polar Area Chart Across All Consultants',
+                            },
+                          },
+                        }}
+                      />
+                    </div>
+                  ) : null}
                 </>
               ) : (
                 <p>No leads available for any consultants.</p>
