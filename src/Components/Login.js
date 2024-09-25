@@ -29,15 +29,16 @@ export default function LoginPage() {
         // If login is successful
         localStorage.setItem("token", data.token); // Store token in local storage
         localStorage.setItem("email", email);      // Store email in local storage
-        localStorage.setItem("role", data.role);   // Store role in local storage
-      
+        localStorage.setItem("role", data.role);
+        localStorage.setItem("user_id", data.id);    // Store role in local storage
+      console.log(data.role)
         // Check the user's role
-        if (data.role !== "admin" && data.role !== "super admin") {
+        if (data.role === "SuperAdmin") {
           // If the role is neither admin nor super admin, navigate to user dashboard
-          navigate("/userdashboard");
+          navigate("/dashboard");
         } else {
           // If the role is admin or super admin, navigate to the admin dashboard
-          navigate("/dashboard");
+          navigate("/userdashboard");
         }
       } else {
         // If login fails, display an error message

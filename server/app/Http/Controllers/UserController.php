@@ -46,7 +46,8 @@ class UserController extends Controller
         return response()->json([
             'message' => 'Login successful',
             'token' => $token, // Include token in response body
-            'role' => $user->role // Include role in response body
+            'role' => $user->role, // Include role in response body
+            'id' => $user->id
         ], 200)->cookie('token', $token, 60 * 24); // Optionally still set the token as a cookie
     }
     
