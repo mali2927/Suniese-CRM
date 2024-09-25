@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar";
-import Sidebar from "../SideBar";
+import Sidebar from "../UserComponents/SideBar";
 import { styles } from "../../Styles/dashboardStyles";
 import {
   ListGroup,
@@ -15,12 +15,15 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
-import LeadsTable from "../AdminComponents/LeadsTable";
+import LeadsTable from "../UserComponents/LeadsTable";
 import LeadActions from "../AdminComponents/LeadAction";
 import ReportModal from "../AdminComponents/Modals/ReportModal"; // Ensure this is updated
 import config from "../../config";
 
 const Leads = () => {
+  // Retrieve user_id from local storage
+  const userId = parseInt(localStorage.getItem("user_id"), 10);
+
   // State for leads and consultants
   const [leads, setLeads] = useState([]);
   const [consultants, setConsultants] = useState([]);
@@ -39,8 +42,10 @@ const Leads = () => {
   // State for active section
   const [activeSection, setActiveSection] = useState(null);
 
-  // State for selected consultant
-  const [selectedConsultantId, setSelectedConsultantId] = useState("");
+  // Initialize selected consultant ID with userId
+  const [selectedConsultantId, setSelectedConsultantId] = useState(
+    userId ? userId.toString() : ""
+  );
 
   // State for selected consultant's name (for display in ReportModal)
   const [selectedConsultantName, setSelectedConsultantName] = useState("");
@@ -61,7 +66,7 @@ const Leads = () => {
     quotedPrice: "",
     meetingTime: "",
     bestTimeToCall: "",
-    consultantId: "", // Initially empty
+    consultantId: userId ? userId.toString() : "", // Set to userId
     status: "",
   });
 
@@ -78,8 +83,12 @@ const Leads = () => {
         console.log("Leads API Response:", result); // Debugging Log
 
         if (result.success) {
-          setLeads(result.data);
-          console.log("Leads Data Set:", result.data); // Debugging Log
+          // Filter leads related to the current user_id
+          const filteredLeads = result.data.filter(
+            (lead) => lead.user_id === userId
+          );
+          setLeads(filteredLeads);
+          console.log("Filtered Leads Data Set:", filteredLeads); // Debugging Log
         } else {
           alert("Failed to fetch leads");
         }
@@ -115,7 +124,7 @@ const Leads = () => {
 
     fetchLeads();
     fetchConsultants();
-  }, []);
+  }, [userId]);
 
   // Fetch Leads for Selected Consultant
   useEffect(() => {
@@ -193,7 +202,7 @@ const Leads = () => {
         },
         body: JSON.stringify({
           ...newLead,
-          user_id: newLead.consultantId, // Assuming consultantId maps to user_id
+          user_id: parseInt(newLead.consultantId, 10), // Ensure it's a number
         }),
       });
 
@@ -220,7 +229,7 @@ const Leads = () => {
           quotedPrice: "",
           meetingTime: "",
           bestTimeToCall: "",
-          consultantId: "",
+          consultantId: userId ? userId.toString() : "", // Reset to userId
           status: "",
         });
         setErrors({}); // Reset errors
@@ -233,9 +242,9 @@ const Leads = () => {
     }
   };
 
-  // Handle consultant selection change
+  // Handle consultant selection change (disabled)
   const handleConsultantChange = (e) => {
-    setSelectedConsultantId(e.target.value);
+    // Do nothing since consultant is fixed
   };
 
   // Mapping status IDs to status labels
@@ -276,13 +285,13 @@ const Leads = () => {
                   as="select"
                   value={selectedConsultantId}
                   onChange={handleConsultantChange}
+                  disabled // Disable selection
                 >
-                  <option value="">-- Select Consultant --</option>
-                  {consultants.map((consultant) => (
-                    <option key={consultant.id} value={consultant.id}>
-                      {consultant.name} - {consultant.role}
-                    </option>
-                  ))}
+                  <option value={userId}>
+                    {consultants.find((c) => c.id === userId)
+                      ? `${consultants.find((c) => c.id === userId).name} - ${consultants.find((c) => c.id === userId).role}`
+                      : "-- Select Consultant --"}
+                  </option>
                 </Form.Control>
               ) : (
                 <p>No consultants available.</p>
@@ -849,7 +858,7 @@ const Leads = () => {
               </Row>
 
               <Row>
-                {/* Consultant Selection */}
+                {/* Consultant Selection (Disabled) */}
                 <Col md={6}>
                   <Form.Group controlId="formConsultant" className="mb-3">
                     <Form.Label>Consultant</Form.Label>
@@ -859,13 +868,15 @@ const Leads = () => {
                       value={newLead.consultantId}
                       onChange={handleChange}
                       isInvalid={!!errors.consultantId}
+                      disabled // Disable selection to prevent changes
                     >
-                      <option value="">-- Select Consultant --</option>
-                      {consultants.map((consultant) => (
-                        <option key={consultant.id} value={consultant.id}>
-                          {consultant.name} - {consultant.role}
-                        </option>
-                      ))}
+                      <option value={userId}>
+                        {consultants.find((c) => c.id === userId)
+                          ? `${consultants.find((c) => c.id === userId).name} - ${consultants.find(
+                              (c) => c.id === userId
+                            ).role}`
+                          : "-- Select Consultant --"}
+                      </option>
                     </Form.Control>
                     <Form.Control.Feedback type="invalid">
                       {errors.consultantId}

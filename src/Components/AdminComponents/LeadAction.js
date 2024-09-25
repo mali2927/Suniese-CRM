@@ -9,7 +9,7 @@ const LeadActions = ({ setActiveSection }) => {
           eventKey="totalLeads"
           onClick={() => setActiveSection("totalLeads")}
         >
-          Total Won Lead Report
+          Total Leads
         </Nav.Link>
       </Nav.Item>
       <Nav.Item>

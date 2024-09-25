@@ -34,24 +34,11 @@ const Sidebar = () => {
         >
           <FileText className="me-2" /> Lead Management
         </Link>
+
+
+        
         <Link
-          to="/user"
-          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
-            "/user"
-          )}`}
-        >
-          <UsersIcon className="me-2" /> User Management
-        </Link>
-        <Link
-          to="/settings"
-          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
-            "/settings"
-          )}`}
-        >
-          <SettingsIcon className="me-2" /> Settings
-        </Link>
-        <Link
-          to="/info"
+          to="#"
           className={`list-group-item list-group-item-action d-flex align-items-center ${isActive(
             "/info"
           )}`}
