@@ -7,7 +7,8 @@ import Settings from "./Components/AdminComponents/Settings";
 import Info from "./Components/AdminComponents/Info";
 import Leads from "./Components/AdminComponents/Leads";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import UserDashboard from "./Components/UserComponents/Dashboard";
+import UserLeads from "./Components/UserComponents/Leads";
 import "./App.css";
 import ProtectedRoute from '../src/ProtectedRoute'; // Import the ProtectedRoute component
 
@@ -40,6 +41,21 @@ function App() {
             path="/user"
             element={<ProtectedRoute element={Users} roleRequired="superadmin" />}
           />
+                    <Route
+            path="/userdashboard"
+            element={
+              <ProtectedRoute element={UserDashboard} roleRequired="sales consultant" />
+            }
+          />
+
+<Route
+            path="/userLeads"
+            element={
+              <ProtectedRoute element={UserLeads} roleRequired="sales consultant" />
+            }
+          />
+
+          
         </Routes>
       </div>
     </Router>
