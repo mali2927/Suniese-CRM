@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LeadStatusController;
 use App\Http\Controllers\LeadReportController;
+use App\Http\Controllers\DashboardController;
 
 
 Route::get('/user', function (Request $request) {
@@ -23,6 +24,7 @@ Route::post('/showAllUsers', [UserController::class, 'showAllUsers']);
 Route::put('/updateUser', [UserController::class, 'updateUser']);
 Route::get('/showUsersForReportInLeads', [UserController::class, 'showUsersForReportInLeads']);
 
+
 //Leads APIS
 
 Route::post('/leads', [LeadController::class, 'store']);
@@ -39,3 +41,9 @@ Route::get('/searchLeadByConsultantId', [LeadController::class, 'searchLeadByCon
 // Lead Pdf
 
 Route::get('/leads/{id}/report', [LeadReportController::class, 'generateReport']);
+ // Dashboard API
+
+ Route::get('/dashboard-report', [DashboardController::class, 'getDashboardReport']);
+ Route::get('/lead-status-counts', [DashboardController::class, 'getLeadStatusCounts']);
+ Route::get('/weekly-lead-data', [DashboardController::class, 'getWeeklyLeadData']);
+
