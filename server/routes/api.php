@@ -7,6 +7,8 @@ use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LeadStatusController;
 use App\Http\Controllers\LeadReportController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\UserDashboardController;
+
 
 
 Route::get('/user', function (Request $request) {
@@ -46,4 +48,6 @@ Route::get('/leads/{id}/report', [LeadReportController::class, 'generateReport']
  Route::get('/dashboard-report', [DashboardController::class, 'getDashboardReport']);
  Route::get('/lead-status-counts', [DashboardController::class, 'getLeadStatusCounts']);
  Route::get('/weekly-lead-data', [DashboardController::class, 'getWeeklyLeadData']);
+// User Dashboard API
 
+Route::get('/dashboard/data', [UserDashboardController::class, 'getDashboardData']);
