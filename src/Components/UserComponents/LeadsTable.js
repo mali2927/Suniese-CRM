@@ -44,12 +44,15 @@ const LeadsTable = ({
   const [statuses, setStatuses] = useState([]);
   const [loadingStatuses, setLoadingStatuses] = useState(true);
   const [statusError, setStatusError] = useState(null); // To handle status fetching errors
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
 
   // Function to handle viewing a lead
   const handleViewLead = (lead) => {
     setSelectedLead(lead);
     setShowViewModal(true);
   };
+
+  // Fetch statuses from the API
   const fetchStatuses = async () => {
     try {
       const response = await fetch(`${config.baseURL}/lead-statuses`);
@@ -59,14 +62,13 @@ const LeadsTable = ({
       console.log("Fetched statuses:", result); // Log fetched statuses
     } catch (error) {
       console.error("Error fetching lead statuses:", error);
-      alert("An error occurred while fetching lead statuses.");
+      setStatusError("Failed to load statuses.");
       setLoadingStatuses(false); // Ensure loading is false on error as well
     }
   };
+
   // Fetch statuses on component mount
   useEffect(() => {
- 
-
     fetchStatuses();
   }, []);
 
@@ -184,10 +186,63 @@ const LeadsTable = ({
     setShowModal(false);
   };
 
+  // Enhanced Filter: Include all relevant fields
+  const filteredLeads = leads.filter((lead) => {
+    const query = searchQuery.toLowerCase();
+
+    // Helper function to safely get string representations
+    const getString = (value) => {
+      if (value === null || value === undefined) return "";
+      if (typeof value === "object") return JSON.stringify(value).toLowerCase();
+      return value.toString().toLowerCase();
+    };
+
+    return (
+      getString(lead.id).includes(query) ||
+      getString(lead.user?.name).includes(query) ||
+      getString(lead.first_name).includes(query) ||
+      getString(lead.surname).includes(query) ||
+      getString(lead.email).includes(query) ||
+      getString(lead.phone_number).includes(query) ||
+      getString(lead.quoted_price).includes(query) ||
+      getString(lead.meeting_time).includes(query) ||
+      getString(lead.status?.title).includes(query)
+    );
+  });
+
   return (
     <>
       {type === "transferLeads" && (
         <>
+          {/* Search Bar */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              flexWrap: "wrap",
+              margin: "20px 0",
+              padding: "0 10px",
+            }}
+          >
+            <input
+              type="text"
+              placeholder="Search leads..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                padding: "10px 15px",
+                width: "100%",
+                maxWidth: "600px", // Increased maxWidth to accommodate more content
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                fontSize: "16px",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                transition: "border-color 0.3s",
+              }}
+            />
+          </div>
+
           {leads.length === 0 ? (
             <Alert variant="info">No leads available for transfer.</Alert>
           ) : (
@@ -207,76 +262,84 @@ const LeadsTable = ({
                 </tr>
               </thead>
               <tbody>
-                {leads.map((lead) => (
-                  <tr key={lead.id}>
-                    <td>{lead.id}</td>
-                    <td>{lead.user?.name || "N/A"}</td>
-                    <td>{lead.first_name || "N/A"}</td>
-                    <td>{lead.surname || "N/A"}</td>
-                    <td>{lead.email || "N/A"}</td>
-                    <td>{lead.phone_number || "N/A"}</td>
-                    <td>
-                      £
-                      {parseFloat(lead.quoted_price || 0).toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </td>
-                    <td>
-                      {lead.meeting_time
-                        ? new Date(lead.meeting_time).toLocaleString()
-                        : "N/A"}
-                    </td>
-                    <td>{lead.status?.title || "N/A"}</td>
-                    <td>
-                      <Row>
-                        <Col>
-                          <Button
-                            variant="outline-info"
-                            size="sm"
-                            onClick={() => handleEditLead(lead)}
-                          >
-                            Edit
-                          </Button>
-                        </Col>
-                        <Col>
-                          <Button
-                            variant="outline-success"
-                            size="sm"
-                            onClick={() => handleViewLead(lead)}
-                          >
-                            View
-                          </Button>
-                        </Col>
-                        <Col>
-                          <DropdownButton
-                            id={`dropdown-action-${lead.id}`}
-                            title="Change Status"
-                            variant="outline-primary"
-                            size="sm"
-                          >
-                            {loadingStatuses ? (
-                              <Dropdown.Item disabled>Loading...</Dropdown.Item>
-                            ) : statusError ? (
-                              <Dropdown.Item disabled>{statusError}</Dropdown.Item>
-                            ) : (
-                              statuses.map((status) => (
-                                <Dropdown.Item
-                                  key={status.id}
-                                  onClick={() =>
-                                    handleDropdownSelect(lead.id, `set${status.title}`)
-                                  }
-                                >
-                                  {status.title}
-                                </Dropdown.Item>
-                              ))
-                            )}
-                          </DropdownButton>
-                        </Col>
-                      </Row>
+                {filteredLeads.length > 0 ? (
+                  filteredLeads.map((lead) => (
+                    <tr key={lead.id}>
+                      <td>{lead.id}</td>
+                      <td>{lead.user?.name || "N/A"}</td>
+                      <td>{lead.first_name || "N/A"}</td>
+                      <td>{lead.surname || "N/A"}</td>
+                      <td>{lead.email || "N/A"}</td>
+                      <td>{lead.phone_number || "N/A"}</td>
+                      <td>
+                        £
+                        {parseFloat(lead.quoted_price || 0).toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </td>
+                      <td>
+                        {lead.meeting_time
+                          ? new Date(lead.meeting_time).toLocaleString()
+                          : "N/A"}
+                      </td>
+                      <td>{lead.status?.title || "N/A"}</td>
+                      <td>
+                        <Row>
+                          <Col xs="auto" className="mb-1">
+                            <Button
+                              variant="outline-info"
+                              size="sm"
+                              onClick={() => handleEditLead(lead)}
+                            >
+                              Edit
+                            </Button>
+                          </Col>
+                          <Col xs="auto" className="mb-1">
+                            <Button
+                              variant="outline-success"
+                              size="sm"
+                              onClick={() => handleViewLead(lead)}
+                            >
+                              View
+                            </Button>
+                          </Col>
+                          <Col xs="auto" className="mb-1">
+                            <DropdownButton
+                              id={`dropdown-action-${lead.id}`}
+                              title="Change Status"
+                              variant="outline-primary"
+                              size="sm"
+                            >
+                              {loadingStatuses ? (
+                                <Dropdown.Item disabled>Loading...</Dropdown.Item>
+                              ) : statusError ? (
+                                <Dropdown.Item disabled>{statusError}</Dropdown.Item>
+                              ) : (
+                                statuses.map((status) => (
+                                  <Dropdown.Item
+                                    key={status.id}
+                                    onClick={() =>
+                                      handleDropdownSelect(lead.id, `set${status.title}`)
+                                    }
+                                  >
+                                    {status.title}
+                                  </Dropdown.Item>
+                                ))
+                              )}
+                            </DropdownButton>
+                          </Col>
+                        </Row>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="10" style={{ textAlign: "center" }}>
+                      No leads found.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </Table>
           )}
