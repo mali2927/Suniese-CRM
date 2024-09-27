@@ -40,10 +40,13 @@ const LeadsTable = ({
   });
   const [statuses, setStatuses] = useState([]); // State for statuses
   const [loadingStatuses, setLoadingStatuses] = useState(true); // Loading state
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+
   const handleViewLead = (lead) => {
     setSelectedLead(lead);
     setShowViewModal(true);
   };
+
   const fetchLeads = async () => {
     try {
       const response = await fetch(`${config.baseURL}/leads`);
@@ -196,88 +199,149 @@ const LeadsTable = ({
     setShowModal(false);
   };
 
+  // Enhanced Filter: Include all relevant fields
+  const filteredLeads = leads.filter((lead) => {
+    const query = searchQuery.toLowerCase();
+
+    // Helper function to safely get string representations
+    const getString = (value) => {
+      if (value === null || value === undefined) return "";
+      if (typeof value === "object") return JSON.stringify(value).toLowerCase();
+      return value.toString().toLowerCase();
+    };
+
+    return (
+      getString(lead.id).includes(query) ||
+      getString(lead.user?.name).includes(query) ||
+      getString(lead.first_name).includes(query) ||
+      getString(lead.surname).includes(query) ||
+      getString(lead.email).includes(query) ||
+      getString(lead.phone_number).includes(query) ||
+      getString(lead.quoted_price).includes(query) ||
+      getString(lead.meeting_time).includes(query) ||
+      getString(lead.status?.title).includes(query)
+    );
+  });
+
   return (
     <>
       {type === "transferLeads" && (
-        <Table striped bordered hover responsive className="mt-3">
-          <thead className="thead-dark">
-            <tr>
-              <th>ID</th>
-              <th>Sales Consultant</th>
-              <th>First Name</th>
-              <th>Surname</th>
-              <th>Email</th>
-              <th>Phone Number</th>
-              <th>Quoted Price</th>
-              <th>Meeting Time</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leads.map((lead) => (
-              <tr key={lead.id}>
-                <td>{lead.id}</td>
-                <td>{lead.user?.name || "N/A"}</td>
-                <td>{lead.first_name || "N/A"}</td>
-                <td>{lead.surname || "N/A"}</td>
-                <td>{lead.email || "N/A"}</td>
-                <td>{lead.phone_number || "N/A"}</td>
-                <td>{lead.quoted_price || "N/A"}</td>
-                <td>{lead.meeting_time || "N/A"}</td>
-                <td>{lead.status?.title || "N/A"}</td>
-                <td>
-                  <Row>
-                    <Col>
-                      <Button
-                        variant="outline-info"
-                        onClick={() => handleEditLead(lead)}
-                      >
-                        Edit
-                      </Button>
-                    </Col>
-                    <Col>
-                      <Button
-                        variant="outline-success"
-                        onClick={() => handleViewLead(lead)} // Handle view lead
-                      >
-                        View
-                      </Button>
-                    </Col>
-                    <Col>
-                      <DropdownButton
-                        id={`dropdown-action-${lead.id}`}
-                        title="Change Status"
-                        variant="outline-primary"
-                      >
-                        {loadingStatuses ? (
-                          <Dropdown.Item disabled>Loading...</Dropdown.Item>
-                        ) : (
-                          statuses.map((status) => (
-                            <Dropdown.Item
-                              key={status.id}
-                              onClick={() =>
-                                handleDropdownSelect(
-                                  lead.id,
-                                  `set${
-                                    status.title.charAt(0).toUpperCase() +
-                                    status.title.slice(1)
-                                  }`
-                                )
-                              }
-                            >
-                              {status.title}
-                            </Dropdown.Item>
-                          ))
-                        )}
-                      </DropdownButton>
-                    </Col>
-                  </Row>
-                </td>
+        <>
+          {/* Search Bar */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              margin: "20px 0",
+            }}
+          >
+            <input
+              type="text"
+              placeholder="Search leads..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                padding: "10px 15px",
+                width: "100%",
+                maxWidth: "600px", // Increased maxWidth to accommodate more content
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                fontSize: "16px",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                transition: "border-color 0.3s",
+              }}
+            />
+          </div>
+
+          {/* Leads Table */}
+          <Table striped bordered hover responsive className="mt-3">
+            <thead className="thead-dark">
+              <tr>
+                <th>ID</th>
+                <th>Sales Consultant</th>
+                <th>First Name</th>
+                <th>Surname</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Quoted Price</th>
+                <th>Meeting Time</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {filteredLeads.length > 0 ? (
+                filteredLeads.map((lead) => (
+                  <tr key={lead.id}>
+                    <td>{lead.id}</td>
+                    <td>{lead.user?.name || "N/A"}</td>
+                    <td>{lead.first_name || "N/A"}</td>
+                    <td>{lead.surname || "N/A"}</td>
+                    <td>{lead.email || "N/A"}</td>
+                    <td>{lead.phone_number || "N/A"}</td>
+                    <td>{lead.quoted_price || "N/A"}</td>
+                    <td>{lead.meeting_time || "N/A"}</td>
+                    <td>{lead.status?.title || "N/A"}</td>
+                    <td>
+                      <Row>
+                        <Col>
+                          <Button
+                            variant="outline-info"
+                            onClick={() => handleEditLead(lead)}
+                          >
+                            Edit
+                          </Button>
+                        </Col>
+                        <Col>
+                          <Button
+                            variant="outline-success"
+                            onClick={() => handleViewLead(lead)} // Handle view lead
+                          >
+                            View
+                          </Button>
+                        </Col>
+                        <Col>
+                          <DropdownButton
+                            id={`dropdown-action-${lead.id}`}
+                            title="Change Status"
+                            variant="outline-primary"
+                          >
+                            {loadingStatuses ? (
+                              <Dropdown.Item disabled>Loading...</Dropdown.Item>
+                            ) : (
+                              statuses.map((status) => (
+                                <Dropdown.Item
+                                  key={status.id}
+                                  onClick={() =>
+                                    handleDropdownSelect(
+                                      lead.id,
+                                      `set${
+                                        status.title.charAt(0).toUpperCase() +
+                                        status.title.slice(1)
+                                      }`
+                                    )
+                                  }
+                                >
+                                  {status.title}
+                                </Dropdown.Item>
+                              ))
+                            )}
+                          </DropdownButton>
+                        </Col>
+                      </Row>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="10" style={{ textAlign: "center" }}>
+                    No leads found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+        </>
       )}
 
       <ConvertLeadToSaleModal
