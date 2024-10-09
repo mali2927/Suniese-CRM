@@ -66,7 +66,7 @@ const Dashboard = () => {
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
             <PoundSterling style={styles.cardIcon} />
-            <h2>Total Revenue</h2>
+            <h2>Total Sales</h2>
             <p>£{dashboardData.totalRevenue.toLocaleString()}</p>
           </motion.div>
         </div>
