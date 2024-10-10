@@ -34,6 +34,7 @@ Route::get('/leads', [LeadController::class, 'index']);
 Route::put('/update-lead/{id}', [LeadController::class, 'update']);
 Route::put('/leads/{id}/status', [LeadController::class, 'updateStatus']);
 Route::put('/leads/{id}/payment', [LeadController::class, 'updatePayment']);
+Route::post('/leads/{lead}/lost-remark', [LeadController::class, 'addLostRemark']);
 
 
 //Leads Statuses

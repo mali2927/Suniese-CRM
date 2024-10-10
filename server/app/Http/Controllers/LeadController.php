@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lead;
+use App\Models\LostRemark;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -21,7 +22,9 @@ class LeadController extends Controller
      public function index()
      {
          try {
-            $leads = Lead::with(['user', 'status'])->get();
+             // Eager load user, status, and lostRemarks relationships
+             $leads = Lead::with(['user', 'status', 'lostRemarks.declaredUser'])->get();
+             
              return response()->json([
                  'success' => true,
                  'data' => $leads
@@ -34,6 +37,7 @@ class LeadController extends Controller
              ], 500);
          }
      }
+     
      
 
     public function store(Request $request)
@@ -261,7 +265,31 @@ class LeadController extends Controller
 }
 
     
-    
+public function addLostRemark(Request $request, $leadId)
+{
+    // Validate the incoming request data
+    $request->validate([
+        'title' => 'required|string',
+        'lead_id' => 'required|exists:leads,id',
+        'lost_declared_user' => 'required|exists:users,id',
+    ]);
+
+    // Find the lead by ID and update its status to 4
+    $lead = Lead::findOrFail($leadId);
+    $lead->status = 4; // Set the status to 4
+    $lead->save();
+
+    // Create the LostRemark entry
+    LostRemark::create([
+        'title' => $request->title,
+        'lead_id' => $request->lead_id,
+        'lost_declared_user' => $request->lost_declared_user,
+    ]);
+
+    return response()->json(['success' => true]);
+}
+
+
 
 }
     

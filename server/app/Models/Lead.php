@@ -42,4 +42,10 @@ class Lead extends Model
     {
         return $this->belongsTo(LeadStatus::class, 'status', 'id');
     }
+
+    public function lostRemarks()
+{
+    return $this->hasMany(LostRemark::class);
+}
+
 }

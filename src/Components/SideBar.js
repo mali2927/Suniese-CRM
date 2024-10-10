@@ -52,11 +52,19 @@ const Sidebar = () => {
         </Link>
         <Link
           to="/info"
-          className={`list-group-item list-group-item-action d-flex align-items-center ${isActive(
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
             "/info"
           )}`}
         >
           <InfoIcon className="me-2" /> Info
+        </Link>
+        <Link
+          to="/pipeline"
+          className={`list-group-item list-group-item-action d-flex align-items-center ${isActive(
+            "/pipeline"
+          )}`}
+        >
+          <InfoIcon className="me-2" /> Pipeline
         </Link>
       </div>
     </aside>

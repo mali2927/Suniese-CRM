@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import "../Styles/LoginPage.css"; // Import the CSS file
 import SunIcon from "./assets/SunIcon";
-import config from '../config'; // Import the config file
+import config from "../config"; // Import the config file
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,7 +13,7 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError(""); // Clear any previous errors
-  
+
     try {
       const response = await fetch(`${config.baseURL}/login`, {
         method: "POST", // Use POST method for login
@@ -22,16 +22,16 @@ export default function LoginPage() {
         },
         body: JSON.stringify({ email, password }), // Send email and password in the request body
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         // If login is successful
         localStorage.setItem("token", data.token); // Store token in local storage
-        localStorage.setItem("email", email);      // Store email in local storage
+        localStorage.setItem("email", email); // Store email in local storage
         localStorage.setItem("role", data.role);
-        localStorage.setItem("user_id", data.id);    // Store role in local storage
-      console.log(data.role)
+        localStorage.setItem("user_id", data.id); // Store role in local storage
+        console.log(data.role);
         // Check the user's role
         if (data.role === "SuperAdmin") {
           // If the role is neither admin nor super admin, navigate to user dashboard
@@ -49,7 +49,6 @@ export default function LoginPage() {
       setError("An error occurred. Please try again later.");
     }
   };
-  
 
   return (
     <div className="login-container">
@@ -110,7 +109,8 @@ export default function LoginPage() {
               placeholder="Enter your password"
             />
           </div>
-          {error && <p className="error-message">{error}</p>} {/* Display error message */}
+          {error && <p className="error-message">{error}</p>}{" "}
+          {/* Display error message */}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}

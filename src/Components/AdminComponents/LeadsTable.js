@@ -14,6 +14,7 @@ import {
 import ConvertLeadToSaleModal from "./Modals/ConvertLeadToSaleModal";
 import EditLeadModal from "./Modals/EditLeadModal";
 import ViewLeadModal from "./Modals/ViewLeadModal"; // Import the new modal
+import LostRemarkModal from "./Modals/LostRemarkModal";
 
 const LeadsTable = ({
   type,
@@ -41,7 +42,41 @@ const LeadsTable = ({
   const [statuses, setStatuses] = useState([]); // State for statuses
   const [loadingStatuses, setLoadingStatuses] = useState(true); // Loading state
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  const [showLostRemarkModal, setShowLostRemarkModal] = useState(false); // State for lost remark modal
 
+  const handleSaveLostRemark = async (remark) => {
+    const userId = parseInt(localStorage.getItem("user_id"), 10);
+
+    try {
+      const response = await fetch(
+        `${config.baseURL}/leads/${selectedLeadId}/lost-remark`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: remark,
+            lead_id: selectedLeadId,
+            lost_declared_user: userId,
+          }),
+        }
+      );
+
+      const result = await response.json();
+      if (result.success) {
+        alert("Lost remark added successfully!");
+        fetchLeads(); // Refetch leads to include the new remark
+      } else {
+        alert("Failed to add lost remark");
+      }
+    } catch (error) {
+      console.error("Error adding lost remark:", error);
+      alert("An error occurred while adding the lost remark.");
+    }
+
+    setShowLostRemarkModal(false); // Close the modal after saving
+  };
   const handleViewLead = (lead) => {
     setSelectedLead(lead);
     setShowViewModal(true);
@@ -98,8 +133,9 @@ const LeadsTable = ({
         statusId = statuses.find((status) => status.title === "Hot")?.id;
         break;
       case "setLost":
-        statusId = statuses.find((status) => status.title === "Lost")?.id;
-        break;
+        setSelectedLeadId(leadId); // Set the selected lead ID
+        setShowLostRemarkModal(true); // Show the lost remark modal
+        return; // Exit early for lost lead case
       case "setWon":
         setSelectedLeadId(leadId);
         setShowModal(true);
@@ -363,6 +399,11 @@ const LeadsTable = ({
         show={showViewModal}
         handleClose={() => setShowViewModal(false)}
         lead={selectedLead} // Pass the selected lead to the modal
+      />
+      <LostRemarkModal
+        show={showLostRemarkModal}
+        handleClose={() => setShowLostRemarkModal(false)}
+        handleSave={handleSaveLostRemark}
       />
     </>
   );
