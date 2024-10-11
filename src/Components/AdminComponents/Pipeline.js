@@ -211,7 +211,7 @@ const Pipeline = () => {
                         <td>{lead.email}</td>
                         <td>{lead.phone_number}</td>
                         <td>{lead.quoted_price}</td>
-                        <td>{lead.lost_remarks[0].title || "No remarks"}</td>
+                        <td>{lead.lost_remarks[0]?.title || "No remarks"}</td>
                         <td>{lead.user.name || "Unknown"}</td>
                       </tr>
                     ))
