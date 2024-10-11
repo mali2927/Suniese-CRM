@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Table, Pagination, Form, InputGroup, Row, Col } from "react-bootstrap";
+import {
+  Table,
+  Pagination,
+  Form,
+  InputGroup,
+  Row,
+  Col,
+  Button,
+  Modal,
+} from "react-bootstrap";
 import config from "../../../config";
 
 const ChaseLeads = ({
@@ -10,6 +19,12 @@ const ChaseLeads = ({
   leadsPerPage,
 }) => {
   const [chaseLeads, setChaseLeads] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedLead, setSelectedLead] = useState(null);
+  const [chaseMethod, setChaseMethod] = useState(""); // Email or Phone
+  const [talkDetail, setTalkDetail] = useState(""); // Talk details
+  const [chaseDate, setChaseDate] = useState(""); // Date when chased
+  const [chaseNotes, setChaseNotes] = useState([]); // Chase notes for the selected lead
 
   useEffect(() => {
     fetchLeads();
@@ -21,15 +36,74 @@ const ChaseLeads = ({
       const result = await response.json();
 
       if (result.success) {
-        const chase = result.data.filter(
-          (lead) => lead.status && lead.status.id === 3 // Assuming 3 is the ID for Chase status
-        );
+        const chase = result.data.filter((lead) => lead.id !== 5); // Exclude leads with ID 5
         setChaseLeads(chase);
       } else {
         console.error("Failed to fetch leads");
       }
     } catch (error) {
       console.error("Error fetching leads:", error);
+    }
+  };
+
+  const fetchChaseNotes = async (leadId) => {
+    try {
+      const response = await fetch(`${config.baseURL}/chase_notes/${leadId}`);
+      const result = await response.json();
+
+      if (result.success) {
+        setChaseNotes(result.data);
+      } else {
+        console.error("Failed to fetch chase notes");
+      }
+    } catch (error) {
+      console.error("Error fetching chase notes:", error);
+    }
+  };
+
+  const handleChaseClick = (lead) => {
+    setSelectedLead(lead);
+    fetchChaseNotes(lead.id); // Fetch chase notes when a lead is selected
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setChaseMethod("");
+    setTalkDetail("");
+    setChaseDate("");
+    setChaseNotes([]); // Clear chase notes when closing the modal
+  };
+
+  const handleSaveChaseNote = async () => {
+    if (!selectedLead) return;
+
+    const chaseNote = {
+      lead_id: selectedLead.id,
+      talk_details: talkDetail,
+      chased_via: chaseMethod,
+      date_contacted: chaseDate,
+    };
+
+    try {
+      const response = await fetch(`${config.baseURL}/chase_notes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(chaseNote),
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        alert("Chase note saved successfully!");
+        fetchChaseNotes(selectedLead.id); // Refresh chase notes after saving
+        handleCloseModal(); // Close the modal after saving
+      } else {
+        console.error("Failed to save chase note");
+      }
+    } catch (error) {
+      console.error("Error saving chase note:", error);
     }
   };
 
@@ -71,7 +145,8 @@ const ChaseLeads = ({
             <th>Email</th>
             <th>Phone Number</th>
             <th>Quoted Price</th>
-            <th>Chase Notes</th>
+            <th>Latest Chase Notes</th>
+            <th>Actions</th> {/* New Actions Column */}
           </tr>
         </thead>
         <tbody>
@@ -83,12 +158,20 @@ const ChaseLeads = ({
                 <td>{lead.email}</td>
                 <td>{lead.phone_number}</td>
                 <td>{lead.quoted_price}</td>
-                <td>{lead.chase_notes || "No notes"}</td>
+                <td>{lead.chase_notes[0]?.talk_detail}</td>
+                <td>
+                  <Button
+                    variant="primary"
+                    onClick={() => handleChaseClick(lead)}
+                  >
+                    Chase
+                  </Button>
+                </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="6" className="text-center">
+              <td colSpan="7" className="text-center">
                 No leads found for Chase status.
               </td>
             </tr>
@@ -110,6 +193,59 @@ const ChaseLeads = ({
           )
         )}
       </Pagination>
+
+      {/* Chase Modal */}
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Chase Lead</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group controlId="chaseMethod">
+              <Form.Label>Chased Via</Form.Label>
+              <Form.Control
+                as="select"
+                value={chaseMethod}
+                onChange={(e) => setChaseMethod(e.target.value)}
+                required
+              >
+                <option value="">Select...</option>
+                <option value="Email">Email</option>
+                <option value="Phone">Phone</option>
+              </Form.Control>
+            </Form.Group>
+
+            <Form.Group controlId="talkDetail">
+              <Form.Label>Talk Details</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={talkDetail}
+                onChange={(e) => setTalkDetail(e.target.value)}
+                required
+              />
+            </Form.Group>
+
+            <Form.Group controlId="chaseDate">
+              <Form.Label>Date Contacted</Form.Label>
+              <Form.Control
+                type="date"
+                value={chaseDate}
+                onChange={(e) => setChaseDate(e.target.value)}
+                required
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={handleSaveChaseNote}>
+            Save Chase Note
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

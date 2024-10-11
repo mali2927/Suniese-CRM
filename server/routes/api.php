@@ -8,6 +8,8 @@ use App\Http\Controllers\LeadStatusController;
 use App\Http\Controllers\LeadReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\ChaseNoteController;
+
 
 
 
@@ -52,3 +54,9 @@ Route::get('/leads/{id}/report', [LeadReportController::class, 'generateReport']
 // User Dashboard API
 
 Route::get('/dashboard/data', [UserDashboardController::class, 'getDashboardData']);
+
+
+//Chase Note
+
+Route::post('/chase_notes', [ChaseNoteController::class, 'store']);
+Route::get('/chase_notes/{leadId}', [ChaseNoteController::class, 'show']);

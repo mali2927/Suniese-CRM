@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Lead extends Model
 {
@@ -30,23 +30,30 @@ class Lead extends Model
         'status',  // Add status here
         'total_payment',
         'customer_type',
+        'chase_id',
     ];
 
     // Define relationship to User
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
     // Define relationship to LeadStatus
-    public function status()
+    public function status(): BelongsTo
     {
         return $this->belongsTo(LeadStatus::class, 'status', 'id');
     }
 
-    public function lostRemarks()
-{
-    return $this->hasMany(LostRemark::class);
-}
+    // Define relationship to LostRemark
+    public function lostRemarks(): HasMany
+    {
+        return $this->hasMany(LostRemark::class);
+    }
 
+    // Define relationship to ChaseNote
+    public function chaseNotes(): HasMany
+    {
+        return $this->hasMany(ChaseNote::class);
+    }
 }

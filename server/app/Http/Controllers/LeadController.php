@@ -23,7 +23,7 @@ class LeadController extends Controller
      {
          try {
              // Eager load user, status, and lostRemarks relationships
-             $leads = Lead::with(['user', 'status', 'lostRemarks.declaredUser'])->get();
+             $leads = Lead::with(['user', 'status','chaseNotes', 'lostRemarks.declaredUser'])->get();
              
              return response()->json([
                  'success' => true,
