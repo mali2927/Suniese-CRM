@@ -91,6 +91,12 @@ const ViewLeadModal = ({ show, handleClose, lead }) => {
             </tr>
             <tr>
               <td>
+                <strong>Cutomer Type</strong>
+              </td>
+              <td>{lead.customer_type}</td>
+            </tr>
+            <tr>
+              <td>
                 <strong>Best Time to Call</strong>
               </td>
               <td>{lead.best_time_to_call}</td>

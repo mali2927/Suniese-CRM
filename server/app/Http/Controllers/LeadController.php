@@ -63,6 +63,7 @@ class LeadController extends Controller
             'quotedPrice' => 'required|numeric',
             'meetingTime' => 'required|date',
             'bestTimeToCall' => 'nullable|date',
+            'customerType' => 'required|string|max:255',
             'status' => 'required|exists:lead_statuses,id', // Validate status_id
         ]);
 
@@ -83,6 +84,7 @@ class LeadController extends Controller
             'quoted_price' => $validatedData['quotedPrice'],
             'meeting_time' => $validatedData['meetingTime'],
             'best_time_to_call' => $validatedData['bestTimeToCall'],
+            'customer_type' => $validatedData['customerType'],
             'status' => $validatedData['status'], // Add status_id
         ];
         log::debug($mappedData);
@@ -153,6 +155,7 @@ class LeadController extends Controller
                 'system_quoted' => $request->input('system_quoted'),
                 'quoted_price' => $request->input('quoted_price'),
                 'meeting_time' => $request->input('meeting_time'),
+                'customerType' => 'required|string|max:255',
                 'best_time_to_call' => $request->input('best_time_to_call'),
             ];
     
@@ -172,6 +175,7 @@ class LeadController extends Controller
                 'system_quoted' => 'required|string|max:255',
                 'quoted_price' => 'required|numeric',
                 'meeting_time' => 'required|date',
+                'customer_type' => $validatedData['customerType'],
                 'best_time_to_call' => 'nullable|date',
             ]);
     

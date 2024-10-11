@@ -63,6 +63,7 @@ const Leads = () => {
     bestTimeToCall: "",
     consultantId: "", // Initially empty
     status: "",
+    customerType: "",
   });
 
   // State for validation errors
@@ -128,10 +129,7 @@ const Leads = () => {
             `${config.baseURL}/searchLeadByConsultantId?user_id=${selectedConsultantId}`
           );
           const result = await response.json();
-          console.log(
-            "Selected Consultant Leads API Response:",
-            result
-          ); // Debugging Log
+          console.log("Selected Consultant Leads API Response:", result); // Debugging Log
 
           if (result.data && result.data.length > 0) {
             setSelectedLeads(result.data);
@@ -221,6 +219,7 @@ const Leads = () => {
           meetingTime: "",
           bestTimeToCall: "",
           consultantId: "",
+          customerType: "",
           status: "",
         });
         setErrors({}); // Reset errors
@@ -267,7 +266,8 @@ const Leads = () => {
               <Form.Label>Select Consultant</Form.Label>
               {loadingConsultants ? (
                 <div>
-                  <Spinner animation="border" size="sm" /> Loading consultants...
+                  <Spinner animation="border" size="sm" /> Loading
+                  consultants...
                 </div>
               ) : errorConsultants ? (
                 <Alert variant="danger">{errorConsultants}</Alert>
@@ -325,13 +325,7 @@ const Leads = () => {
                     </h4>
                     {/* Responsive Table */}
                     <div className="table-responsive">
-                      <Table
-                        striped
-                        bordered
-                        hover
-                        size="sm"
-                        className="mt-3"
-                      >
+                      <Table striped bordered hover size="sm" className="mt-3">
                         <thead className="thead-dark">
                           <tr>
                             <th style={{ width: "5%" }}>#</th>
@@ -373,7 +367,8 @@ const Leads = () => {
                               </td>
                               <td>{lead.system_quoted}</td>
                               <td>
-                                £{parseFloat(lead.quoted_price).toLocaleString(
+                                £
+                                {parseFloat(lead.quoted_price).toLocaleString(
                                   undefined,
                                   {
                                     minimumFractionDigits: 2,
@@ -383,7 +378,8 @@ const Leads = () => {
                               </td>
                               {/* New Total Payment Cell */}
                               <td>
-                                £{parseFloat(lead.total_payment).toLocaleString(
+                                £
+                                {parseFloat(lead.total_payment).toLocaleString(
                                   undefined,
                                   {
                                     minimumFractionDigits: 2,
@@ -501,10 +497,7 @@ const Leads = () => {
     }
 
     // Best Time To Call Validation (Optional)
-    if (
-      newLead.bestTimeToCall &&
-      isNaN(Date.parse(newLead.bestTimeToCall))
-    ) {
+    if (newLead.bestTimeToCall && isNaN(Date.parse(newLead.bestTimeToCall))) {
       newErrors.bestTimeToCall = "Best time to call is invalid.";
     }
 
@@ -555,7 +548,9 @@ const Leads = () => {
           </Button>
         </div>
         <LeadActions setActiveSection={setActiveSection} />
-        <div className="section-content">{renderSectionContent(activeSection)}</div>
+        <div className="section-content">
+          {renderSectionContent(activeSection)}
+        </div>
 
         {/* Add Lead Modal */}
         <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
@@ -893,6 +888,31 @@ const Leads = () => {
                     </Form.Control>
                     <Form.Control.Feedback type="invalid">
                       {errors.status}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                {/* Customer Type */}
+                <Col md={6}>
+                  <Form.Group controlId="formCustomerType" className="mb-3">
+                    <Form.Label>Customer Type</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="customerType"
+                      value={newLead.customerType}
+                      onChange={handleChange}
+                      isInvalid={!!errors.customerType}
+                    >
+                      <option value="">-- Select Customer Type --</option>
+                      <option value="Commercial">Commercial</option>
+                      <option value="Educational">Educational</option>
+                      <option value="Residential">Residential</option>
+                      <option value="Government">Government</option>
+                      <option value="Other">Other</option>
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.customerType}
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
