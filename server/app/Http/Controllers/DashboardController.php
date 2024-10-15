@@ -18,7 +18,8 @@ class DashboardController extends Controller
         $totalLeads = Lead::count();
 
         // Total revenue (sum of total_payment in the leads)
-        $totalRevenue = Lead::sum('total_payment');
+        $totalRevenue = Lead::where('status', 5)->sum('total_payment');
+
 
         // Prepare the response data
         $data = [
@@ -31,23 +32,34 @@ class DashboardController extends Controller
     }
     public function getLeadStatusCounts(): JsonResponse
     {
-        // Get count of leads grouped by status
-        $leadStatusCounts = Lead::selectRaw('status, COUNT(*) as count')
+        // Get count and sum of quoted price grouped by status
+        $leadStatusData = Lead::selectRaw('status, COUNT(*) as count, SUM(quoted_price) as total_price')
             ->groupBy('status')
             ->get()
-            ->pluck('count', 'status');
-
+            ->mapWithKeys(function ($item) {
+                return [$item->status => ['count' => $item->count, 'total_price' => $item->total_price]];
+            });
+    
+        // Get total payment sum for status 5 (Won)
+        $totalPaymentWon = Lead::where('status', 5)->sum('total_payment');
+    
         // Create a response with status IDs mapped to their names
         $data = [
-            'hot' => $leadStatusCounts[1] ?? 0,   // Status ID 1 = Hot
-            'cold' => $leadStatusCounts[2] ?? 0,  // Status ID 2 = Cold
-            'warm' => $leadStatusCounts[3] ?? 0,  // Status ID 3 = Warm
-            'lost' => $leadStatusCounts[4] ?? 0,  // Status ID 4 = Lost
-            'won' => $leadStatusCounts[5] ?? 0,   // Status ID 5 = Won
+            'hot' => ['count' => $leadStatusData[1]['count'] ?? 0, 'total_price' => $leadStatusData[1]['total_price'] ?? 0],   // Status ID 1 = Hot
+            'cold' => ['count' => $leadStatusData[2]['count'] ?? 0, 'total_price' => $leadStatusData[2]['total_price'] ?? 0],  // Status ID 2 = Cold
+            'warm' => ['count' => $leadStatusData[3]['count'] ?? 0, 'total_price' => $leadStatusData[3]['total_price'] ?? 0],  // Status ID 3 = Warm
+            'lost' => ['count' => $leadStatusData[4]['count'] ?? 0, 'total_price' => $leadStatusData[4]['total_price'] ?? 0],  // Status ID 4 = Lost
+            'won' => [
+                'count' => $leadStatusData[5]['count'] ?? 0,
+                'total_price' => $leadStatusData[5]['total_price'] ?? 0,
+                'total_payment' => $totalPaymentWon,  // Add total payment for Won leads
+            ],
         ];
-
+    
         return response()->json($data);
     }
+    
+    
     public function getWeeklyLeadData(): JsonResponse
     {
         // Get the total leads per week for the last 4 weeks

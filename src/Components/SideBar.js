@@ -43,6 +43,14 @@ const Sidebar = () => {
           <UsersIcon className="me-2" /> User Management
         </Link>
         <Link
+          to="/pipeline"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/pipeline"
+          )}`}
+        >
+          <InfoIcon className="me-2" /> Pipeline
+        </Link>
+        <Link
           to="/settings"
           className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
             "/settings"
@@ -57,14 +65,6 @@ const Sidebar = () => {
           )}`}
         >
           <InfoIcon className="me-2" /> Info
-        </Link>
-        <Link
-          to="/pipeline"
-          className={`list-group-item list-group-item-action d-flex align-items-center ${isActive(
-            "/pipeline"
-          )}`}
-        >
-          <InfoIcon className="me-2" /> Pipeline
         </Link>
       </div>
     </aside>

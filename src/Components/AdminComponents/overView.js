@@ -27,11 +27,11 @@ ChartJS.register(
 
 const Overview = () => {
   const [leadStatusCounts, setLeadStatusCounts] = useState({
-    hot: 0,
-    cold: 0,
-    warm: 0,
-    lost: 0,
-    won: 0,
+    hot: { count: 0, total_price: 0 },
+    cold: { count: 0, total_price: 0 },
+    warm: { count: 0, total_price: 0 },
+    lost: { count: 0, total_price: 0 },
+    won: { count: 0, total_price: 0 },
   });
 
   const [weeklyData, setWeeklyData] = useState({
@@ -41,7 +41,7 @@ const Overview = () => {
   });
 
   useEffect(() => {
-    // Fetch lead status counts for the pie chart
+    // Fetch lead status counts for the pie chart and table
     fetch(`${config.baseURL}/lead-status-counts`)
       .then((response) => response.json())
       .then((data) => setLeadStatusCounts(data))
@@ -63,11 +63,11 @@ const Overview = () => {
     datasets: [
       {
         data: [
-          leadStatusCounts.cold,
-          leadStatusCounts.warm,
-          leadStatusCounts.hot,
-          leadStatusCounts.won,
-          leadStatusCounts.lost,
+          leadStatusCounts.cold.count,
+          leadStatusCounts.warm.count,
+          leadStatusCounts.hot.count,
+          leadStatusCounts.won.count,
+          leadStatusCounts.lost.count,
         ],
         backgroundColor: [
           "#3498db", // Cold
@@ -81,41 +81,94 @@ const Overview = () => {
   };
 
   const lineData = {
-    labels: weeklyData.weeks.map((week) => `Week ${week}`), // Display weeks dynamically
+    labels: weeklyData.weeks,
     datasets: [
       {
         label: "Total Leads",
         data: weeklyData.total_leads,
-        fill: false,
         borderColor: "#3498db",
-        tension: 0.4, // Add tension for a smooth line
+        backgroundColor: "rgba(52, 152, 219, 0.2)",
+        fill: true,
+        tension: 0.4,
       },
       {
         label: "Converted Sales",
         data: weeklyData.converted_sales,
-        fill: false,
         borderColor: "#2ecc71",
-        tension: 0.4, // Add tension for a smooth line
+        backgroundColor: "rgba(46, 204, 113, 0.2)",
+        fill: true,
+        tension: 0.4,
       },
     ],
   };
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "2rem",
-      }}
-    >
-      <div style={styles.chartContainer}>
-        <h3>Lead Distribution</h3>
-        <Pie data={pieData} />
+    <div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "2rem",
+        }}
+      >
+        <div style={styles.chartContainer}>
+          <h3>Lead Distribution</h3>
+          <Pie data={pieData} />
+        </div>
+        <div style={styles.chartContainer}>
+          <h3>Quoted Prices</h3>
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Total Quoted Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Cold Leads</td>
+                <td>£{leadStatusCounts.cold.total_price}</td>
+              </tr>
+              <tr>
+                <td>Warm Leads</td>
+                <td>£{leadStatusCounts.warm.total_price}</td>
+              </tr>
+              <tr>
+                <td>Hot Leads</td>
+                <td>£{leadStatusCounts.hot.total_price}</td>
+              </tr>
+              <tr>
+                <td>Won Jobs</td>
+                <td>£{leadStatusCounts.won.total_price}</td>
+              </tr>
+              <tr>
+                <td>Lost Jobs</td>
+                <td>£{leadStatusCounts.lost.total_price}</td>
+              </tr>
+            </tbody>
+          </table>
+          <h3>Sales Prices</h3>
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Total Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Won Jobs</td>
+                <td>£{leadStatusCounts.won.total_payment}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div style={styles.chartContainer}>
+
+      {/* <div style={{ ...styles.chartContainer, marginTop: "2rem" }}>
         <h3>Performance Trends</h3>
         <Line data={lineData} />
-      </div>
+      </div> */}
     </div>
   );
 };
