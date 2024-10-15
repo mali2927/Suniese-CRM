@@ -3,7 +3,16 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { Pie, Bar, Doughnut, Radar, PolarArea } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, RadialLinearScale } from 'chart.js';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  RadialLinearScale,
+} from "chart.js";
 import config from "../../../config";
 
 // Register chart elements and scales
@@ -17,7 +26,13 @@ ChartJS.register(
   RadialLinearScale
 );
 
-const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) => {
+const ReportModal = ({
+  show,
+  onHide,
+  leadData,
+  consultantName,
+  consultants,
+}) => {
   // Replace comparisonMode with mode
   const [mode, setMode] = useState("single"); // Modes: "single", "comparison", "all"
 
@@ -36,7 +51,13 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
   const [loadingAll, setLoadingAll] = useState(false);
   const [errorAll, setErrorAll] = useState(null);
   const [allChartType, setAllChartType] = useState("Bar"); // Options: "Bar", "Pie", "Doughnut", "Radar", "PolarArea"
-
+  const [leadStatusCounts, setLeadStatusCounts] = useState({
+    hot: { count: 0, total_price: 0 },
+    cold: { count: 0, total_price: 0 },
+    warm: { count: 0, total_price: 0 },
+    lost: { count: 0, total_price: 0 },
+    won: { count: 0, total_price: 0 },
+  });
   // Function to map status IDs to labels
   const getStatusLabel = (statusId) => {
     const statusMap = {
@@ -48,13 +69,21 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
     };
     return statusMap[statusId] || "Pending";
   };
+  console.log(leadData[0]?.user_id);
 
   // Function to fetch leads data for a consultant
-  const fetchLeadsForConsultant = async (consultantId, setLeads, setLoading, setError) => {
+  const fetchLeadsForConsultant = async (
+    consultantId,
+    setLeads,
+    setLoading,
+    setError
+  ) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${config.baseURL}/searchLeadByConsultantId?user_id=${consultantId}`);
+      const response = await fetch(
+        `${config.baseURL}/searchLeadByConsultantId?user_id=${consultantId}`
+      );
       const result = await response.json();
       console.log(`Leads API Response for Consultant ${consultantId}:`, result);
 
@@ -65,7 +94,10 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
         setError("No leads found for this consultant.");
       }
     } catch (error) {
-      console.error(`Error fetching leads for consultant ${consultantId}:`, error);
+      console.error(
+        `Error fetching leads for consultant ${consultantId}:`,
+        error
+      );
       setError("An error occurred while fetching leads.");
     } finally {
       setLoading(false);
@@ -76,7 +108,7 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
   const handleModeChange = (e) => {
     const selectedMode = e.target.value;
     setMode(selectedMode);
-    
+
     // Reset other states
     setSelectedConsultant1("");
     setSelectedConsultant2("");
@@ -92,17 +124,40 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
   // Effect to fetch leads1 when selectedConsultant1 changes
   useEffect(() => {
     if (mode === "comparison" && selectedConsultant1) {
-      fetchLeadsForConsultant(selectedConsultant1, setLeads1, setLoading1, setError1);
+      fetchLeadsForConsultant(
+        selectedConsultant1,
+        setLeads1,
+        setLoading1,
+        setError1
+      );
     } else {
       setLeads1([]);
       setError1(null);
     }
   }, [selectedConsultant1, mode]);
 
+  useEffect(() => {
+    const userId = leadData[0]?.user_id; // Get the user ID from leadData
+
+    if (userId) {
+      fetch(`${config.baseURL}/lead-status-counts-by-user-id/${userId}`) // Send user ID in the API request
+        .then((response) => response.json())
+        .then((data) => setLeadStatusCounts(data))
+        .catch((error) =>
+          console.error("Error fetching lead status counts:", error)
+        );
+    }
+  }, [leadData]);
+
   // Effect to fetch leads2 when selectedConsultant2 changes
   useEffect(() => {
     if (mode === "comparison" && selectedConsultant2) {
-      fetchLeadsForConsultant(selectedConsultant2, setLeads2, setLoading2, setError2);
+      fetchLeadsForConsultant(
+        selectedConsultant2,
+        setLeads2,
+        setLoading2,
+        setError2
+      );
     } else {
       setLeads2([]);
       setError2(null);
@@ -124,7 +179,9 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
     setErrorAll(null);
     try {
       const fetchPromises = consultants.map((consultant) =>
-        fetch(`${config.baseURL}/searchLeadByConsultantId?user_id=${consultant.id}`)
+        fetch(
+          `${config.baseURL}/searchLeadByConsultantId?user_id=${consultant.id}`
+        )
           .then((response) => response.json())
           .then((result) => ({
             consultantId: consultant.id,
@@ -140,7 +197,9 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
       setLeadsAll(allLeads);
     } catch (error) {
       console.error("Error fetching all leads:", error);
-      setErrorAll("An error occurred while fetching leads for all consultants.");
+      setErrorAll(
+        "An error occurred while fetching leads for all consultants."
+      );
     } finally {
       setLoadingAll(false);
     }
@@ -148,6 +207,7 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
 
   // Compute status counts for a given leads array
   const computeStatusCounts = (leads) => {
+    console.log(leads);
     return leads.reduce((acc, lead) => {
       const statusLabel = getStatusLabel(lead.status);
       acc[statusLabel] = (acc[statusLabel] || 0) + 1;
@@ -158,44 +218,45 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
   // Define a color mapping based on status labels
   const colorMap = {
     Hot: {
-      background: 'rgba(255, 0, 0, 0.6)',    // Red
-      border: 'rgba(255, 0, 0, 1)',
+      background: "rgba(255, 0, 0, 0.6)", // Red
+      border: "rgba(255, 0, 0, 1)",
     },
     Cold: {
-      background: 'rgba(54, 162, 235, 0.6)', // Blue
-      border: 'rgba(54, 162, 235, 1)',
+      background: "rgba(54, 162, 235, 0.6)", // Blue
+      border: "rgba(54, 162, 235, 1)",
     },
     Warm: {
-      background: 'rgba(255, 206, 86, 0.6)', // Yellow
-      border: 'rgba(255, 206, 86, 1)',
+      background: "rgba(255, 206, 86, 0.6)", // Yellow
+      border: "rgba(255, 206, 86, 1)",
     },
     Lost: {
-      background: 'rgba(75, 192, 192, 0.6)', // Teal
-      border: 'rgba(75, 192, 192, 1)',
+      background: "rgba(75, 192, 192, 0.6)", // Teal
+      border: "rgba(75, 192, 192, 1)",
     },
     Won: {
-      background: 'rgba(0, 128, 0, 0.6)',     // Green
-      border: 'rgba(0, 128, 0, 1)',
+      background: "rgba(0, 128, 0, 0.6)", // Green
+      border: "rgba(0, 128, 0, 1)",
     },
     Pending: {
-      background: 'rgba(201, 203, 207, 0.6)', // Grey
-      border: 'rgba(201, 203, 207, 1)',
+      background: "rgba(201, 203, 207, 0.6)", // Grey
+      border: "rgba(201, 203, 207, 1)",
     },
   };
 
   // Prepare data for a pie chart
   const prepareChartData = (statusCounts) => {
+    console.log(statusCounts);
     return {
       labels: Object.keys(statusCounts),
       datasets: [
         {
-          label: '# of Leads',
+          label: "# of Leads",
           data: Object.values(statusCounts),
           backgroundColor: Object.keys(statusCounts).map(
-            (label) => colorMap[label]?.background || 'rgba(0,0,0,0.1)'
+            (label) => colorMap[label]?.background || "rgba(0,0,0,0.1)"
           ),
           borderColor: Object.keys(statusCounts).map(
-            (label) => colorMap[label]?.border || 'rgba(0,0,0,1)'
+            (label) => colorMap[label]?.border || "rgba(0,0,0,1)"
           ),
           borderWidth: 1,
         },
@@ -213,10 +274,11 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
         label: status,
         data: consultants.map((consultant) => {
           const leads = leadsAll[consultant.id] || [];
-          return leads.filter((lead) => getStatusLabel(lead.status) === status).length;
+          return leads.filter((lead) => getStatusLabel(lead.status) === status)
+            .length;
         }),
-        backgroundColor: colorMap[status]?.background || 'rgba(0,0,0,0.1)',
-        borderColor: colorMap[status]?.border || 'rgba(0,0,0,1)',
+        backgroundColor: colorMap[status]?.background || "rgba(0,0,0,0.1)",
+        borderColor: colorMap[status]?.border || "rgba(0,0,0,1)",
         borderWidth: 1,
       };
     });
@@ -232,21 +294,27 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
     const labels = ["Hot", "Cold", "Warm", "Lost", "Won", "Pending"];
     const datasets = [
       {
-        label: 'Leads Status',
-        data: labels.map(label => {
+        label: "Leads Status",
+        data: labels.map((label) => {
           let total = 0;
-          consultants.forEach(consultant => {
+          consultants.forEach((consultant) => {
             const leads = leadsAll[consultant.id] || [];
-            total += leads.filter(lead => getStatusLabel(lead.status) === label).length;
+            total += leads.filter(
+              (lead) => getStatusLabel(lead.status) === label
+            ).length;
           });
           return total;
         }),
-        backgroundColor: labels.map(label => colorMap[label]?.background || 'rgba(0,0,0,0.1)'),
-        borderColor: labels.map(label => colorMap[label]?.border || 'rgba(0,0,0,1)'),
+        backgroundColor: labels.map(
+          (label) => colorMap[label]?.background || "rgba(0,0,0,0.1)"
+        ),
+        borderColor: labels.map(
+          (label) => colorMap[label]?.border || "rgba(0,0,0,1)"
+        ),
         borderWidth: 1,
       },
     ];
-    
+
     return {
       labels,
       datasets,
@@ -256,11 +324,14 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
   // Prepare data for Radar chart
   const prepareRadarChartData = () => {
     const labels = ["Hot", "Cold", "Warm", "Lost", "Won", "Pending"];
-    const datasets = consultants.map(consultant => {
+    const datasets = consultants.map((consultant) => {
       const leads = leadsAll[consultant.id] || [];
-      const data = labels.map(label => leads.filter(lead => getStatusLabel(lead.status) === label).length);
+      const data = labels.map(
+        (label) =>
+          leads.filter((lead) => getStatusLabel(lead.status) === label).length
+      );
       const color = getRandomColor(); // Function to assign a unique color to each consultant
-      
+
       return {
         label: consultant.name,
         data: data,
@@ -270,7 +341,7 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
         fill: true,
       };
     });
-    
+
     return {
       labels,
       datasets,
@@ -282,21 +353,27 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
     const labels = ["Hot", "Cold", "Warm", "Lost", "Won", "Pending"];
     const datasets = [
       {
-        label: 'Leads Status',
-        data: labels.map(label => {
+        label: "Leads Status",
+        data: labels.map((label) => {
           let total = 0;
-          consultants.forEach(consultant => {
+          consultants.forEach((consultant) => {
             const leads = leadsAll[consultant.id] || [];
-            total += leads.filter(lead => getStatusLabel(lead.status) === label).length;
+            total += leads.filter(
+              (lead) => getStatusLabel(lead.status) === label
+            ).length;
           });
           return total;
         }),
-        backgroundColor: labels.map(label => colorMap[label]?.background || 'rgba(0,0,0,0.1)'),
-        borderColor: labels.map(label => colorMap[label]?.border || 'rgba(0,0,0,1)'),
+        backgroundColor: labels.map(
+          (label) => colorMap[label]?.background || "rgba(0,0,0,0.1)"
+        ),
+        borderColor: labels.map(
+          (label) => colorMap[label]?.border || "rgba(0,0,0,1)"
+        ),
         borderWidth: 1,
       },
     ];
-    
+
     return {
       labels,
       datasets,
@@ -320,11 +397,11 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
     maintainAspectRatio: false, // Allows custom height and width
     plugins: {
       legend: {
-        position: 'bottom',
+        position: "bottom",
       },
       title: {
         display: false,
-        text: 'Leads Status',
+        text: "Leads Status",
       },
     },
     // Add default scales configuration if needed
@@ -344,7 +421,8 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
     <Modal show={show} onHide={onHide} size="lg" centered>
       <Modal.Header closeButton>
         <Modal.Title>
-          Lead Status Report {mode === "single" && consultantName ? `- ${consultantName}` : ''}
+          Lead Status Report{" "}
+          {mode === "single" && consultantName ? `- ${consultantName}` : ""}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -411,19 +489,27 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
                     {/* Consultant 1 Chart */}
                     <Col md={6}>
                       <h5>
-                        {
-                          consultants.find(
-                            (c) => c.id === Number(selectedConsultant1)
-                          )?.name || 'Consultant 1'
-                        }'s Leads
+                        {consultants.find(
+                          (c) => c.id === Number(selectedConsultant1)
+                        )?.name || "Consultant 1"}
+                        's Leads
                       </h5>
                       {loading1 ? (
                         <Spinner animation="border" size="sm" />
                       ) : error1 ? (
                         <Alert variant="danger">{error1}</Alert>
                       ) : leads1.length > 0 ? (
-                        <div style={{ position: 'relative', height: '300px', width: '100%' }}>
-                          <Pie data={prepareChartData(computeStatusCounts(leads1))} options={options} />
+                        <div
+                          style={{
+                            position: "relative",
+                            height: "300px",
+                            width: "100%",
+                          }}
+                        >
+                          <Pie
+                            data={prepareChartData(computeStatusCounts(leads1))}
+                            options={options}
+                          />
                         </div>
                       ) : (
                         <p>No leads available for this consultant.</p>
@@ -433,19 +519,27 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
                     {/* Consultant 2 Chart */}
                     <Col md={6}>
                       <h5>
-                        {
-                          consultants.find(
-                            (c) => c.id === Number(selectedConsultant2)
-                          )?.name || 'Consultant 2'
-                        }'s Leads
+                        {consultants.find(
+                          (c) => c.id === Number(selectedConsultant2)
+                        )?.name || "Consultant 2"}
+                        's Leads
                       </h5>
                       {loading2 ? (
                         <Spinner animation="border" size="sm" />
                       ) : error2 ? (
                         <Alert variant="danger">{error2}</Alert>
                       ) : leads2.length > 0 ? (
-                        <div style={{ position: 'relative', height: '300px', width: '100%' }}>
-                          <Pie data={prepareChartData(computeStatusCounts(leads2))} options={options} />
+                        <div
+                          style={{
+                            position: "relative",
+                            height: "300px",
+                            width: "100%",
+                          }}
+                        >
+                          <Pie
+                            data={prepareChartData(computeStatusCounts(leads2))}
+                            options={options}
+                          />
                         </div>
                       ) : (
                         <p>No leads available for this consultant.</p>
@@ -477,143 +571,175 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
 
             {loadingAll ? (
               <div className="text-center">
-                <Spinner animation="border" /> Loading leads for all consultants...
+                <Spinner animation="border" /> Loading leads for all
+                consultants...
               </div>
             ) : errorAll ? (
               <Alert variant="danger">{errorAll}</Alert>
+            ) : leadsAll && consultants.length > 0 ? (
+              <>
+                {allChartType === "Bar" ? (
+                  /* Render Bar Chart */
+                  <div
+                    style={{
+                      position: "relative",
+                      height: "500px",
+                      width: "100%",
+                    }}
+                  >
+                    <Bar
+                      data={barChartData}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false, // Allows custom height and width
+                        plugins: {
+                          legend: {
+                            position: "top",
+                          },
+                          title: {
+                            display: true,
+                            text: "Leads Status Across All Consultants",
+                          },
+                        },
+                        scales: {
+                          x: {
+                            stacked: true,
+                          },
+                          y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            title: {
+                              display: true,
+                              text: "Number of Leads",
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                ) : allChartType === "Pie" ? (
+                  /* Render Pie Chart */
+                  <div
+                    style={{
+                      position: "relative",
+                      height: "500px",
+                      width: "100%",
+                    }}
+                  >
+                    <Pie
+                      data={prepareDoughnutChartData()} // Reusing Doughnut data for Pie
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                          legend: {
+                            position: "bottom",
+                          },
+                          title: {
+                            display: true,
+                            text: "Leads Status Distribution Across All Consultants",
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                ) : allChartType === "Doughnut" ? (
+                  /* Render Doughnut Chart */
+                  <div
+                    style={{
+                      position: "relative",
+                      height: "500px",
+                      width: "100%",
+                    }}
+                  >
+                    <Doughnut
+                      data={prepareDoughnutChartData()}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                          legend: {
+                            position: "bottom",
+                          },
+                          title: {
+                            display: true,
+                            text: "Leads Status Distribution (Doughnut)",
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                ) : allChartType === "Radar" ? (
+                  /* Render Radar Chart */
+                  <div
+                    style={{
+                      position: "relative",
+                      height: "500px",
+                      width: "100%",
+                    }}
+                  >
+                    <Radar
+                      data={prepareRadarChartData()}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                          legend: {
+                            position: "top",
+                          },
+                          title: {
+                            display: true,
+                            text: "Leads Status Comparison Across Consultants",
+                          },
+                        },
+                        scales: {
+                          r: {
+                            angleLines: {
+                              display: true,
+                            },
+                            suggestedMin: 0,
+                            suggestedMax:
+                              Math.max(
+                                ...consultants.map((c) => {
+                                  const leads = leadsAll[c.id] || [];
+                                  return leads.length;
+                                })
+                              ) + 5,
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                ) : allChartType === "PolarArea" ? (
+                  /* Render Polar Area Chart */
+                  <div
+                    style={{
+                      position: "relative",
+                      height: "500px",
+                      width: "100%",
+                    }}
+                  >
+                    <PolarArea
+                      data={preparePolarAreaChartData()}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                          legend: {
+                            position: "right",
+                          },
+                          title: {
+                            display: true,
+                            text: "Leads Status Polar Area Chart Across All Consultants",
+                          },
+                        },
+                      }}
+                    />
+                  </div>
+                ) : null}
+              </>
             ) : (
-              leadsAll && consultants.length > 0 ? (
-                <>
-                  {allChartType === "Bar" ? (
-                    /* Render Bar Chart */
-                    <div style={{ position: 'relative', height: '500px', width: '100%' }}>
-                      <Bar
-                        data={barChartData}
-                        options={{
-                          responsive: true,
-                          maintainAspectRatio: false, // Allows custom height and width
-                          plugins: {
-                            legend: {
-                              position: 'top',
-                            },
-                            title: {
-                              display: true,
-                              text: 'Leads Status Across All Consultants',
-                            },
-                          },
-                          scales: {
-                            x: {
-                              stacked: true,
-                            },
-                            y: {
-                              stacked: true,
-                              beginAtZero: true,
-                              title: {
-                                display: true,
-                                text: 'Number of Leads',
-                              },
-                            },
-                          },
-                        }}
-                      />
-                    </div>
-                  ) : allChartType === "Pie" ? (
-                    /* Render Pie Chart */
-                    <div style={{ position: 'relative', height: '500px', width: '100%' }}>
-                      <Pie
-                        data={prepareDoughnutChartData()} // Reusing Doughnut data for Pie
-                        options={{
-                          responsive: true,
-                          maintainAspectRatio: false,
-                          plugins: {
-                            legend: {
-                              position: 'bottom',
-                            },
-                            title: {
-                              display: true,
-                              text: 'Leads Status Distribution Across All Consultants',
-                            },
-                          },
-                        }}
-                      />
-                    </div>
-                  ) : allChartType === "Doughnut" ? (
-                    /* Render Doughnut Chart */
-                    <div style={{ position: 'relative', height: '500px', width: '100%' }}>
-                      <Doughnut
-                        data={prepareDoughnutChartData()}
-                        options={{
-                          responsive: true,
-                          maintainAspectRatio: false,
-                          plugins: {
-                            legend: {
-                              position: 'bottom',
-                            },
-                            title: {
-                              display: true,
-                              text: 'Leads Status Distribution (Doughnut)',
-                            },
-                          },
-                        }}
-                      />
-                    </div>
-                  ) : allChartType === "Radar" ? (
-                    /* Render Radar Chart */
-                    <div style={{ position: 'relative', height: '500px', width: '100%' }}>
-                      <Radar
-                        data={prepareRadarChartData()}
-                        options={{
-                          responsive: true,
-                          maintainAspectRatio: false,
-                          plugins: {
-                            legend: {
-                              position: 'top',
-                            },
-                            title: {
-                              display: true,
-                              text: 'Leads Status Comparison Across Consultants',
-                            },
-                          },
-                          scales: {
-                            r: {
-                              angleLines: {
-                                display: true,
-                              },
-                              suggestedMin: 0,
-                              suggestedMax: Math.max(...consultants.map(c => {
-                                const leads = leadsAll[c.id] || [];
-                                return leads.length;
-                              })) + 5,
-                            },
-                          },
-                        }}
-                      />
-                    </div>
-                  ) : allChartType === "PolarArea" ? (
-                    /* Render Polar Area Chart */
-                    <div style={{ position: 'relative', height: '500px', width: '100%' }}>
-                      <PolarArea
-                        data={preparePolarAreaChartData()}
-                        options={{
-                          responsive: true,
-                          maintainAspectRatio: false,
-                          plugins: {
-                            legend: {
-                              position: 'right',
-                            },
-                            title: {
-                              display: true,
-                              text: 'Leads Status Polar Area Chart Across All Consultants',
-                            },
-                          },
-                        }}
-                      />
-                    </div>
-                  ) : null}
-                </>
-              ) : (
-                <p>No leads available for any consultants.</p>
-              )
+              <p>No leads available for any consultants.</p>
             )}
           </div>
         ) : (
@@ -621,9 +747,85 @@ const ReportModal = ({ show, onHide, leadData, consultantName, consultants }) =>
           <div>
             {/* Single Consultant Report */}
             {leadData.length > 0 ? (
-              <div style={{ position: 'relative', height: '300px', width: '100%' }}>
-                <Pie data={prepareChartData(computeStatusCounts(leadData))} options={options} />
-              </div>
+              <>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    height: "100%", // Adjusted height to fill modal space
+                    width: "100%",
+                    overflow: "hidden", // Prevents overflow of children
+                  }}
+                >
+                  <div
+                    style={{ flex: "2", position: "relative", height: "400px" }}
+                  >
+                    {" "}
+                    {/* Increased height */}
+                    <Pie
+                      data={prepareChartData(computeStatusCounts(leadData))}
+                      options={{
+                        ...options,
+                        maintainAspectRatio: false, // Allows for responsive height
+                      }}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      flex: "1",
+                      paddingLeft: "20px",
+                      overflowY: "auto",
+                    }}
+                  >
+                    <h3>Quoted Prices</h3>
+                    <table className="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Status</th>
+                          <th>Total Quoted Price</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Cold Leads</td>
+                          <td>£{leadStatusCounts.cold.total_price}</td>
+                        </tr>
+                        <tr>
+                          <td>Warm Leads</td>
+                          <td>£{leadStatusCounts.warm.total_price}</td>
+                        </tr>
+                        <tr>
+                          <td>Hot Leads</td>
+                          <td>£{leadStatusCounts.hot.total_price}</td>
+                        </tr>
+                        <tr>
+                          <td>Won Jobs</td>
+                          <td>£{leadStatusCounts.won.total_price}</td>
+                        </tr>
+                        <tr>
+                          <td>Lost Jobs</td>
+                          <td>£{leadStatusCounts.lost.total_price}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <h3>Sales Prices</h3>
+                    <table className="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Status</th>
+                          <th>Total Sales</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Won Jobs</td>
+                          <td>£{leadStatusCounts.won.total_payment}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </>
             ) : (
               <p>No data available to display.</p>
             )}

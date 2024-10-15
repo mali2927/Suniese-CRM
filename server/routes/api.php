@@ -60,3 +60,5 @@ Route::get('/dashboard/data', [UserDashboardController::class, 'getDashboardData
 
 Route::post('/chase_notes', [ChaseNoteController::class, 'store']);
 Route::get('/chase_notes/{leadId}', [ChaseNoteController::class, 'show']);
+
+Route::get('/lead-status-counts-by-user-id/{userId}', [DashboardController::class, 'getLeadStatusCountsByUserId']);
