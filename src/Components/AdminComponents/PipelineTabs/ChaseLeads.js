@@ -20,11 +20,13 @@ const ChaseLeads = ({
 }) => {
   const [chaseLeads, setChaseLeads] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [showNotesModal, setShowNotesModal] = useState(false); // New state for notes modal
   const [selectedLead, setSelectedLead] = useState(null);
   const [chaseMethod, setChaseMethod] = useState(""); // Email or Phone
   const [talkDetail, setTalkDetail] = useState(""); // Talk details
   const [chaseDate, setChaseDate] = useState(""); // Date when chased
   const [chaseNotes, setChaseNotes] = useState([]); // Chase notes for the selected lead
+  const [allChaseNotes, setAllChaseNotes] = useState([]); // All chase notes for displaying in modal
 
   useEffect(() => {
     fetchLeads();
@@ -106,7 +108,25 @@ const ChaseLeads = ({
       console.error("Error saving chase note:", error);
     }
   };
-
+  const handleNotesClick = async (lead) => {
+    setSelectedLead(lead);
+    try {
+      const response = await fetch(`${config.baseURL}/chase_notes/${lead.id}`);
+      const result = await response.json();
+      if (result.success) {
+        setAllChaseNotes(result.data);
+        setShowNotesModal(true); // Show modal when notes are fetched
+      } else {
+        console.error("Failed to fetch all chase notes");
+      }
+    } catch (error) {
+      console.error("Error fetching all chase notes:", error);
+    }
+  };
+  const handleCloseNotesModal = () => {
+    setShowNotesModal(false); // Close the notes modal
+    setAllChaseNotes([]); // Clear notes data when closing the modal
+  };
   const filteredChaseLeads = chaseLeads.filter(
     (lead) =>
       lead.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -158,7 +178,11 @@ const ChaseLeads = ({
                 <td>{lead.email}</td>
                 <td>{lead.phone_number}</td>
                 <td>{lead.quoted_price}</td>
-                <td>{lead.chase_notes[0]?.talk_detail}</td>
+                <td>
+                  <Button variant="link" onClick={() => handleNotesClick(lead)}>
+                    {lead.chase_notes[0]?.talk_detail || "View Notes"}
+                  </Button>
+                </td>
                 <td>
                   <Button
                     variant="primary"
@@ -243,6 +267,38 @@ const ChaseLeads = ({
           </Button>
           <Button variant="primary" onClick={handleSaveChaseNote}>
             Save Chase Note
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <Modal show={showNotesModal} onHide={handleCloseNotesModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>All Chase Notes</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Chased Via</th>
+                <th>Date Contacted</th>
+                <th>Talk Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allChaseNotes.map((note, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>{note.chased_via}</td>
+                  <td>{note.last_contacted}</td>
+                  <td>{note.talk_detail}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseNotesModal}>
+            Close
           </Button>
         </Modal.Footer>
       </Modal>
