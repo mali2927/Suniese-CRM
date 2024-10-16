@@ -58,6 +58,14 @@ const ReportModal = ({
     lost: { count: 0, total_price: 0 },
     won: { count: 0, total_price: 0 },
   });
+
+  const [leadStatusCountsAll, setLeadStatusCountsAll] = useState({
+    hot: { count: 0, total_price: 0 },
+    cold: { count: 0, total_price: 0 },
+    warm: { count: 0, total_price: 0 },
+    lost: { count: 0, total_price: 0 },
+    won: { count: 0, total_price: 0 },
+  });
   // Function to map status IDs to labels
   const getStatusLabel = (statusId) => {
     const statusMap = {
@@ -147,6 +155,15 @@ const ReportModal = ({
           console.error("Error fetching lead status counts:", error)
         );
     }
+  }, [leadData]);
+
+  useEffect(() => {
+    fetch(`${config.baseURL}/lead-status-counts`) // Send user ID in the API request
+      .then((response) => response.json())
+      .then((data) => setLeadStatusCountsAll(data))
+      .catch((error) =>
+        console.error("Error fetching lead status counts:", error)
+      );
   }, [leadData]);
 
   // Effect to fetch leads2 when selectedConsultant2 changes
@@ -578,6 +595,54 @@ const ReportModal = ({
               <Alert variant="danger">{errorAll}</Alert>
             ) : leadsAll && consultants.length > 0 ? (
               <>
+                <div>
+                  <h3>Quoted Prices</h3>
+                  <table className="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Status</th>
+                        <th>Total Quoted Price</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Cold Leads</td>
+                        <td>£{leadStatusCountsAll.cold.total_price}</td>
+                      </tr>
+                      <tr>
+                        <td>Warm Leads</td>
+                        <td>£{leadStatusCountsAll.warm.total_price}</td>
+                      </tr>
+                      <tr>
+                        <td>Hot Leads</td>
+                        <td>£{leadStatusCountsAll.hot.total_price}</td>
+                      </tr>
+                      <tr>
+                        <td>Won Jobs</td>
+                        <td>£{leadStatusCountsAll.won.total_price}</td>
+                      </tr>
+                      <tr>
+                        <td>Lost Jobs</td>
+                        <td>£{leadStatusCountsAll.lost.total_price}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <h3>Sales Prices</h3>
+                  <table className="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Status</th>
+                        <th>Total Sales</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Won Jobs</td>
+                        <td>£{leadStatusCountsAll.won.total_payment}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
                 {allChartType === "Bar" ? (
                   /* Render Bar Chart */
                   <div
