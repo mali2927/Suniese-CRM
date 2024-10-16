@@ -21,7 +21,7 @@ const Sidebar = () => {
         <Link
           to="/userdashboard"
           className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
-            "/dashboard"
+            "/userdashboard"
           )}`}
         >
           <Home className="me-2" /> Overview
@@ -29,18 +29,24 @@ const Sidebar = () => {
         <Link
           to="/userleads"
           className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
-            "/leads"
+            "/userleads"
           )}`}
         >
           <FileText className="me-2" /> Lead Management
         </Link>
+        <Link
+          to="/userpipeline"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/userpipeline"
+          )}`}
+        >
+          <InfoIcon className="me-2" /> Pipeline
+        </Link>
 
-
-        
         <Link
           to="#"
-          className={`list-group-item list-group-item-action d-flex align-items-center ${isActive(
-            "/info"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/userinfo"
           )}`}
         >
           <InfoIcon className="me-2" /> Info

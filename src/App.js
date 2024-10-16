@@ -4,6 +4,7 @@ import LoginPage from "./Components/Login";
 import Dashboard from "./Components/Dashboard";
 import Users from "./Components/AdminComponents/Users";
 import Pipeline from "./Components/AdminComponents/Pipeline";
+import UserPipeline from "./Components/UserComponents/UserPipeline";
 import Settings from "./Components/AdminComponents/Settings";
 import Info from "./Components/AdminComponents/Info";
 import Leads from "./Components/AdminComponents/Leads";
@@ -73,6 +74,16 @@ function App() {
             element={
               <ProtectedRoute
                 element={UserLeads}
+                roleRequired="sales consultant"
+              />
+            }
+          />
+
+          <Route
+            path="/userpipeline"
+            element={
+              <ProtectedRoute
+                element={UserPipeline}
                 roleRequired="sales consultant"
               />
             }
