@@ -33,15 +33,21 @@ const ChaseLeads = ({
   }, []);
 
   const fetchLeads = async () => {
+    const selectedConsultantId = localStorage.getItem("user_id");
+
     try {
-      const response = await fetch(`${config.baseURL}/leads`);
+      const response = await fetch(
+        `${config.baseURL}/leads/consultant/${selectedConsultantId}`
+      );
       const result = await response.json();
 
       if (result.success) {
-        const chase = result.data.filter((lead) => lead.id !== 5); // Exclude leads with ID 5
-        setChaseLeads(chase);
+        const won = result.data.filter(
+          (lead) => lead.status && lead.status.id !== 5
+        );
+        setChaseLeads(won);
       } else {
-        console.error("Failed to fetch leads");
+        console.error("Failed to fetch leads for the selected consultant");
       }
     } catch (error) {
       console.error("Error fetching leads:", error);

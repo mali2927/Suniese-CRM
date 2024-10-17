@@ -62,3 +62,6 @@ Route::post('/chase_notes', [ChaseNoteController::class, 'store']);
 Route::get('/chase_notes/{leadId}', [ChaseNoteController::class, 'show']);
 
 Route::get('/lead-status-counts-by-user-id/{userId}', [DashboardController::class, 'getLeadStatusCountsByUserId']);
+
+Route::get('/leads/consultant/{consultantId}', [LeadController::class, 'getLeadsByConsultant']);
+Route::get('/leads/lost/consultant/{consultantId}', [LeadController::class, 'getLostLeadsByConsultant']);

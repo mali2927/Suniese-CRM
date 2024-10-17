@@ -37,6 +37,51 @@ class LeadController extends Controller
              ], 500);
          }
      }
+     public function getLeadsByConsultant($consultantId)
+    {
+    try {
+        // Fetch leads where user_id matches the consultantId
+        $leads = Lead::with(['user', 'status', 'chaseNotes', 'lostRemarks.declaredUser'])
+                     ->where('user_id', $consultantId)
+                     ->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $leads
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error fetching leads for consultant: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred while fetching leads for the selected consultant.',
+        ], 500);
+    }
+    }
+
+    public function getLostLeadsByConsultant($consultantId)
+    {
+    try {
+        // Fetch lost leads where user_id matches the consultantId and status id is 4
+        $lostLeads = Lead::with(['user', 'status', 'lostRemarks.declaredUser'])
+                         ->where('user_id', $consultantId)
+                         ->where('status_id', 4) // Assuming 4 represents lost status
+                         ->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $lostLeads
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error fetching lost leads for consultant: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred while fetching lost leads for the selected consultant.',
+        ], 500);
+    }
+
+    }
+
+
      
      
 

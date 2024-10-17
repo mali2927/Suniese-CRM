@@ -16,20 +16,21 @@ const LostLeads = ({
   }, []);
 
   const fetchLeads = async () => {
+    const selectedConsultantId = localStorage.getItem("user_id");
+
     try {
-      const response = await fetch(`${config.baseURL}/leads`);
+      const response = await fetch(
+        `${config.baseURL}/leads/lost/consultant/${selectedConsultantId}`
+      );
       const result = await response.json();
 
       if (result.success) {
-        const lost = result.data.filter(
-          (lead) => lead.status && lead.status.id === 4
-        );
-        setLostLeads(lost);
+        setLostLeads(result.data);
       } else {
-        console.error("Failed to fetch leads");
+        console.error("Failed to fetch lost leads");
       }
     } catch (error) {
-      console.error("Error fetching leads:", error);
+      console.error("Error fetching lost leads:", error);
     }
   };
 
