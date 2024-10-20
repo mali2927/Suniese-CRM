@@ -28,8 +28,7 @@ const LeadActions = ({ setActiveSection }) => {
           Transfer Leads
         </Nav.Link>
       </Nav.Item>
-
-   
+  
     </Nav>
   );
 };
