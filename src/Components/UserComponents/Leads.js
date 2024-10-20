@@ -68,6 +68,7 @@ const Leads = () => {
     bestTimeToCall: "",
     consultantId: userId ? userId.toString() : "", // Set to userId
     status: "",
+    customerType: "",
   });
 
   // State for validation errors
@@ -226,7 +227,8 @@ const Leads = () => {
           quotedPrice: "",
           meetingTime: "",
           bestTimeToCall: "",
-          consultantId: userId ? userId.toString() : "", // Reset to userId
+          consultantId: "",
+          customerType: "",
           status: "",
         });
         setErrors({}); // Reset errors
@@ -901,6 +903,31 @@ const Leads = () => {
                     </Form.Control>
                     <Form.Control.Feedback type="invalid">
                       {errors.status}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                {/* Customer Type */}
+                <Col md={6}>
+                  <Form.Group controlId="formCustomerType" className="mb-3">
+                    <Form.Label>Customer Type</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="customerType"
+                      value={newLead.customerType}
+                      onChange={handleChange}
+                      isInvalid={!!errors.customerType}
+                    >
+                      <option value="">-- Select Customer Type --</option>
+                      <option value="Commercial">Commercial</option>
+                      <option value="Educational">Educational</option>
+                      <option value="Residential">Residential</option>
+                      <option value="Government">Government</option>
+                      <option value="Other">Other</option>
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.customerType}
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
