@@ -137,10 +137,7 @@ const Leads = () => {
             `${config.baseURL}/searchLeadByConsultantId?user_id=${selectedConsultantId}`
           );
           const result = await response.json();
-          console.log(
-            "Selected Consultant Leads API Response:",
-            result
-          ); // Debugging Log
+          console.log("Selected Consultant Leads API Response:", result); // Debugging Log
 
           if (result.data && result.data.length > 0) {
             setSelectedLeads(result.data);
@@ -276,7 +273,8 @@ const Leads = () => {
               <Form.Label>Select Consultant</Form.Label>
               {loadingConsultants ? (
                 <div>
-                  <Spinner animation="border" size="sm" /> Loading consultants...
+                  <Spinner animation="border" size="sm" /> Loading
+                  consultants...
                 </div>
               ) : errorConsultants ? (
                 <Alert variant="danger">{errorConsultants}</Alert>
@@ -289,7 +287,9 @@ const Leads = () => {
                 >
                   <option value={userId}>
                     {consultants.find((c) => c.id === userId)
-                      ? `${consultants.find((c) => c.id === userId).name} - ${consultants.find((c) => c.id === userId).role}`
+                      ? `${consultants.find((c) => c.id === userId).name} - ${
+                          consultants.find((c) => c.id === userId).role
+                        }`
                       : "-- Select Consultant --"}
                   </option>
                 </Form.Control>
@@ -334,13 +334,7 @@ const Leads = () => {
                     </h4>
                     {/* Responsive Table */}
                     <div className="table-responsive">
-                      <Table
-                        striped
-                        bordered
-                        hover
-                        size="sm"
-                        className="mt-3"
-                      >
+                      <Table striped bordered hover size="sm" className="mt-3">
                         <thead className="thead-dark">
                           <tr>
                             <th style={{ width: "5%" }}>#</th>
@@ -382,7 +376,8 @@ const Leads = () => {
                               </td>
                               <td>{lead.system_quoted}</td>
                               <td>
-                                £{parseFloat(lead.quoted_price).toLocaleString(
+                                £
+                                {parseFloat(lead.quoted_price).toLocaleString(
                                   undefined,
                                   {
                                     minimumFractionDigits: 2,
@@ -392,7 +387,8 @@ const Leads = () => {
                               </td>
                               {/* New Total Payment Cell */}
                               <td>
-                                £{parseFloat(lead.total_payment).toLocaleString(
+                                £
+                                {parseFloat(lead.total_payment).toLocaleString(
                                   undefined,
                                   {
                                     minimumFractionDigits: 2,
@@ -510,10 +506,7 @@ const Leads = () => {
     }
 
     // Best Time To Call Validation (Optional)
-    if (
-      newLead.bestTimeToCall &&
-      isNaN(Date.parse(newLead.bestTimeToCall))
-    ) {
+    if (newLead.bestTimeToCall && isNaN(Date.parse(newLead.bestTimeToCall))) {
       newErrors.bestTimeToCall = "Best time to call is invalid.";
     }
 
@@ -564,7 +557,9 @@ const Leads = () => {
           </Button>
         </div>
         <LeadActions setActiveSection={setActiveSection} />
-        <div className="section-content">{renderSectionContent(activeSection)}</div>
+        <div className="section-content">
+          {renderSectionContent(activeSection)}
+        </div>
 
         {/* Add Lead Modal */}
         <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
@@ -872,9 +867,11 @@ const Leads = () => {
                     >
                       <option value={userId}>
                         {consultants.find((c) => c.id === userId)
-                          ? `${consultants.find((c) => c.id === userId).name} - ${consultants.find(
-                              (c) => c.id === userId
-                            ).role}`
+                          ? `${
+                              consultants.find((c) => c.id === userId).name
+                            } - ${
+                              consultants.find((c) => c.id === userId).role
+                            }`
                           : "-- Select Consultant --"}
                       </option>
                     </Form.Control>
