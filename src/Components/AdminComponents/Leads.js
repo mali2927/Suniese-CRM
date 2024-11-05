@@ -806,10 +806,9 @@ const Leads = () => {
                   </Form.Group>
                 </Col>
               </Row>
-
               <Row>
                 {/* Meeting Time */}
-                <Col md={6}>
+                <Col md={6}>                
                   <Form.Group controlId="formMeetingTime" className="mb-3">
                     <Form.Label>Meeting Time</Form.Label>
                     <Form.Control
