@@ -82,6 +82,7 @@ const WonLeads = ({
             <th>Phone Number</th>
             <th>Quoted Price</th>
             <th>Total Value</th>
+            <th>Date Won</th>
           </tr>
         </thead>
         <tbody>
@@ -94,6 +95,7 @@ const WonLeads = ({
                 <td>{lead.phone_number}</td>
                 <td>{lead.quoted_price}</td>
                 <td>{lead.total_payment}</td>
+                <td>{new Date(lead.updated_at).toISOString().split("T")[0]}</td>
               </tr>
             ))
           ) : (
