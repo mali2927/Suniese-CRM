@@ -106,6 +106,8 @@ class LeadController extends Controller
             'homeownershipStatus' => 'required|string|in:Owner,Tenant',
             'systemQuoted' => 'required|string|max:255',
             'quotedPrice' => 'required|numeric',
+            'totalContractValueGross' => 'required|numeric',
+            'totalContractValueNet' => 'required|numeric',
             'meetingTime' => 'required|date',
             'bestTimeToCall' => 'nullable|date',
             'customerType' => 'required|string|max:255',
@@ -137,6 +139,8 @@ class LeadController extends Controller
             'client_name' => $validatedData['clientName'], // Add status_id
             'end_user' => $validatedData['endUser'], // Add status_id
             'service_description' => $validatedData['serviceDescription'], // Add status_id
+            'total_contract_value_net' => $validatedData['totalContractValueNet'], // Add status_id
+            'total_contract_value_gross' => $validatedData['totalContractValueGross'], // Add status_id
         ];
         log::debug($mappedData);
 

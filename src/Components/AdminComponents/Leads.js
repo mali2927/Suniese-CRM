@@ -67,6 +67,8 @@ const Leads = () => {
     clientName: "-",
     endUser: "-",
     serviceDescription: "-",
+    totalContractValueGross: "",
+    totalContractValueNet: "",
   });
 
   // State for validation errors
@@ -826,6 +828,50 @@ const Leads = () => {
                     />
                     <Form.Control.Feedback type="invalid">
                       {errors.quotedPrice}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Form.Group
+                    controlId="formTotalContractValueNet"
+                    className="mb-3"
+                  >
+                    <Form.Label>Total Contract Value Net (£)</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="totalContractValueNet"
+                      value={newLead.totalContractValueNet}
+                      onChange={handleChange}
+                      isInvalid={!!errors.totalContractValueNet}
+                      placeholder="Enter Contract Value Net"
+                      min="0"
+                      step="0.01"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.totalContractValueNet}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group
+                    controlId="formTotalContractValueGross"
+                    className="mb-3"
+                  >
+                    <Form.Label>Total Contract Value Gross (£)</Form.Label>
+                    <Form.Control
+                      type="number"
+                      name="totalContractValueGross"
+                      value={newLead.totalContractValueGross}
+                      onChange={handleChange}
+                      isInvalid={!!errors.totalContractValueGross}
+                      placeholder="Enter Contract Value Gross"
+                      min="0"
+                      step="0.01"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.totalContractValueGross}
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>

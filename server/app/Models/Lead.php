@@ -36,6 +36,8 @@ class Lead extends Model
         'service_description',     // New field
         'commission',              // New field
         'commission_status',       // New field
+        'total_contract_value_net',  // New field for net contract value
+        'total_contract_value_gross' // New field for gross contract value
     ];
 
     // Define relationship to User
