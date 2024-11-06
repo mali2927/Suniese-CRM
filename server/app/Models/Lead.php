@@ -27,10 +27,15 @@ class Lead extends Model
         'quoted_price',
         'meeting_time',
         'best_time_to_call',
-        'status',  // Add status here
+        'status', // Status column
         'total_payment',
         'customer_type',
         'chase_id',
+        'client_name',             // New field
+        'end_user',                // New field
+        'service_description',     // New field
+        'commission',              // New field
+        'commission_status',       // New field
     ];
 
     // Define relationship to User
