@@ -69,6 +69,9 @@ const Leads = () => {
     serviceDescription: "-",
     totalContractValueGross: "",
     totalContractValueNet: "",
+    paymentFrequency: "",
+    paymentMethod: "",
+    paymentFrequency: "",
   });
 
   // State for validation errors
@@ -983,6 +986,79 @@ const Leads = () => {
                   </Form.Group>
                 </Col>
               </Row>
+              <Row>
+                {/* Contract Length */}
+                <Col md={6}>
+                  <Form.Group controlId="formContractLength" className="mb-3">
+                    <Form.Label>Contract Length (Months)</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="contractLength"
+                      value={newLead.contractLength}
+                      onChange={handleChange}
+                      isInvalid={!!errors.contractLength}
+                    >
+                      <option value="">-- Select Contract Length --</option>
+                      <option value="12">12 Months</option>
+                      <option value="24">24 Months</option>
+                      <option value="3">3 Months</option>
+                      <option value="custom">Custom</option>
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.contractLength}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+
+                {/* Payment Method */}
+                <Col md={6}>
+                  <Form.Group controlId="formPaymentMethod" className="mb-3">
+                    <Form.Label>Payment Method</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="paymentMethod"
+                      value={newLead.paymentMethod}
+                      onChange={handleChange}
+                      isInvalid={!!errors.paymentMethod}
+                    >
+                      <option value="">-- Select Payment Method --</option>
+                      <option value="cash">Cash</option>
+                      <option value="debit">Debit</option>
+                      <option value="credit">Credit</option>
+                      <option value="finance">Finance</option>
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.paymentMethod}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Row>
+                {/* Payment Frequency */}
+                <Col md={6}>
+                  <Form.Group controlId="formPaymentFrequency" className="mb-3">
+                    <Form.Label>Payment Frequency</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="paymentFrequency"
+                      value={newLead.paymentFrequency}
+                      onChange={handleChange}
+                      isInvalid={!!errors.paymentFrequency}
+                    >
+                      <option value="">-- Select Payment Frequency --</option>
+                      <option value="monthly">Monthly</option>
+                      <option value="quarterly">Quarterly</option>
+                      <option value="half-yearly">Half-Yearly</option>
+                      <option value="annually">Annually</option>
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.paymentFrequency}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+
               {newLead.customerType === "Commercial" && (
                 <>
                   <Row>

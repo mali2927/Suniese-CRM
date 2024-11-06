@@ -37,7 +37,10 @@ class Lead extends Model
         'commission',              // New field
         'commission_status',       // New field
         'total_contract_value_net',  // New field for net contract value
-        'total_contract_value_gross' // New field for gross contract value
+        'total_contract_value_gross', // New field for gross contract value
+        'contract_length',          // New field for contract length
+        'payment_method',           // New field for payment method
+        'payment_frequency'         // New field for payment frequency
     ];
 
     // Define relationship to User

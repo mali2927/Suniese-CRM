@@ -115,6 +115,9 @@ class LeadController extends Controller
             'clientName'=> 'nullable|string',
             'endUser'=> 'nullable|string',
             'serviceDescription'=> 'nullable|string',
+            'contractLength' => 'required|string',
+            'paymentMethod' => 'required|string',
+            'paymentFrequency' => 'required|string',
         ]);
 
         // Map camelCase fields to snake_case fields
@@ -141,6 +144,9 @@ class LeadController extends Controller
             'service_description' => $validatedData['serviceDescription'], // Add status_id
             'total_contract_value_net' => $validatedData['totalContractValueNet'], // Add status_id
             'total_contract_value_gross' => $validatedData['totalContractValueGross'], // Add status_id
+            'contract_length' => $validatedData['contractLength'], // Add status_id
+            'payment_method' => $validatedData['paymentMethod'], // Add status_id
+            'payment_frequency' => $validatedData['paymentFrequency'], // Add status_id
         ];
         log::debug($mappedData);
 
