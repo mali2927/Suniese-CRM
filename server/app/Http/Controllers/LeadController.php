@@ -110,6 +110,9 @@ class LeadController extends Controller
             'bestTimeToCall' => 'nullable|date',
             'customerType' => 'required|string|max:255',
             'status' => 'required|exists:lead_statuses,id', // Validate status_id
+            'clientName'=> 'nullable|string',
+            'endUser'=> 'nullable|string',
+            'serviceDescription'=> 'nullable|string',
         ]);
 
         // Map camelCase fields to snake_case fields
@@ -131,6 +134,9 @@ class LeadController extends Controller
             'best_time_to_call' => $validatedData['bestTimeToCall'],
             'customer_type' => $validatedData['customerType'],
             'status' => $validatedData['status'], // Add status_id
+            'client_name' => $validatedData['clientName'], // Add status_id
+            'end_user' => $validatedData['endUser'], // Add status_id
+            'service_description' => $validatedData['serviceDescription'], // Add status_id
         ];
         log::debug($mappedData);
 
@@ -202,6 +208,7 @@ class LeadController extends Controller
                 'meeting_time' => $request->input('meeting_time'),
                 'customerType' => 'required|string|max:255',
                 'best_time_to_call' => $request->input('best_time_to_call'),
+                
             ];
     
             // Validate the data

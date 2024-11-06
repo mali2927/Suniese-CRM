@@ -64,6 +64,9 @@ const Leads = () => {
     consultantId: "", // Initially empty
     status: "",
     customerType: "",
+    clientName: "-",
+    endUser: "-",
+    serviceDescription: "-",
   });
 
   // State for validation errors
@@ -555,7 +558,7 @@ const Leads = () => {
         {/* Add Lead Modal */}
         <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
           <Modal.Header closeButton>
-            <Modal.Title>Add New Lead</Modal.Title>
+            <Modal.Title>Add New Leadddd</Modal.Title>
           </Modal.Header>
           <Form onSubmit={handleSubmit}>
             <Modal.Body>
@@ -670,15 +673,29 @@ const Leads = () => {
                 {/* House Number */}
                 <Col md={6}>
                   <Form.Group controlId="formHouseNumber" className="mb-3">
-                    <Form.Label>House Number</Form.Label>
+                    {newLead.customerType === "Commercial" ? (
+                      <>
+                        <Form.Label>Address</Form.Label>
+                      </>
+                    ) : (
+                      <>
+                        <Form.Label>House Name</Form.Label>
+                      </>
+                    )}
+
                     <Form.Control
                       type="text"
                       name="houseNumber"
                       value={newLead.houseNumber}
                       onChange={handleChange}
                       isInvalid={!!errors.houseNumber}
-                      placeholder="Enter house number"
+                      placeholder={
+                        newLead.customerType === "Commercial"
+                          ? "Enter address"
+                          : "Enter house name"
+                      }
                     />
+
                     <Form.Control.Feedback type="invalid">
                       {errors.houseNumber}
                     </Form.Control.Feedback>
@@ -744,26 +761,33 @@ const Leads = () => {
                 </Col>
 
                 {/* Homeownership Status */}
+
                 <Col md={6}>
-                  <Form.Group
-                    controlId="formHomeownershipStatus"
-                    className="mb-3"
-                  >
-                    <Form.Label>Homeownership Status</Form.Label>
-                    <Form.Control
-                      as="select"
-                      name="homeownershipStatus"
-                      value={newLead.homeownershipStatus}
-                      onChange={handleChange}
-                      isInvalid={!!errors.homeownershipStatus}
-                    >
-                      <option value="Owner">Owner</option>
-                      <option value="Tenant">Tenant</option>
-                    </Form.Control>
-                    <Form.Control.Feedback type="invalid">
-                      {errors.homeownershipStatus}
-                    </Form.Control.Feedback>
-                  </Form.Group>
+                  {newLead.customerType === "Commercial" ? (
+                    <></>
+                  ) : (
+                    <>
+                      <Form.Group
+                        controlId="formHomeownershipStatus"
+                        className="mb-3"
+                      >
+                        <Form.Label>Homeownership Status</Form.Label>
+                        <Form.Control
+                          as="select"
+                          name="homeownershipStatus"
+                          value={newLead.homeownershipStatus}
+                          onChange={handleChange}
+                          isInvalid={!!errors.homeownershipStatus}
+                        >
+                          <option value="Owner">Owner</option>
+                          <option value="Tenant">Tenant</option>
+                        </Form.Control>
+                        <Form.Control.Feedback type="invalid">
+                          {errors.homeownershipStatus}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    </>
+                  )}
                 </Col>
               </Row>
 
@@ -808,7 +832,7 @@ const Leads = () => {
               </Row>
               <Row>
                 {/* Meeting Time */}
-                <Col md={6}>                
+                <Col md={6}>
                   <Form.Group controlId="formMeetingTime" className="mb-3">
                     <Form.Label>Meeting Time</Form.Label>
                     <Form.Control
@@ -905,10 +929,7 @@ const Leads = () => {
                     >
                       <option value="">-- Select Customer Type --</option>
                       <option value="Commercial">Commercial</option>
-                      <option value="Educational">Educational</option>
                       <option value="Residential">Residential</option>
-                      <option value="Government">Government</option>
-                      <option value="Other">Other</option>
                     </Form.Control>
                     <Form.Control.Feedback type="invalid">
                       {errors.customerType}
@@ -916,6 +937,71 @@ const Leads = () => {
                   </Form.Group>
                 </Col>
               </Row>
+              {newLead.customerType === "Commercial" && (
+                <>
+                  <Row>
+                    {/* Client Name */}
+                    <Col md={6}>
+                      <Form.Group controlId="formClientName" className="mb-3">
+                        <Form.Label>Client Name</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="clientName"
+                          value={newLead.clientName || ""}
+                          onChange={handleChange}
+                          placeholder="Enter client name"
+                          isInvalid={!!errors.clientName}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.clientName}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    </Col>
+
+                    {/* End User */}
+                    <Col md={6}>
+                      <Form.Group controlId="formEndUser" className="mb-3">
+                        <Form.Label>End User</Form.Label>
+                        <Form.Control
+                          type="text"
+                          name="endUser"
+                          value={newLead.endUser || ""}
+                          onChange={handleChange}
+                          placeholder="Enter end user"
+                          isInvalid={!!errors.endUser}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.endUser}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    {/* Service Description */}
+                    <Col md={12}>
+                      <Form.Group
+                        controlId="formServiceDescription"
+                        className="mb-3"
+                      >
+                        <Form.Label>Service Description</Form.Label>
+                        <Form.Control
+                          as="textarea"
+                          rows={3}
+                          name="serviceDescription"
+                          value={newLead.serviceDescription || ""}
+                          onChange={handleChange}
+                          placeholder="Enter service description"
+                          isInvalid={!!errors.serviceDescription}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.serviceDescription}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                </>
+              )}
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={() => setShowModal(false)}>
