@@ -44,6 +44,7 @@ const Leads = () => {
 
   // State for selected consultant's name (for display in ReportModal)
   const [selectedConsultantName, setSelectedConsultantName] = useState("");
+  const [customContractLength, setCustomContractLength] = useState("");
 
   // State for new lead form
   const [newLead, setNewLead] = useState({
@@ -73,6 +74,7 @@ const Leads = () => {
     paymentMethod: "",
     paymentFrequency: "",
     comissionStatus: "",
+    customContractLength: "",
   });
 
   // State for validation errors
@@ -564,7 +566,7 @@ const Leads = () => {
         {/* Add Lead Modal */}
         <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
           <Modal.Header closeButton>
-            <Modal.Title>Add New Leadddd</Modal.Title>
+            <Modal.Title>Add New Lead</Modal.Title>
           </Modal.Header>
           <Form onSubmit={handleSubmit}>
             <Modal.Body>
@@ -1034,6 +1036,33 @@ const Leads = () => {
                   </Form.Group>
                 </Col>
               </Row>
+
+              {/* Custom Contract Length */}
+              {newLead.contractLength === "custom" && (
+                <Row>
+                  <Col md={6}>
+                    <Form.Group
+                      controlId="formCustomContractLength"
+                      className="mb-3"
+                    >
+                      <Form.Label>Custom Contract Length (Months)</Form.Label>
+                      <Form.Control
+                        type="number"
+                        name="customContractLength"
+                        value={newLead.customContractLength}
+                        onChange={handleChange}
+                        isInvalid={!!errors.contractLength}
+                        placeholder="Enter Contract Length"
+                        min="0"
+                        step="1"
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.contractLength}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              )}
 
               <Row>
                 {/* Payment Frequency */}
