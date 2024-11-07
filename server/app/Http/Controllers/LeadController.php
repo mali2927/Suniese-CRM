@@ -118,6 +118,7 @@ class LeadController extends Controller
             'contractLength' => 'required|string',
             'paymentMethod' => 'required|string',
             'paymentFrequency' => 'required|string',
+            'comissionStatus' => 'required|string',
         ]);
 
         // Map camelCase fields to snake_case fields
@@ -147,6 +148,7 @@ class LeadController extends Controller
             'contract_length' => $validatedData['contractLength'], // Add status_id
             'payment_method' => $validatedData['paymentMethod'], // Add status_id
             'payment_frequency' => $validatedData['paymentFrequency'], // Add status_id
+            'commission_status' => $validatedData['comissionStatus'], // Add status_id
         ];
         log::debug($mappedData);
 

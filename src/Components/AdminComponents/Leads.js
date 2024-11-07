@@ -72,6 +72,7 @@ const Leads = () => {
     paymentFrequency: "",
     paymentMethod: "",
     paymentFrequency: "",
+    comissionStatus: "",
   });
 
   // State for validation errors
@@ -1054,6 +1055,27 @@ const Leads = () => {
                     </Form.Control>
                     <Form.Control.Feedback type="invalid">
                       {errors.paymentFrequency}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group controlId="formComissionStatus" className="mb-3">
+                    <Form.Label>Status for Comission</Form.Label>
+                    <Form.Control
+                      as="select"
+                      name="comissionStatus"
+                      value={newLead.comissionStatus}
+                      onChange={handleChange}
+                      isInvalid={!!errors.comissionStatus}
+                    >
+                      <option value="">
+                        -- Select Status for Comission --
+                      </option>
+                      <option value="internal">Internal</option>
+                      <option value="external">External</option>
+                    </Form.Control>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.comissionStatus}
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>
