@@ -134,7 +134,7 @@ class LeadController extends Controller
             'street_name' => $validatedData['streetName'],
             'town_city' => $validatedData['townCity'],
             'postal_code' => $validatedData['postalCode'],
-            'homeownership_status' => $validatedData['homeownershipStatus'],
+            'homeownership_status' => $validatedData['customerType'] === 'Commercial' ? "null" : $validatedData['homeownershipStatus'],
             'system_quoted' => $validatedData['systemQuoted'],
             'quoted_price' => $validatedData['quotedPrice'],
             'meeting_time' => $validatedData['meetingTime'],
