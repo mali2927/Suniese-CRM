@@ -137,10 +137,10 @@ const Overview = () => {
                 <td>Hot Leads</td>
                 <td>£{leadStatusCounts.hot.total_price}</td>
               </tr>
-              <tr>
+              {/* <tr>
                 <td>Won Jobs</td>
                 <td>£{leadStatusCounts.won.total_price}</td>
-              </tr>
+              </tr> */}
               <tr>
                 <td>Lost Jobs</td>
                 <td>£{leadStatusCounts.lost.total_price}</td>
