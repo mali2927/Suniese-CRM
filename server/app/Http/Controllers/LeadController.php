@@ -207,7 +207,7 @@ class LeadController extends Controller
 
     public function update(Request $request, $id)
     {
-        Log::debug($request->all()); // Log all request data for easier debugging
+        //Log::debug($request->all()); // Log all request data for easier debugging
         try {
             // Map incoming data to snake_case, matching your DB column names
             $mappedData = [
@@ -225,7 +225,7 @@ class LeadController extends Controller
                 'system_quoted' => $request->input('system_quoted'),
                 'quoted_price' => $request->input('quoted_price'),
                 'meeting_time' => $request->input('meeting_time'),
-                'customerType' => 'required|string|max:255',
+               
                 'best_time_to_call' => $request->input('best_time_to_call'),
                 
             ];
@@ -246,12 +246,13 @@ class LeadController extends Controller
                 'system_quoted' => 'required|string|max:255',
                 'quoted_price' => 'required|numeric',
                 'meeting_time' => 'required|date',
-                'customer_type' => $validatedData['customerType'],
+               
                 'best_time_to_call' => 'nullable|date',
             ]);
     
             // Validate the mapped data
             $validatedData = $validator->validate();
+           
     
             // Find the lead and update it
             $lead = Lead::findOrFail($id);
@@ -384,10 +385,6 @@ public function delete($id)
         ], 500);
     }
 }
-
-
-
-
 }
     
 
