@@ -234,6 +234,30 @@ const LeadsTable = ({
 
     setShowModal(false);
   };
+  const handleDeleteLead = async (leadId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this lead?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`${config.baseURL}/leads/${leadId}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert("Lead deleted successfully!");
+        // Optionally, notify parent to refetch leads or update state directly
+        handleStatusChange(leadId); // Remove lead from parent state
+      } else {
+        alert("Failed to delete the lead");
+      }
+    } catch (error) {
+      console.error("Error deleting lead:", error);
+      alert("An error occurred while deleting the lead.");
+    }
+  };
 
   // Enhanced Filter: Include all relevant fields
   const filteredLeads = leads.filter((lead) => {
@@ -334,6 +358,15 @@ const LeadsTable = ({
                             onClick={() => handleViewLead(lead)} // Handle view lead
                           >
                             View
+                          </Button>
+                        </Col>
+                        <Col xs="auto" className="mb-1">
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => handleDeleteLead(lead.id)}
+                          >
+                            Delete
                           </Button>
                         </Col>
                         <Col>

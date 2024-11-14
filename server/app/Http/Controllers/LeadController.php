@@ -363,6 +363,28 @@ public function addLostRemark(Request $request, $leadId)
 
     return response()->json(['success' => true]);
 }
+public function delete($id)
+{
+    try {
+        // Find the lead by ID
+        $lead = Lead::findOrFail($id);
+
+        // Delete the lead
+        $lead->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lead deleted successfully',
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error deleting lead: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred while deleting the lead.',
+        ], 500);
+    }
+}
+
 
 
 

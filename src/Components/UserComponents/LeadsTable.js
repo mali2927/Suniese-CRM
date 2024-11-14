@@ -45,6 +45,7 @@ const LeadsTable = ({
   const [loadingStatuses, setLoadingStatuses] = useState(true);
   const [statusError, setStatusError] = useState(null); // To handle status fetching errors
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  const [refresh, setRefresh] = useState(false); // State to trigger re-fetching
 
   // Function to handle viewing a lead
   const handleViewLead = (lead) => {
@@ -137,13 +138,16 @@ const LeadsTable = ({
   // Save edited lead
   const handleEditSave = async () => {
     try {
-      const response = await fetch(`${config.baseURL}/update-lead/${editingLead.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(editingLead),
-      });
+      const response = await fetch(
+        `${config.baseURL}/update-lead/${editingLead.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editingLead),
+        }
+      );
 
       const result = await response.json();
       if (result.success) {
@@ -162,13 +166,16 @@ const LeadsTable = ({
   // Save payment amount for converting to sale
   const handleModalSave = async () => {
     try {
-      const response = await fetch(`${config.baseURL}/leads/${selectedLeadId}/payment`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ total_payment: paymentAmount }),
-      });
+      const response = await fetch(
+        `${config.baseURL}/leads/${selectedLeadId}/payment`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ total_payment: paymentAmount }),
+        }
+      );
 
       const result = await response.json();
       if (result.success) {
@@ -184,6 +191,31 @@ const LeadsTable = ({
     }
 
     setShowModal(false);
+  };
+  const handleDeleteLead = async (leadId) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this lead?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const response = await fetch(`${config.baseURL}/leads/${leadId}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert("Lead deleted successfully!");
+        // Optionally, notify parent to refetch leads or update state directly
+        handleStatusChange(leadId); // Remove lead from parent state
+        setRefresh(!refresh); // Toggle `refresh` to trigger re-fetching
+      } else {
+        alert("Failed to delete the lead");
+      }
+    } catch (error) {
+      console.error("Error deleting lead:", error);
+      alert("An error occurred while deleting the lead.");
+    }
   };
 
   // Enhanced Filter: Include all relevant fields
@@ -273,10 +305,13 @@ const LeadsTable = ({
                       <td>{lead.phone_number || "N/A"}</td>
                       <td>
                         £
-                        {parseFloat(lead.quoted_price || 0).toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
+                        {parseFloat(lead.quoted_price || 0).toLocaleString(
+                          undefined,
+                          {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }
+                        )}
                       </td>
                       <td>
                         {lead.meeting_time
@@ -305,6 +340,15 @@ const LeadsTable = ({
                             </Button>
                           </Col>
                           <Col xs="auto" className="mb-1">
+                            <Button
+                              variant="outline-danger"
+                              size="sm"
+                              onClick={() => handleDeleteLead(lead.id)}
+                            >
+                              Delete
+                            </Button>
+                          </Col>
+                          <Col xs="auto" className="mb-1">
                             <DropdownButton
                               id={`dropdown-action-${lead.id}`}
                               title="Change Status"
@@ -312,15 +356,22 @@ const LeadsTable = ({
                               size="sm"
                             >
                               {loadingStatuses ? (
-                                <Dropdown.Item disabled>Loading...</Dropdown.Item>
+                                <Dropdown.Item disabled>
+                                  Loading...
+                                </Dropdown.Item>
                               ) : statusError ? (
-                                <Dropdown.Item disabled>{statusError}</Dropdown.Item>
+                                <Dropdown.Item disabled>
+                                  {statusError}
+                                </Dropdown.Item>
                               ) : (
                                 statuses.map((status) => (
                                   <Dropdown.Item
                                     key={status.id}
                                     onClick={() =>
-                                      handleDropdownSelect(lead.id, `set${status.title}`)
+                                      handleDropdownSelect(
+                                        lead.id,
+                                        `set${status.title}`
+                                      )
                                     }
                                   >
                                     {status.title}
