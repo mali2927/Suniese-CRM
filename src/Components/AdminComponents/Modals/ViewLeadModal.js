@@ -121,6 +121,42 @@ const ViewLeadModal = ({ show, handleClose, lead }) => {
             </tr>
             <tr>
               <td>
+                <strong>Client Name</strong>
+              </td>
+              <td>{lead.client_name || "-"}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>End User</strong>
+              </td>
+              <td>{lead.end_user || "-"}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Service Description</strong>
+              </td>
+              <td>{lead.service_description || "-"}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Total Contract Value Net</strong>
+              </td>
+              <td>{lead.total_contract_value_net || "-"}</td>
+            </tr>{" "}
+            <tr>
+              <td>
+                <strong>Total Contract Value Gross</strong>
+              </td>
+              <td>{lead.total_contract_value_gross || "-"}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Commission</strong>
+              </td>
+              <td>{lead.commission || "-"}</td>
+            </tr>
+            <tr>
+              <td>
                 <strong>Sales Consultant</strong>
               </td>
               <td>{lead.user?.name || "N/A"}</td>
