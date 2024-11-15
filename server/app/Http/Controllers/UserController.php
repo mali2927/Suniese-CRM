@@ -51,7 +51,46 @@ class UserController extends Controller
         ], 200)->cookie('token', $token, 60 * 24); // Optionally still set the token as a cookie
     }
     
+    public function changePassword(Request $request)
+    {
+        // Validate the request data
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'old_password' => 'required|min:6',
+            'new_password' => 'required|min:6|different:old_password',
+        ]);
     
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+    
+        // Attempt to find the user by email
+        $user = User::where('email', $request->input('email'))->first();
+    
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found.'
+            ], 404);
+        }
+    
+        // Check if old password matches
+        if (!Hash::check($request->input('old_password'), $user->password)) {
+            return response()->json([
+                'message' => 'Old password does not match.'
+            ], 401);
+        }
+    
+        // Update the password
+        $user->password = Hash::make($request->input('new_password'));
+        $user->save();
+    
+        // Return a success response
+        return response()->json([
+            'message' => 'Password updated successfully.'
+        ], 200);
+    }
         public function register(Request $request)
         {
             // Validate the request data
