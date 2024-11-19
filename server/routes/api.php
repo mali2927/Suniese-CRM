@@ -53,6 +53,9 @@ Route::get('/leads/{id}/report', [LeadReportController::class, 'generateReport']
  Route::get('/dashboard-report', [DashboardController::class, 'getDashboardReport']);
  Route::get('/lead-status-counts', [DashboardController::class, 'getLeadStatusCounts']);
  Route::get('/weekly-lead-data', [DashboardController::class, 'getWeeklyLeadData']);
+ Route::get('lead-status-counts/{userId}', [DashboardController::class, 'getLeadStatusCountsByUserId']);
+ Route::get('weekly-lead-data/{userId}', [DashboardController::class, 'getWeeklyLeadData']);
+
 // User Dashboard API
 
 Route::get('/dashboard/data', [UserDashboardController::class, 'getDashboardData']);

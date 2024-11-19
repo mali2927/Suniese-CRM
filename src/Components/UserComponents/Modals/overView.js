@@ -40,9 +40,13 @@ const Overview = () => {
     converted_sales: [],
   });
 
+  const selectedConsultantId = localStorage.getItem("user_id");
+
   useEffect(() => {
+    if (!selectedConsultantId) return;
+
     // Fetch lead status counts for the pie chart and table
-    fetch(`${config.baseURL}/lead-status-counts`)
+    fetch(`${config.baseURL}/lead-status-counts/${selectedConsultantId}`)
       .then((response) => response.json())
       .then((data) => setLeadStatusCounts(data))
       .catch((error) =>
@@ -50,13 +54,13 @@ const Overview = () => {
       );
 
     // Fetch weekly lead data for the line chart
-    fetch(`${config.baseURL}/weekly-lead-data`)
+    fetch(`${config.baseURL}/weekly-lead-data/${selectedConsultantId}`)
       .then((response) => response.json())
       .then((data) => setWeeklyData(data))
       .catch((error) =>
         console.error("Error fetching weekly lead data:", error)
       );
-  }, []);
+  }, [selectedConsultantId]);
 
   const pieData = {
     labels: ["Cold Leads", "Warm Leads", "Hot Leads", "Won Jobs", "Lost Jobs"],
@@ -137,10 +141,6 @@ const Overview = () => {
                 <td>Hot Leads</td>
                 <td>£{leadStatusCounts.hot.total_price}</td>
               </tr>
-              {/* <tr>
-                <td>Won Jobs</td>
-                <td>£{leadStatusCounts.won.total_price}</td>
-              </tr> */}
               <tr>
                 <td>Lost Jobs</td>
                 <td>£{leadStatusCounts.lost.total_price}</td>
@@ -164,11 +164,6 @@ const Overview = () => {
           </table>
         </div>
       </div>
-
-      {/* <div style={{ ...styles.chartContainer, marginTop: "2rem" }}>
-        <h3>Performance Trends</h3>
-        <Line data={lineData} />
-      </div> */}
     </div>
   );
 };
