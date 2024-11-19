@@ -20,14 +20,12 @@ const Navbar = () => {
         <Sun className="navbar-icon" />
         <h1 className="navbar-title">Solar Dashboard</h1>
       </div>
-      <div style={{ display: "flex" }}>
         <button className="navbar-button" onClick={() => setShowModal(true)}>
           Change Password
         </button>
         <button className="navbar-button" onClick={handleLogout}>
           Logout
         </button>
-      </div>
       {showModal && (
         <ChangePasswordModal onClose={() => setShowModal(false)} />
       )}
