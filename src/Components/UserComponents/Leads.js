@@ -897,7 +897,7 @@ const Leads = () => {
                       <option value="">-- Select Status --</option>
                       <option value="1">Hot</option>
                       <option value="2">Cold</option>
-                      <option value="3">Warm</option>
+                      {/* <option value="3">Warm</option> */}
                       <option value="4">Lost</option>
                       <option value="5">Won</option>
                     </Form.Control>

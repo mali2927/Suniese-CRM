@@ -63,19 +63,19 @@ const Overview = () => {
   }, [selectedConsultantId]);
 
   const pieData = {
-    labels: ["Cold Leads", "Warm Leads", "Hot Leads", "Won Jobs", "Lost Jobs"],
+    labels: ["Cold Leads", "Hot Leads", "Won Jobs", "Lost Jobs"],
     datasets: [
       {
         data: [
           leadStatusCounts.cold.count,
-          leadStatusCounts.warm.count,
+          // leadStatusCounts.warm.count,
           leadStatusCounts.hot.count,
           leadStatusCounts.won.count,
           leadStatusCounts.lost.count,
         ],
         backgroundColor: [
           "#3498db", // Cold
-          "#f1c40f", // Warm
+          // "#f1c40f", // Warm
           "#e74c3c", // Hot
           "#2ecc71", // Won
           "#95a5a6", // Lost
@@ -133,10 +133,10 @@ const Overview = () => {
                 <td>Cold Leads</td>
                 <td>£{leadStatusCounts.cold.total_price}</td>
               </tr>
-              <tr>
+              {/* <tr>
                 <td>Warm Leads</td>
                 <td>£{leadStatusCounts.warm.total_price}</td>
-              </tr>
+              </tr> */}
               <tr>
                 <td>Hot Leads</td>
                 <td>£{leadStatusCounts.hot.total_price}</td>
