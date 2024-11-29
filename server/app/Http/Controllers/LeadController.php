@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 
-class LeadController extends Controller 
+class LeadController extends Controller
 {
     /**
      * Store a new lead.
@@ -82,70 +82,100 @@ class LeadController extends Controller
     }
     public function store(Request $request)
     {
-        try{
-        // Log incoming request data
-        Log::debug($request);
-
-        // Validate the request data
-        $validatedData = $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'title' => 'required|string|max:255',
-            'firstName' => 'required|string|max:255',
-            'surname' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phoneNumber' => 'required|string|max:20',
-            'houseNumber' => 'required|string|max:255',
-            'streetName' => 'required|string|max:255',
-            'townCity' => 'required|string|max:255',
-            'postalCode' => 'required|string|max:10',
-            'homeownershipStatus' => 'required|string|in:Owner,Tenant',
-            'systemQuoted' => 'required|string|max:255',
-            'quotedPrice' => 'required|numeric',
-            'meetingTime' => 'required|date',
-            'bestTimeToCall' => 'nullable|date',
-            'customerType' => 'required|string|max:255',
-            'status' => 'required|exists:lead_statuses,id', // Validate status_id
-        ]);
-
-        // Map camelCase fields to snake_case fields
-        $mappedData = [
-            'user_id' => $validatedData['user_id'],
-            'title' => $validatedData['title'],
-            'first_name' => $validatedData['firstName'],
-            'surname' => $validatedData['surname'],
-            'email' => $validatedData['email'],
-            'phone_number' => $validatedData['phoneNumber'],
-            'house_number' => $validatedData['houseNumber'],
-            'street_name' => $validatedData['streetName'],
-            'town_city' => $validatedData['townCity'],
-            'postal_code' => $validatedData['postalCode'],
-            'homeownership_status' => $validatedData['homeownershipStatus'],
-            'system_quoted' => $validatedData['systemQuoted'],
-            'quoted_price' => $validatedData['quotedPrice'],
-            'meeting_time' => $validatedData['meetingTime'],
-            'best_time_to_call' => $validatedData['bestTimeToCall'],
-            'customer_type' => $validatedData['customerType'],
-            'status' => $validatedData['status'], // Add status_id
-        ];
-        log::debug($mappedData);
-
-        // Create a new lead in the database
-        $lead = Lead::create($mappedData);
-
-        // Return a response
-        return response()->json([
-            'success' => true,
-            'message' => 'Lead created successfully',
-            'data' => $lead
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Error creating lead: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'An error occurred while creating the lead.',
-        ], 500);
+        try {
+            // Log incoming request data
+            Log::debug($request->all());
+    
+            // Validate the request data
+            $validatedData = $request->validate([
+                'user_id' => 'required|exists:users,id',
+                'title' => 'required|string|max:255',
+                'firstName' => 'required|string|max:255',
+                'surname' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'phoneNumber' => 'required|string|max:20',
+                'houseNumber' => 'required|string|max:255',
+                'streetName' => 'required|string|max:255',
+                'townCity' => 'required|string|max:255',
+                'postalCode' => 'required|string|max:10',
+                'homeownershipStatus' => 'required|string|in:Owner,Tenant',
+                'systemQuoted' => 'required|string|max:255',
+                'quotedPrice' => 'required|numeric',
+                'totalContractValueGross' => 'required|numeric',
+                'totalContractValueNet' => 'required|numeric',
+                'meetingTime' => 'required|date',
+                'bestTimeToCall' => 'nullable|date',
+                'customerType' => 'required|string|max:255',
+                'status' => 'required|exists:lead_statuses,id',
+                'clientName'=> 'nullable|string',
+                'endUser'=> 'nullable|string',
+                'serviceDescription'=> 'nullable|string',
+                'contractLength' => 'required|string',
+                'paymentMethod' => 'required|string',
+                'paymentFrequency' => 'required|string',
+                'comissionStatus' => 'required|string',
+                'customContractLength' => 'nullable|string',
+            ]);
+    
+            // Map camelCase fields to snake_case fields
+            $mappedData = [
+                'user_id' => $validatedData['user_id'],
+                'title' => $validatedData['title'],
+                'first_name' => $validatedData['firstName'],
+                'surname' => $validatedData['surname'],
+                'email' => $validatedData['email'],
+                'phone_number' => $validatedData['phoneNumber'],
+                'house_number' => $validatedData['houseNumber'],
+                'street_name' => $validatedData['streetName'],
+                'town_city' => $validatedData['townCity'],
+                'postal_code' => $validatedData['postalCode'],
+                'homeownership_status' => $validatedData['customerType'] === 'Commercial' ? "null" : $validatedData['homeownershipStatus'],
+                'system_quoted' => $validatedData['systemQuoted'],
+                'quoted_price' => $validatedData['quotedPrice'],
+                'meeting_time' => $validatedData['meetingTime'],
+                'best_time_to_call' => $validatedData['bestTimeToCall'],
+                'customer_type' => $validatedData['customerType'],
+                'status' => $validatedData['status'],
+                'client_name' => $validatedData['clientName'],
+                'end_user' => $validatedData['endUser'],
+                'service_description' => $validatedData['serviceDescription'],
+                'total_contract_value_net' => $validatedData['totalContractValueNet'],
+                'total_contract_value_gross' => $validatedData['totalContractValueGross'],
+                'contract_length' => $validatedData['contractLength'] === 'custom' ? $validatedData['customContractLength'] : $validatedData['contractLength'],
+                'payment_method' => $validatedData['paymentMethod'],
+                'payment_frequency' => $validatedData['paymentFrequency'],
+                'commission_status' => $validatedData['comissionStatus'],
+            ];
+    
+            // Calculate commission based on commission status
+            $commissionRate = 0;
+            if ($validatedData['comissionStatus'] === 'external') {
+                $commissionRate = 0.017; // 1.7%
+            } elseif ($validatedData['comissionStatus'] === 'internal') {
+                $commissionRate = 0.026; // 2.6%
+            }
+            $mappedData['commission'] = $validatedData['quotedPrice'] * $commissionRate;
+    
+            Log::debug($mappedData);
+    
+            // Create a new lead in the database
+            $lead = Lead::create($mappedData);
+    
+            // Return a response
+            return response()->json([
+                'success' => true,
+                'message' => 'Lead created successfully',
+                'data' => $lead
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error creating lead: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while creating the lead.',
+            ], 500);
+        }
     }
-    }
+    
 
     public function searchLeadByConsultantId(Request $request)
     {
@@ -177,7 +207,7 @@ class LeadController extends Controller
 
     public function update(Request $request, $id)
     {
-        Log::debug($request->all()); // Log all request data for easier debugging
+        //Log::debug($request->all()); // Log all request data for easier debugging
         try {
             // Map incoming data to snake_case, matching your DB column names
             $mappedData = [
@@ -195,8 +225,9 @@ class LeadController extends Controller
                 'system_quoted' => $request->input('system_quoted'),
                 'quoted_price' => $request->input('quoted_price'),
                 'meeting_time' => $request->input('meeting_time'),
-                'customerType' => 'required|string|max:255',
+               
                 'best_time_to_call' => $request->input('best_time_to_call'),
+                
             ];
     
             // Validate the data
@@ -215,12 +246,13 @@ class LeadController extends Controller
                 'system_quoted' => 'required|string|max:255',
                 'quoted_price' => 'required|numeric',
                 'meeting_time' => 'required|date',
-                'customer_type' => $validatedData['customerType'],
+               
                 'best_time_to_call' => 'nullable|date',
             ]);
     
             // Validate the mapped data
             $validatedData = $validator->validate();
+           
     
             // Find the lead and update it
             $lead = Lead::findOrFail($id);
@@ -332,9 +364,27 @@ public function addLostRemark(Request $request, $leadId)
 
     return response()->json(['success' => true]);
 }
+public function delete($id)
+{
+    try {
+        // Find the lead by ID
+        $lead = Lead::findOrFail($id);
 
+        // Delete the lead
+        $lead->delete();
 
-
+        return response()->json([
+            'success' => true,
+            'message' => 'Lead deleted successfully',
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error deleting lead: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred while deleting the lead.',
+        ], 500);
+    }
+}
 }
     
 
