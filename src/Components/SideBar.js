@@ -8,6 +8,7 @@ import {
   Info as InfoIcon,
   Pen as Pen,
   Shell as Shell,
+  Archive as Archive,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -59,6 +60,14 @@ const Sidebar = () => {
           )}`}
         >
           <Pen className="me-2" /> Quote Bank
+        </Link>
+        <Link
+          to="/archive"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/archive"
+          )}`}
+        >
+          <Archive className="me-2" /> Archive
         </Link>
         <Link
           to="/settings"

@@ -41,7 +41,9 @@ Route::post('/leads/{lead}/lost-remark', [LeadController::class, 'addLostRemark'
 Route::delete('/leads/{id}', [LeadController::class, 'delete']);
 Route::post('/archiveleads/{id}', [LeadController::class, 'archive']);
 Route::post('/leads/{id}/update-quote-status', [LeadController::class, 'updateQuoteStatus']);
-
+Route::get('/archived-leads', [LeadController::class, 'getArchivedLeads']);
+Route::delete('/delete-lead/{id}', [LeadController::class, 'deleteLead']);
+Route::post('/restore-lead/{id}', [LeadController::class, 'restoreLead']);
 
 
 //Leads Statuses

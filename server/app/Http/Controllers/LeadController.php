@@ -40,6 +40,15 @@ class LeadController extends Controller
              ], 500);
          }
      }
+     public function getArchivedLeads()
+     {
+         // Fetch leads where archive_status = 1
+         $archivedLeads = Lead::with(['user', 'status', 'chaseNotes', 'lostRemarks.declaredUser'])
+         ->where('archive_status', 1)->get();
+ 
+         // Return the data as a JSON response
+         return response()->json($archivedLeads);
+     }
      
      public function getLeadsByConsultant($consultantId)
      {
@@ -446,6 +455,35 @@ public function archive($id)
         ], 500);
     }
 }
+public function deleteLead($id)
+    {
+        $lead = Lead::find($id);
+
+        if (!$lead) {
+            return response()->json(['message' => 'Lead not found'], 404);
+        }
+
+        // Delete the lead record
+        $lead->delete();
+
+        return response()->json(['message' => 'Lead deleted successfully']);
+    }
+
+    // Restore a lead by updating the archive_status to 0
+    public function restoreLead($id)
+    {
+        $lead = Lead::find($id);
+
+        if (!$lead) {
+            return response()->json(['message' => 'Lead not found'], 404);
+        }
+
+        // Update archive_status to 0 to restore the lead
+        $lead->archive_status = 0;
+        $lead->save();
+
+        return response()->json(['message' => 'Lead restored successfully']);
+    }
 
 }
     

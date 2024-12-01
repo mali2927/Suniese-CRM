@@ -8,6 +8,7 @@ import UserPipeline from "./Components/UserComponents/UserPipeline";
 import QuoteBank from "./Components/AdminComponents/QuoteBank";
 import Settings from "./Components/AdminComponents/Settings";
 import UserQuoteBank from "./Components/UserComponents/UserQuoteBank";
+import Archive from "./Components/AdminComponents/Archive";
 import Info from "./Components/AdminComponents/Info";
 import Leads from "./Components/AdminComponents/Leads";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -65,6 +66,12 @@ function App() {
             path="/quotebank"
             element={
               <ProtectedRoute element={QuoteBank} roleRequired="superadmin" />
+            }
+          />
+          <Route
+            path="/archive"
+            element={
+              <ProtectedRoute element={Archive} roleRequired="superadmin" />
             }
           />
           <Route
