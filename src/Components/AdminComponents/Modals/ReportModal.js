@@ -284,7 +284,7 @@ const ReportModal = ({
   // Prepare data for the Bar chart in "All Consultants" mode
   const prepareBarChartData = () => {
     const labels = consultants.map((consultant) => consultant.name);
-    const statuses = ["Hot", "Cold", "Warm", "Lost", "Won", "Pending"];
+    const statuses = ["Hot", "Cold", "Warm", "Lost", "Won"];
 
     const datasets = statuses.map((status) => {
       return {
@@ -609,10 +609,10 @@ const ReportModal = ({
                         <td>Cold Leads</td>
                         <td>£{leadStatusCountsAll.cold.total_price}</td>
                       </tr>
-                      <tr>
+                      {/* <tr>
                         <td>Warm Leads</td>
                         <td>£{leadStatusCountsAll.warm.total_price}</td>
-                      </tr>
+                      </tr> */}
                       <tr>
                         <td>Hot Leads</td>
                         <td>£{leadStatusCountsAll.hot.total_price}</td>
@@ -855,10 +855,10 @@ const ReportModal = ({
                           <td>Cold Leads</td>
                           <td>£{leadStatusCounts.cold.total_price}</td>
                         </tr>
-                        <tr>
+                        {/* <tr>
                           <td>Warm Leads</td>
                           <td>£{leadStatusCounts.warm.total_price}</td>
-                        </tr>
+                        </tr> */}
                         <tr>
                           <td>Hot Leads</td>
                           <td>£{leadStatusCounts.hot.total_price}</td>
