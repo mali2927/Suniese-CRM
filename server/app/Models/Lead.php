@@ -40,7 +40,8 @@ class Lead extends Model
         'total_contract_value_gross', // New field for gross contract value
         'contract_length',          // New field for contract length
         'payment_method',           // New field for payment method
-        'payment_frequency'         // New field for payment frequency
+        'payment_frequency',        // New field for payment frequency
+        'maintenance_check'         // New field for maintenance check
     ];
 
     // Define relationship to User

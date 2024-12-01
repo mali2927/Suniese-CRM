@@ -80,6 +80,7 @@ const Leads = () => {
     comissionStatus: "",
     contractLength: "36",
     customContractLength: "",
+    maintenanceCheck: "",
   });
   // State for validation errors
   const [errors, setErrors] = useState({});
@@ -995,6 +996,37 @@ const Leads = () => {
                     </Form.Control>
                     <Form.Control.Feedback type="invalid">
                       {errors.customerType}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group controlId="formMaintenanceCheck" className="mb-3">
+                    <Form.Label>Maintenance Check</Form.Label>
+                    <div className="d-flex align-items-center">
+                      <Form.Check
+                        type="radio"
+                        label="Yes"
+                        name="maintenanceCheck"
+                        value="1"
+                        onChange={handleChange}
+                        checked={newLead.maintenanceCheck === "1"}
+                        className="me-3"
+                        id="maintenanceYes"
+                        isInvalid={!!errors.maintenanceCheck}
+                      />
+                      <Form.Check
+                        type="radio"
+                        label="No"
+                        name="maintenanceCheck"
+                        value="0"
+                        onChange={handleChange}
+                        checked={newLead.maintenanceCheck === "0"}
+                        id="maintenanceNo"
+                        isInvalid={!!errors.maintenanceCheck}
+                      />
+                    </div>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.maintenanceCheck}
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>

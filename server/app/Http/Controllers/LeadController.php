@@ -115,6 +115,8 @@ class LeadController extends Controller
                 'paymentFrequency' => 'required|string',
                 'comissionStatus' => 'required|string',
                 'customContractLength' => 'nullable|string',
+                'maintenanceCheck' => 'required|boolean',
+                
             ]);
     
             // Map camelCase fields to snake_case fields
@@ -145,6 +147,7 @@ class LeadController extends Controller
                 'payment_method' => $validatedData['paymentMethod'],
                 'payment_frequency' => $validatedData['paymentFrequency'],
                 'commission_status' => $validatedData['comissionStatus'],
+                'maintenance_check' => $validatedData['maintenanceCheck'], // Include maintenance_check
             ];
     
             // Calculate commission based on commission status
