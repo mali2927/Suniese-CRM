@@ -13,6 +13,7 @@ import Info from "./Components/AdminComponents/Info";
 import Leads from "./Components/AdminComponents/Leads";
 import "bootstrap/dist/css/bootstrap.min.css";
 import UserDashboard from "./Components/UserComponents/Dashboard";
+import UserArchive from "./Components/UserComponents/UserArchive";
 import UserLeads from "./Components/UserComponents/Leads";
 import "./App.css";
 import ProtectedRoute from "../src/ProtectedRoute"; // Import the ProtectedRoute component
@@ -108,6 +109,15 @@ function App() {
             element={
               <ProtectedRoute
                 element={UserQuoteBank}
+                roleRequired="sales consultant"
+              />
+            }
+          />
+          <Route
+            path="/userarchive"
+            element={
+              <ProtectedRoute
+                element={UserArchive}
                 roleRequired="sales consultant"
               />
             }
