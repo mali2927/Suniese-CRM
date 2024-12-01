@@ -9,6 +9,7 @@ use App\Http\Controllers\LeadReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\ChaseNoteController;
+use App\Http\Controllers\InquiryFormController;
 
 
 
@@ -75,3 +76,4 @@ Route::get('/lead-status-counts-by-user-id/{userId}', [DashboardController::clas
 
 Route::get('/leads/consultant/{consultantId}', [LeadController::class, 'getLeadsByConsultant']);
 Route::get('/leads/lost/consultant/{consultantId}', [LeadController::class, 'getLostLeadsByConsultant']);
+Route::resource('inquiries', InquiryFormController::class);

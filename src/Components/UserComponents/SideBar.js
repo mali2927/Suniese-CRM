@@ -10,6 +10,7 @@ import {
   Pen as Pen,
   Archive as Archive,
   ClipboardPlus as ClipboardPlus,
+  BookText as BookText,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -69,6 +70,14 @@ const Sidebar = () => {
           )}`}
         >
           <ClipboardPlus className="me-2" /> Summary
+        </Link>
+        <Link
+          to="/inquiryform"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/inquiryform"
+          )}`}
+        >
+          <BookText className="me-2" /> Inquiry Form
         </Link>
         <Link
           to="#"

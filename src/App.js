@@ -16,6 +16,7 @@ import UserDashboard from "./Components/UserComponents/Dashboard";
 import UserArchive from "./Components/UserComponents/UserArchive";
 import UserLeads from "./Components/UserComponents/Leads";
 import Summary from "./Components/UserComponents/Summary";
+import InquiryForm from "./Components/UserComponents/InquiryForm";
 import "./App.css";
 import ProtectedRoute from "../src/ProtectedRoute"; // Import the ProtectedRoute component
 
@@ -128,6 +129,15 @@ function App() {
             element={
               <ProtectedRoute
                 element={Summary}
+                roleRequired="sales consultant"
+              />
+            }
+          />
+          <Route
+            path="/inquiryform"
+            element={
+              <ProtectedRoute
+                element={InquiryForm}
                 roleRequired="sales consultant"
               />
             }
