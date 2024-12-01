@@ -775,7 +775,8 @@ const Leads = () => {
                 {/* Homeownership Status */}
 
                 <Col md={6}>
-                  {newLead.customerType === "Commercial" ? (
+                  {newLead.customerType === "Commercial" ||
+                  newLead.customerType === "Educational" ? (
                     <></>
                   ) : (
                     <>
