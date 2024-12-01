@@ -49,6 +49,7 @@ const Leads = () => {
 
   // State for selected consultant's name (for display in ReportModal)
   const [selectedConsultantName, setSelectedConsultantName] = useState("");
+  const [commission, setCommission] = useState(0); // State to store the commission
 
   // State for new lead form
   const [newLead, setNewLead] = useState({
