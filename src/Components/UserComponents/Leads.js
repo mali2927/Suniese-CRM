@@ -550,12 +550,41 @@ const Leads = () => {
   };
 
   // Handle input change
+  const calculateCommission = (quotedPrice, comissionStatus) => {
+    const price = parseFloat(quotedPrice) || 0;
+    let commRate = 0;
+
+    // Determine commission rate based on comissionStatus
+    if (comissionStatus === "internal") {
+      commRate = 1.7;
+    } else if (comissionStatus === "external") {
+      commRate = 2.6;
+    }
+
+    // Calculate commission
+    const comm = (price * commRate) / 100;
+    setCommission(comm);
+  };
+
+  // Handle input change and calculate commission
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewLead((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setNewLead((prev) => {
+      const updatedLead = {
+        ...prev,
+        [name]: value,
+      };
+
+      // Recalculate commission immediately after updating state
+      if (name === "quotedPrice" || name === "comissionStatus") {
+        calculateCommission(
+          updatedLead.quotedPrice,
+          updatedLead.comissionStatus
+        );
+      }
+
+      return updatedLead;
+    });
   };
 
   return (
@@ -1153,6 +1182,18 @@ const Leads = () => {
                     <Form.Control.Feedback type="invalid">
                       {errors.comissionStatus}
                     </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={6}>
+                  <Form.Group controlId="formComission" className="mb-3">
+                    <Form.Label>Calculated Commission (£)</Form.Label>
+                    <Form.Control
+                      type="text"
+                      readOnly
+                      value={commission.toFixed(2)} // Display commission with 2 decimal points
+                    />
                   </Form.Group>
                 </Col>
               </Row>
