@@ -7,6 +7,7 @@ import Pipeline from "./Components/AdminComponents/Pipeline";
 import UserPipeline from "./Components/UserComponents/UserPipeline";
 import QuoteBank from "./Components/AdminComponents/QuoteBank";
 import Settings from "./Components/AdminComponents/Settings";
+import UserQuoteBank from "./Components/UserComponents/UserQuoteBank";
 import Info from "./Components/AdminComponents/Info";
 import Leads from "./Components/AdminComponents/Leads";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -91,6 +92,15 @@ function App() {
             element={
               <ProtectedRoute
                 element={UserPipeline}
+                roleRequired="sales consultant"
+              />
+            }
+          />
+          <Route
+            path="/userquotebank"
+            element={
+              <ProtectedRoute
+                element={UserQuoteBank}
                 roleRequired="sales consultant"
               />
             }
