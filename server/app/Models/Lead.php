@@ -41,7 +41,8 @@ class Lead extends Model
         'contract_length',          // New field for contract length
         'payment_method',           // New field for payment method
         'payment_frequency',        // New field for payment frequency
-        'maintenance_check'         // New field for maintenance check
+        'maintenance_check',       // New field for maintenance check
+        'quote_status'
     ];
 
     // Define relationship to User
