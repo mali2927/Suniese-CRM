@@ -10,6 +10,9 @@ const Archive = () => {
   const [archivedLeads, setArchivedLeads] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedLead, setSelectedLead] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     // Fetch archived leads from the Laravel API
@@ -19,40 +22,49 @@ const Archive = () => {
       .catch((error) => console.error("Error fetching archived leads:", error));
   }, []);
 
-  // Function to handle opening the modal with selected lead data
+  // Filter leads based on search query
+  const filteredLeads = archivedLeads.filter(
+    (lead) =>
+      lead.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lead.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lead.surname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      lead.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentLeads = filteredLeads.slice(indexOfFirstItem, indexOfLastItem);
+
   const handleViewLead = (lead) => {
     setSelectedLead(lead);
     setShowModal(true);
   };
 
-  // Function to close the modal
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedLead(null);
   };
 
-  // Function to delete the lead
   const handleDeleteLead = (leadId) => {
     fetch(`${config.baseURL}/delete-lead/${leadId}`, {
       method: "DELETE",
     })
       .then((response) => response.json())
       .then(() => {
-        // Remove the lead from the state after deletion
         setArchivedLeads(archivedLeads.filter((lead) => lead.id !== leadId));
         console.log("Lead deleted successfully.");
       })
       .catch((error) => console.error("Error deleting lead:", error));
   };
 
-  // Function to restore the lead
   const handleRestoreLead = (leadId) => {
     fetch(`${config.baseURL}/restore-lead/${leadId}`, {
       method: "POST",
     })
       .then((response) => response.json())
       .then(() => {
-        // Update the list to reflect the restored lead
         setArchivedLeads(archivedLeads.filter((lead) => lead.id !== leadId));
         console.log("Lead restored successfully.");
       })
@@ -65,6 +77,18 @@ const Archive = () => {
       <main style={styles.mainContent}>
         <Navbar />
         <h2>Archived Leads</h2>
+
+        {/* Search Bar */}
+        <div className="mb-3">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search leads..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
         <div className="table-responsive">
           <table className="table table-bordered table-striped">
             <thead>
@@ -78,7 +102,7 @@ const Archive = () => {
               </tr>
             </thead>
             <tbody>
-              {archivedLeads.map((lead) => (
+              {currentLeads.map((lead) => (
                 <tr key={lead.id}>
                   <td>{lead.id}</td>
                   <td>{lead.title}</td>
@@ -86,7 +110,6 @@ const Archive = () => {
                   <td>{lead.surname}</td>
                   <td>{lead.email}</td>
                   <td>
-                    {/* View Button */}
                     <Button
                       variant="info"
                       size="sm"
@@ -94,7 +117,6 @@ const Archive = () => {
                     >
                       View
                     </Button>{" "}
-                    {/* Restore Button */}
                     <Button
                       variant="success"
                       size="sm"
@@ -102,7 +124,6 @@ const Archive = () => {
                     >
                       Restore
                     </Button>{" "}
-                    {/* Delete Button */}
                     <Button
                       variant="danger"
                       size="sm"
@@ -116,9 +137,33 @@ const Archive = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Controls */}
+        <div className="d-flex justify-content-between align-items-center">
+          <p>
+            Page {currentPage} of {totalPages}
+          </p>
+          <div>
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+            >
+              Previous
+            </Button>{" "}
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage(currentPage + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
       </main>
 
-      {/* Modal for Viewing Lead Details */}
       <ViewLeadModal
         show={showModal}
         handleClose={handleCloseModal}
