@@ -683,7 +683,8 @@ const Leads = () => {
                 {/* House Number */}
                 <Col md={6}>
                   <Form.Group controlId="formHouseNumber" className="mb-3">
-                    {newLead.customerType === "Commercial" ? (
+                    {newLead.customerType === "Commercial" ||
+                    newLead.customerType === "Educational" ? (
                       <>
                         <Form.Label>Address</Form.Label>
                       </>
@@ -700,7 +701,8 @@ const Leads = () => {
                       onChange={handleChange}
                       isInvalid={!!errors.houseNumber}
                       placeholder={
-                        newLead.customerType === "Commercial"
+                        newLead.customerType === "Commercial" ||
+                        newLead.customerType === "Educational"
                           ? "Enter address"
                           : "Enter house name"
                       }
@@ -984,6 +986,7 @@ const Leads = () => {
                       <option value="">-- Select Customer Type --</option>
                       <option value="Commercial">Commercial</option>
                       <option value="Residential">Residential</option>
+                      <option value="Educational">Educational</option>
                     </Form.Control>
                     <Form.Control.Feedback type="invalid">
                       {errors.customerType}
@@ -1144,7 +1147,8 @@ const Leads = () => {
                 </Col>
               </Row>
 
-              {newLead.customerType === "Commercial" && (
+              {(newLead.customerType === "Commercial" ||
+                newLead.customerType === "Educational") && (
                 <>
                   <Row>
                     {/* Client Name */}
