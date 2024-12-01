@@ -9,6 +9,7 @@ import {
   Shell as Shell,
   Pen as Pen,
   Archive as Archive,
+  ClipboardPlus as ClipboardPlus,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -60,6 +61,14 @@ const Sidebar = () => {
           )}`}
         >
           <Pen className="me-2" /> Quote Bank
+        </Link>
+        <Link
+          to="/usersummary"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/usersummary"
+          )}`}
+        >
+          <ClipboardPlus className="me-2" /> Summary
         </Link>
         <Link
           to="#"
