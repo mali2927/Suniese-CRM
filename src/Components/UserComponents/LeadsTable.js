@@ -199,8 +199,8 @@ const LeadsTable = ({
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(`${config.baseURL}/leads/${leadId}`, {
-        method: "DELETE",
+      const response = await fetch(`${config.baseURL}/archiveleads/${leadId}`, {
+        method: "POST",
       });
 
       const result = await response.json();

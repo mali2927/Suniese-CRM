@@ -39,6 +39,7 @@ Route::put('/leads/{id}/status', [LeadController::class, 'updateStatus']);
 Route::put('/leads/{id}/payment', [LeadController::class, 'updatePayment']);
 Route::post('/leads/{lead}/lost-remark', [LeadController::class, 'addLostRemark']);
 Route::delete('/leads/{id}', [LeadController::class, 'delete']);
+Route::post('/archiveleads/{id}', [LeadController::class, 'archive']);
 Route::post('/leads/{id}/update-quote-status', [LeadController::class, 'updateQuoteStatus']);
 
 

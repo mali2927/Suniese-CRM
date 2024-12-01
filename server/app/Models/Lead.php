@@ -42,7 +42,8 @@ class Lead extends Model
         'payment_method',           // New field for payment method
         'payment_frequency',        // New field for payment frequency
         'maintenance_check',       // New field for maintenance check
-        'quote_status'
+        'quote_status',
+        'archive_status'
     ];
 
     // Define relationship to User

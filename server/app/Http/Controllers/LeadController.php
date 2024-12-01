@@ -22,8 +22,11 @@ class LeadController extends Controller
      public function index()
      {
          try {
-             // Eager load user, status, and lostRemarks relationships
-             $leads = Lead::with(['user', 'status','chaseNotes', 'lostRemarks.declaredUser'])->get();
+             // Eager load user, status, chaseNotes, and lostRemarks.declaredUser relationships
+             // Filter leads where archive_status is 0
+             $leads = Lead::with(['user', 'status', 'chaseNotes', 'lostRemarks.declaredUser'])
+                          ->where('archive_status', 0)
+                          ->get();
              
              return response()->json([
                  'success' => true,
@@ -37,49 +40,52 @@ class LeadController extends Controller
              ], 500);
          }
      }
+     
      public function getLeadsByConsultant($consultantId)
-    {
-    try {
-        // Fetch leads where user_id matches the consultantId
-        $leads = Lead::with(['user', 'status', 'chaseNotes', 'lostRemarks.declaredUser'])
-                     ->where('user_id', $consultantId)
-                     ->get();
-        
-        return response()->json([
-            'success' => true,
-            'data' => $leads
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Error fetching leads for consultant: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'An error occurred while fetching leads for the selected consultant.',
-        ], 500);
-    }
-    }
-
-    public function getLostLeadsByConsultant($consultantId)
-    {
-    try {
-        // Fetch lost leads where user_id matches the consultantId and status id is 4
-        $lostLeads = Lead::with(['user', 'status', 'lostRemarks.declaredUser'])
-                         ->where('user_id', $consultantId)
-                         ->where('status_id', 4) // Assuming 4 represents lost status
-                         ->get();
-        
-        return response()->json([
-            'success' => true,
-            'data' => $lostLeads
-        ]);
-    } catch (\Exception $e) {
-        Log::error('Error fetching lost leads for consultant: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'An error occurred while fetching lost leads for the selected consultant.',
-        ], 500);
-    }
-
-    }
+     {
+         try {
+             // Fetch leads where user_id matches the consultantId and archive_status is 0
+             $leads = Lead::with(['user', 'status', 'chaseNotes', 'lostRemarks.declaredUser'])
+                          ->where('user_id', $consultantId)
+                          ->where('archive_status', 0)
+                          ->get();
+             
+             return response()->json([
+                 'success' => true,
+                 'data' => $leads
+             ]);
+         } catch (\Exception $e) {
+             Log::error('Error fetching leads for consultant: ' . $e->getMessage());
+             return response()->json([
+                 'success' => false,
+                 'message' => 'An error occurred while fetching leads for the selected consultant.',
+             ], 500);
+         }
+     }
+     
+     public function getLostLeadsByConsultant($consultantId)
+     {
+         try {
+             // Fetch lost leads where user_id matches the consultantId, status_id is 4, and archive_status is 0
+             $lostLeads = Lead::with(['user', 'status', 'lostRemarks.declaredUser'])
+                              ->where('user_id', $consultantId)
+                              ->where('status', 4) // Assuming 4 represents lost status
+                              ->where('archive_status', 0)
+                              ->get();
+             
+             return response()->json([
+                 'success' => true,
+                 'data' => $lostLeads
+             ]);
+         } catch (\Exception $e) {
+             Log::error('Error fetching lost leads for consultant: ' . $e->getMessage());
+             return response()->json([
+                 'success' => false,
+                 'message' => 'An error occurred while fetching lost leads for the selected consultant.',
+             ], 500);
+         }
+     }
+     
 
     public function updateQuoteStatus(Request $request, $id)
 {
@@ -404,7 +410,7 @@ public function delete($id)
         $lead = Lead::findOrFail($id);
 
         // Delete the lead
-        $lead->delete();
+        //$lead->delete();
 
         return response()->json([
             'success' => true,
@@ -418,6 +424,29 @@ public function delete($id)
         ], 500);
     }
 }
+public function archive($id)
+{
+    try {
+        // Find the lead by ID
+        $lead = Lead::findOrFail($id);
+
+        // Set the archive_status to 1 instead of deleting the lead
+        $lead->archive_status = 1;
+        $lead->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Lead archived successfully',
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error archiving lead: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred while archiving the lead.',
+        ], 500);
+    }
+}
+
 }
     
 
