@@ -5,6 +5,7 @@ import Dashboard from "./Components/Dashboard";
 import Users from "./Components/AdminComponents/Users";
 import Pipeline from "./Components/AdminComponents/Pipeline";
 import UserPipeline from "./Components/UserComponents/UserPipeline";
+import QuoteBank from "./Components/AdminComponents/QuoteBank";
 import Settings from "./Components/AdminComponents/Settings";
 import Info from "./Components/AdminComponents/Info";
 import Leads from "./Components/AdminComponents/Leads";
@@ -57,6 +58,12 @@ function App() {
             path="/pipeline"
             element={
               <ProtectedRoute element={Pipeline} roleRequired="superadmin" />
+            }
+          />
+          <Route
+            path="/quotebank"
+            element={
+              <ProtectedRoute element={QuoteBank} roleRequired="superadmin" />
             }
           />
           <Route

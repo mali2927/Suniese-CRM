@@ -6,6 +6,8 @@ import {
   Users as UsersIcon,
   Settings as SettingsIcon,
   Info as InfoIcon,
+  Pen as Pen,
+  Shell as Shell,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -48,7 +50,15 @@ const Sidebar = () => {
             "/pipeline"
           )}`}
         >
-          <InfoIcon className="me-2" /> Pipeline
+          <Shell className="me-2" /> Pipeline
+        </Link>
+        <Link
+          to="/quotebank"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/quotebank"
+          )}`}
+        >
+          <Pen className="me-2" /> Quote Bank
         </Link>
         <Link
           to="/settings"
