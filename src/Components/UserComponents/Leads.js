@@ -78,6 +78,7 @@ const Leads = () => {
     paymentMethod: "",
     paymentFrequency: "",
     comissionStatus: "",
+    contractLength: "36",
     customContractLength: "",
   });
   // State for validation errors
@@ -1013,6 +1014,7 @@ const Leads = () => {
                       <option value="">-- Select Contract Length --</option>
                       <option value="12">12 Months</option>
                       <option value="24">24 Months</option>
+                      <option value="36">36 Months</option>
                       <option value="3">3 Months</option>
                       <option value="custom">Custom</option>
                     </Form.Control>
