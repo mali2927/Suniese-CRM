@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar";
-import Sidebar from "../SideBar";
+import Sidebar from "./SideBar";
 import { styles } from "../../Styles/dashboardStyles";
 import { Tabs, Tab } from "react-bootstrap";
 import NotQuoted from "../AdminComponents/QuoteBankTabs/NotQuoted";
