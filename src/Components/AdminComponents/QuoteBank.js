@@ -4,12 +4,14 @@ import Sidebar from "../SideBar";
 import { styles } from "../../Styles/dashboardStyles";
 import { Tabs, Tab } from "react-bootstrap";
 import NotQuoted from "./QuoteBankTabs/NotQuoted";
+import QuotedLeads from "./QuoteBankTabs/QuotedLeads"; // New component for quoted leads
 import QuoteNowModal from "./Modals/QuoteNowModal";
 import config from "../../config"; // Adjust path if needed
 
 const QuoteBank = () => {
   const [key, setKey] = useState("notQuoted");
   const [chaseLeads, setChaseLeads] = useState([]);
+  const [quotedLeads, setQuotedLeads] = useState([]); // State for quoted leads
   const [searchTermNotQuoted, setSearchTermNotQuoted] = useState("");
   const [currentPageNotQuoted, setCurrentPageNotQuoted] = useState(1);
   const [showModal, setShowModal] = useState(false);
@@ -17,17 +19,23 @@ const QuoteBank = () => {
   const [selectedLeadId, setSelectedLeadId] = useState(null); // Track the selected lead
 
   const quotesPerPage = 10; // Number of quotes per page
+
   const fetchLeads = async () => {
     try {
       const response = await fetch(`${config.baseURL}/leads`);
       const result = await response.json();
 
       if (result.success) {
-        // Filter leads with ID not equal to 5 and quote_id not equal to 0
+        // Filter leads for not quoted and quoted separately
         const chase = result.data.filter(
           (lead) => lead.id !== 5 && lead.quote_status == 0
         );
         setChaseLeads(chase);
+
+        const quoted = result.data.filter(
+          (lead) => lead.quote_status !== 0 // Filter quoted leads
+        );
+        setQuotedLeads(quoted); // Set quoted leads
       } else {
         console.error("Failed to fetch leads");
       }
@@ -85,6 +93,18 @@ const QuoteBank = () => {
               quotesPerPage={quotesPerPage}
               setShowModal={setShowModal}
               setSelectedLeadId={setSelectedLeadId} // Pass the selected lead ID
+            />
+          </Tab>
+
+          {/* New Tab for Quoted Leads */}
+          <Tab eventKey="quoted" title="Quoted Leads">
+            <QuotedLeads
+              leads={quotedLeads}
+              searchTerm={searchTermNotQuoted}
+              setSearchTerm={setSearchTermNotQuoted}
+              currentPage={currentPageNotQuoted}
+              setCurrentPage={setCurrentPageNotQuoted}
+              quotesPerPage={quotesPerPage}
             />
           </Tab>
         </Tabs>
