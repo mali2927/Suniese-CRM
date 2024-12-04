@@ -7,6 +7,12 @@ use App\Models\LostRemark;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Barryvdh\DomPDF\Facade\Pdf; // Install via `composer require barryvdh/laravel-dompdf`
+use Chartjs\Chartjs;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
+
+
 
 
 class LeadController extends Controller
@@ -484,6 +490,48 @@ public function deleteLead($id)
 
         return response()->json(['message' => 'Lead restored successfully']);
     }
+    public function downloadSummary(Request $request)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'dateRange.start' => 'required|date',
+            'dateRange.end' => 'required|date|after_or_equal:dateRange.start',
+        ]);
+    
+        // Retrieve user_id and date range
+        $userId = $validated['user_id'];
+        $startDate = $validated['dateRange']['start'];
+        $endDate = $validated['dateRange']['end'];
+    
+        // Fetch leads for the user within the date range
+        $leads = Lead::where('user_id', $userId)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->get();
+    
+        // Manually group leads by status ID
+        $statusGroups = [
+            'hot' => $leads->filter(fn($lead) => $lead->status == 1),  // Status ID 1 = hot
+            'cold' => $leads->filter(fn($lead) => $lead->status == 2), // Status ID 2 = cold
+            'lost' => $leads->filter(fn($lead) => $lead->status == 4), // Status ID 4 = lost
+            'won' => $leads->filter(fn($lead) => $lead->status == 5),  // Status ID 5 = won
+        ];
+    
+        // Prepare data for PDF
+        $data = [
+            'userId' => $userId,
+            'leads' => $statusGroups,
+            'totalLeads' => $leads->count(),
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        ];
+    
+        // Generate PDF
+        $pdf = Pdf::loadView('leads.summary', $data);
+    
+        // Return the generated PDF as a download
+        return $pdf->download("leads-summary-$userId.pdf");
+    }
+    
 
 }
     

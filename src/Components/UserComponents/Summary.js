@@ -4,21 +4,50 @@ import "react-datepicker/dist/react-datepicker.css";
 import Navbar from "../Navbar";
 import Sidebar from "./SideBar";
 import { styles } from "../../Styles/dashboardStyles";
+import config from "../../config";
 
 const Summary = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-
-  const handleDownloadReport = () => {
+  const handleDownloadReport = async () => {
     if (startDate && endDate) {
-      // Construct API payload
+      const userId = localStorage.getItem("user_id");
+
       const payload = {
-        dateRange: { start: startDate, end: endDate },
+        user_id: userId,
+        dateRange: {
+          start: startDate,
+          end: endDate,
+        },
       };
 
-      // Example: Replace with your API call
-      console.log("Downloading report with the following data:", payload);
-      alert("Report downloaded successfully!");
+      try {
+        const response = await fetch(`${config.baseURL}/leads/summary`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to download the report");
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "leads-summary.pdf");
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+
+        alert("Report downloaded successfully!");
+      } catch (error) {
+        console.error(error);
+        alert("Error downloading the report. Please try again.");
+      }
     } else {
       alert("Please select a date range before downloading the report.");
     }

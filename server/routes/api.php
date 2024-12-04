@@ -45,6 +45,7 @@ Route::post('/leads/{id}/update-quote-status', [LeadController::class, 'updateQu
 Route::get('/archived-leads', [LeadController::class, 'getArchivedLeads']);
 Route::delete('/delete-lead/{id}', [LeadController::class, 'deleteLead']);
 Route::post('/restore-lead/{id}', [LeadController::class, 'restoreLead']);
+Route::post('/leads/summary', [LeadController::class, 'downloadSummary']);
 
 
 //Leads Statuses
