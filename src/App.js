@@ -133,15 +133,7 @@ function App() {
               />
             }
           />
-          <Route
-            path="/inquiryform"
-            element={
-              <ProtectedRoute
-                element={InquiryForm}
-                roleRequired="sales consultant"
-              />
-            }
-          />
+          <Route path="/inquiryform/:user_id" element={<InquiryForm />} />
         </Routes>
       </div>
     </Router>

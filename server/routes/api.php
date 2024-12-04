@@ -14,6 +14,7 @@ use App\Http\Controllers\InquiryFormController;
 
 
 
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -77,4 +78,6 @@ Route::get('/lead-status-counts-by-user-id/{userId}', [DashboardController::clas
 
 Route::get('/leads/consultant/{consultantId}', [LeadController::class, 'getLeadsByConsultant']);
 Route::get('/leads/lost/consultant/{consultantId}', [LeadController::class, 'getLostLeadsByConsultant']);
-Route::resource('inquiries', InquiryFormController::class);
+
+//Inquiry Queries
+Route::post('/inquiries/{user_id}', [InquiryFormController::class, 'store']);
