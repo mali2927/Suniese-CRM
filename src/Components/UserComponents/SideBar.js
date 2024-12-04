@@ -72,12 +72,12 @@ const Sidebar = () => {
           <ClipboardPlus className="me-2" /> Summary
         </Link>
         <Link
-          to="/inquiryform"
+          to="/inquiry"
           className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
-            "/inquiryform"
+            "/inquiry"
           )}`}
         >
-          <BookText className="me-2" /> Inquiry Form
+          <BookText className="me-2" /> Inquiry
         </Link>
         <Link
           to="#"

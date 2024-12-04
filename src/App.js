@@ -17,6 +17,7 @@ import UserArchive from "./Components/UserComponents/UserArchive";
 import UserLeads from "./Components/UserComponents/Leads";
 import Summary from "./Components/UserComponents/Summary";
 import InquiryForm from "./Components/UserComponents/InquiryForm";
+import Inquiry from "./Components/UserComponents/Inquiry";
 import "./App.css";
 import ProtectedRoute from "../src/ProtectedRoute"; // Import the ProtectedRoute component
 
@@ -129,6 +130,15 @@ function App() {
             element={
               <ProtectedRoute
                 element={Summary}
+                roleRequired="sales consultant"
+              />
+            }
+          />
+          <Route
+            path="/inquiry"
+            element={
+              <ProtectedRoute
+                element={Inquiry}
                 roleRequired="sales consultant"
               />
             }

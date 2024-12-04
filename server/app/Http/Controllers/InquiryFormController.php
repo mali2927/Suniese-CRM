@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\InquiryForm;
+use App\Models\User;
+
 
 class InquiryFormController extends Controller
 {
@@ -48,4 +50,33 @@ class InquiryFormController extends Controller
             ], 500);
         }
     }
+    public function getInquiryLink(Request $request)
+    {
+        // Get the user_id from the request
+        $userId = $request->input('user_id');  // Get user_id from the request payload
+    
+        // Find the user by the user_id
+        $user = User::find($userId);
+    
+        if ($user) {
+            return response()->json(['inquiry_link' => $user->inquiry_link]);
+        }
+    
+        return response()->json(['message' => 'User not found'], 404);
+    }
+    public function getInquiriesByUser(Request $request)
+    {
+        $userId = $request->user_id;
+
+        if (!$userId) {
+            return response()->json(['error' => 'User ID is required.'], 400);
+        }
+
+        // Fetch inquiries by user_id
+        $inquiries = InquiryForm::where('user_id', $userId)->get();
+
+        return response()->json($inquiries);
+    }
+    
+
 }

@@ -24,6 +24,7 @@ class User extends Authenticatable
         'api_token',
         'status',
         'id',
+        'inquiry_link',
     ];
 
     /**

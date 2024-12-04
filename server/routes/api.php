@@ -81,3 +81,5 @@ Route::get('/leads/lost/consultant/{consultantId}', [LeadController::class, 'get
 
 //Inquiry Queries
 Route::post('/inquiries/{user_id}', [InquiryFormController::class, 'store']);
+Route::get('/inquiry-link', [InquiryFormController::class, 'getInquiryLink']);
+Route::get('/submitted-inquiries', [InquiryFormController::class, 'getInquiriesByUser']);

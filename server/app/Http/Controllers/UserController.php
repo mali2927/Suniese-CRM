@@ -155,37 +155,42 @@ class UserController extends Controller
     }
     public function addUser(Request $request)
     {
-
+        // Check if the email is already registered
         $existingUser = User::where('email', $request->input('email'))->first();
     
         if ($existingUser) {
-            // Return a custom response with error message to the front end
             return response()->json([
                 'success' => false,
                 'message' => 'The email address is already registered.',
             ], 422); // 422 Unprocessable Entity
         }
     
-        // Log the inputs (optional)
-    
-        // Store the data in the database
+        // Create a new user
         $user = new User();
         $user->name = $request->input('name');
         $user->email = $request->input('email');
         $user->role = $request->input('designation');
-        $user->password = Hash::make('123456789'); // Hash the default password
-        $user->status=('Active');
-      
-        $user->save(); // Save the user to the database
+        $user->password = Hash::make('123456789'); // Default password
+        $user->status = 'Active';
+        $user->save(); // Save to generate the user ID
+    
+        // Set the inquiry link based on the user's ID
+        $user->inquiry_link = "http://localhost:3000/inquiryform/" . $user->id;
+        $user->save(); // Save again to update the inquiry link
     
         return response()->json([
             'success' => true,
-            'message' => 'User created successfully!'
+            'message' => 'User created successfully!',
+            'data' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'inquiry_link' => $user->inquiry_link, // Return the inquiry link
+            ]
         ]);
-
-
-
     }
+    
 
 
     public function updateUser(Request $request)
