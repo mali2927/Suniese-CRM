@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Table, Pagination, Form, InputGroup, Row, Col } from "react-bootstrap";
+import {
+  Table,
+  Pagination,
+  Form,
+  InputGroup,
+  Row,
+  Col,
+  Button,
+} from "react-bootstrap";
 import config from "../../../config";
-
+import ViewLeadModal from "../Modals/ViewLeadModal";
 const LostLeads = ({
   searchTerm,
   setSearchTerm,
@@ -10,6 +18,8 @@ const LostLeads = ({
   leadsPerPage,
 }) => {
   const [lostLeads, setLostLeads] = useState([]);
+  const [showModal, setShowModal] = useState(false); // State to control modal visibility
+  const [selectedLead, setSelectedLead] = useState(null); // State to store the selected lead
 
   useEffect(() => {
     fetchLeads();
@@ -46,6 +56,15 @@ const LostLeads = ({
     indexOfFirstLead,
     indexOfLastLead
   );
+  const handleShowModal = (lead) => {
+    setSelectedLead(lead);
+    setShowModal(true); // Show the modal
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedLead(null); // Reset the selected lead
+  };
 
   return (
     <div>
@@ -73,6 +92,7 @@ const LostLeads = ({
             <th>Quoted Price</th>
             <th>Remarks</th>
             <th>Sales Cons.</th>
+            <th>Action</th> {/* Added Action column */}
           </tr>
         </thead>
         <tbody>
@@ -86,6 +106,14 @@ const LostLeads = ({
                 <td>{lead.quoted_price}</td>
                 <td>{lead.lost_remarks[0]?.title || "No remarks"}</td>
                 <td>{lead.user.name || "Unknown"}</td>
+                <td>
+                  <Button
+                    variant="info"
+                    onClick={() => handleShowModal(lead)} // On click, show the modal
+                  >
+                    View
+                  </Button>
+                </td>
               </tr>
             ))
           ) : (
@@ -112,6 +140,12 @@ const LostLeads = ({
           )
         )}
       </Pagination>
+      {/* View Lead Modal */}
+      <ViewLeadModal
+        show={showModal}
+        handleClose={handleCloseModal}
+        lead={selectedLead}
+      />
     </div>
   );
 };

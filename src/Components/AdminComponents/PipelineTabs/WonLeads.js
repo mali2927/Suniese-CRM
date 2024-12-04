@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Table, Pagination, Form, InputGroup, Row, Col } from "react-bootstrap";
+import {
+  Table,
+  Pagination,
+  Form,
+  InputGroup,
+  Row,
+  Col,
+  Button,
+} from "react-bootstrap";
 import config from "../../../config";
-
+import ViewLeadModal from "../Modals/ViewLeadModal";
 const WonLeads = ({
   searchTerm,
   setSearchTerm,
@@ -10,7 +18,8 @@ const WonLeads = ({
   leadsPerPage,
 }) => {
   const [wonLeads, setWonLeads] = useState([]);
-
+  const [selectedLead, setSelectedLead] = useState(null); // State for selected lead
+  const [showModal, setShowModal] = useState(false); // State to manage modal visibility
   useEffect(() => {
     fetchLeads();
   }, []);
@@ -46,6 +55,18 @@ const WonLeads = ({
     indexOfFirstLead,
     indexOfLastLead
   );
+
+  // Function to handle opening the modal
+  const handleViewLead = (lead) => {
+    setSelectedLead(lead);
+    setShowModal(true);
+  };
+
+  // Function to handle closing the modal
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedLead(null);
+  };
 
   // Calculate the average selling price for won leads
   const totalPayment = filteredWonLeads.reduce(
@@ -83,6 +104,7 @@ const WonLeads = ({
             <th>Quoted Price</th>
             <th>Total Value</th>
             <th>Date Won</th>
+            <th>Action</th> {/* Add Action column */}
           </tr>
         </thead>
         <tbody>
@@ -96,6 +118,14 @@ const WonLeads = ({
                 <td>{lead.quoted_price}</td>
                 <td>{lead.total_payment}</td>
                 <td>{new Date(lead.updated_at).toISOString().split("T")[0]}</td>
+                <td>
+                  <Button
+                    variant="info"
+                    onClick={() => handleViewLead(lead)} // Trigger the modal
+                  >
+                    View
+                  </Button>
+                </td>
               </tr>
             ))
           ) : (
@@ -126,6 +156,13 @@ const WonLeads = ({
           )
         )}
       </Pagination>
+
+      {/* ViewLeadModal */}
+      <ViewLeadModal
+        show={showModal}
+        handleClose={handleCloseModal}
+        lead={selectedLead}
+      />
     </div>
   );
 };
