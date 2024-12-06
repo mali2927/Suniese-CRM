@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lead;
+use App\Models\User;
 use App\Models\LostRemark;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -503,6 +504,9 @@ public function deleteLead($id)
         $startDate = $validated['dateRange']['start'];
         $endDate = $validated['dateRange']['end'];
     
+        // Fetch the user information
+        $user = User::find($userId);
+    
         // Fetch leads for the user within the date range
         $leads = Lead::where('user_id', $userId)
             ->whereBetween('created_at', [$startDate, $endDate])
@@ -516,13 +520,18 @@ public function deleteLead($id)
             'won' => $leads->filter(fn($lead) => $lead->status == 5),  // Status ID 5 = won
         ];
     
+        // Calculate the sum of quote_status where quote_status = 1
+        $quoteStatusSum = $leads->where('quote_status', 1)->sum('quote_status');
+    
         // Prepare data for PDF
         $data = [
             'userId' => $userId,
+            'userName' => $user->name, // Pass the user's name
             'leads' => $statusGroups,
             'totalLeads' => $leads->count(),
             'startDate' => $startDate,
             'endDate' => $endDate,
+            'quoteStatusSum' => $quoteStatusSum, // Include the sum of quote_status
         ];
     
         // Generate PDF
@@ -531,6 +540,8 @@ public function deleteLead($id)
         // Return the generated PDF as a download
         return $pdf->download("leads-summary-$userId.pdf");
     }
+    
+    
     
 
 }

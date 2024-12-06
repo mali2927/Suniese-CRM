@@ -23,9 +23,9 @@
     </style>
 </head>
 <body>
-    <h2>Leads Summary</h2>
+    <h1>Leads Summary for {{ $userName }}</h1>
     <p><strong>User ID:</strong> {{ $userId }}</p>
-    
+    <p><strong>Sales Consultant Name:</strong> {{ $userName }}</p>
     <p><strong>Date Range:</strong> {{ \Carbon\Carbon::parse($startDate)->format('F j, Y') }} to {{ \Carbon\Carbon::parse($endDate)->format('F j, Y') }}</p>
     <p><strong>Total Leads:</strong> {{ $totalLeads }}</p>
 
@@ -52,6 +52,10 @@
             <tr>
                 <td>Won</td>
                 <td>{{ $leads['won']->count() }}</td>
+            </tr>
+            <tr>
+                <td>Quoted</td>
+                <td>{{ $quoteStatusSum }}</td>
             </tr>
         </tbody>
     </table>
