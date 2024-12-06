@@ -103,6 +103,7 @@ const WonLeads = ({
             <th>Phone Number</th>
             <th>Quoted Price</th>
             <th>Total Value</th>
+            <th>Sales Cons.</th>
             <th>Date Won</th>
             <th>Action</th> {/* Add Action column */}
           </tr>
@@ -117,6 +118,8 @@ const WonLeads = ({
                 <td>{lead.phone_number}</td>
                 <td>{lead.quoted_price}</td>
                 <td>{lead.total_payment}</td>
+                <td>{lead.user.name || "Unknown"}</td>
+
                 <td>{new Date(lead.updated_at).toISOString().split("T")[0]}</td>
                 <td>
                   <Button
