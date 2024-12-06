@@ -174,8 +174,11 @@ class UserController extends Controller
         $user->status = 'Active';
         $user->save(); // Save to generate the user ID
     
+        // Retrieve the base URL from the configuration
+        $baseUrl = config('app.url');
+    
         // Set the inquiry link based on the user's ID
-        $user->inquiry_link = "http://localhost:3000/inquiryform/" . $user->id;
+        $user->inquiry_link = "/inquiryform/{$user->id}";
         $user->save(); // Save again to update the inquiry link
     
         return response()->json([
@@ -190,6 +193,7 @@ class UserController extends Controller
             ]
         ]);
     }
+    
     
 
 

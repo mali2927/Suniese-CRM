@@ -53,17 +53,23 @@ class InquiryFormController extends Controller
     public function getInquiryLink(Request $request)
     {
         // Get the user_id from the request
-        $userId = $request->input('user_id');  // Get user_id from the request payload
+        $userId = $request->input('user_id'); // Get user_id from the request payload
     
         // Find the user by the user_id
         $user = User::find($userId);
     
         if ($user) {
-            return response()->json(['inquiry_link' => $user->inquiry_link]);
+            // Dynamically attach the base URL with the port to the inquiry link
+            $baseUrl = config('app.url');
+            $fullInquiryLink = "{$baseUrl}:3000{$user->inquiry_link}";
+    
+            return response()->json(['inquiry_link' => $fullInquiryLink]);
         }
     
         return response()->json(['message' => 'User not found'], 404);
     }
+    
+    
     public function getInquiriesByUser(Request $request)
     {
         $userId = $request->user_id;
