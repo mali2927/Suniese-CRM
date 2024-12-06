@@ -30,6 +30,14 @@ const NotQuoted = ({
     indexOfFirstLead,
     indexOfLastLead
   );
+  const validateUrl = (url) => {
+    try {
+      new URL(url);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
 
   const totalPages = Math.ceil(filteredLeads.length / quotesPerPage);
 
@@ -48,14 +56,22 @@ const NotQuoted = ({
   };
 
   const handleSubmit = () => {
-    // Send the quote URL and update the quote status to 1
+    if (!quoteUrl.trim()) {
+      alert("URL cannot be empty.");
+      return;
+    }
+    if (!validateUrl(quoteUrl)) {
+      alert("Please enter a valid URL.");
+      return;
+    }
+
     fetch(`${config.baseURL}/leads/${selectedLead.id}/update-quote-status`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Make sure to add the auth token if needed
+        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
       },
-      body: JSON.stringify({ quote_status: 1 }),
+      body: JSON.stringify({ quote_status: 1, quote_url: quoteUrl }),
     })
       .then((response) => response.json())
       .then((data) => {

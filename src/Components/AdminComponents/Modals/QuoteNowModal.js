@@ -20,7 +20,9 @@ const QuoteNowModal = ({
   };
 
   const handleFormSubmit = () => {
-    if (!validateUrl(quoteUrl)) {
+    if (!quoteUrl.trim()) {
+      setError("URL cannot be empty.");
+    } else if (!validateUrl(quoteUrl)) {
       setError("Please enter a valid URL.");
     } else {
       setError("");
@@ -55,7 +57,11 @@ const QuoteNowModal = ({
         <Button variant="secondary" onClick={handleClose}>
           Cancel
         </Button>
-        <Button variant="primary" onClick={handleFormSubmit}>
+        <Button
+          variant="primary"
+          onClick={handleFormSubmit}
+          disabled={!quoteUrl.trim() || error}
+        >
           Submit
         </Button>
       </Modal.Footer>
