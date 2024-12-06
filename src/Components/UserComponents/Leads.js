@@ -82,6 +82,8 @@ const Leads = () => {
     contractLength: "36",
     customContractLength: "",
     maintenanceCheck: "",
+    installationCheck: "",
+    monitoringCheck: "",
   });
   // State for validation errors
   const [errors, setErrors] = useState({});
@@ -1035,32 +1037,43 @@ const Leads = () => {
                 </Col>
                 <Col md={6}>
                   <Form.Group controlId="formMaintenanceCheck" className="mb-3">
-                    <Form.Label>Maintenance Check</Form.Label>
-                    <div className="d-flex align-items-center">
+                    <Form.Label>Checks</Form.Label>
+                    <div className="d-flex flex-column">
                       <Form.Check
-                        type="radio"
-                        label="Yes"
+                        type="checkbox"
+                        label="Maintenance Check"
                         name="maintenanceCheck"
                         value="1"
                         onChange={handleChange}
                         checked={newLead.maintenanceCheck === "1"}
-                        className="me-3"
-                        id="maintenanceYes"
-                        isInvalid={!!errors.maintenanceCheck}
+                        className="mb-2"
+                        id="maintenanceCheck"
                       />
                       <Form.Check
-                        type="radio"
-                        label="No"
-                        name="maintenanceCheck"
-                        value="0"
+                        type="checkbox"
+                        label="Installation of Solar Panel"
+                        name="installationCheck"
+                        value="1"
                         onChange={handleChange}
-                        checked={newLead.maintenanceCheck === "0"}
-                        id="maintenanceNo"
-                        isInvalid={!!errors.maintenanceCheck}
+                        checked={newLead.installationCheck === "1"}
+                        className="mb-2"
+                        id="installationCheck"
+                      />
+                      <Form.Check
+                        type="checkbox"
+                        label="Monitoring of Solar Panel"
+                        name="monitoringCheck"
+                        value="1"
+                        onChange={handleChange}
+                        checked={newLead.monitoringCheck === "1"}
+                        className="mb-2"
+                        id="monitoringCheck"
                       />
                     </div>
                     <Form.Control.Feedback type="invalid">
-                      {errors.maintenanceCheck}
+                      {errors.maintenanceCheck ||
+                        errors.installationCheck ||
+                        errors.monitoringCheck}
                     </Form.Control.Feedback>
                   </Form.Group>
                 </Col>

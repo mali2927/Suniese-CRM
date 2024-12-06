@@ -163,6 +163,30 @@ const ViewLeadModal = ({ show, handleClose, lead }) => {
             </tr>
             <tr>
               <td>
+                <strong>Monitoring Check</strong>
+              </td>
+              <td>
+                {lead.monitoring_check === 1
+                  ? "Yes"
+                  : lead.monitoring_check === 0
+                  ? "No"
+                  : "-"}
+              </td>
+            </tr>{" "}
+            <tr>
+              <td>
+                <strong>Installation Check</strong>
+              </td>
+              <td>
+                {lead.installation_check === 1
+                  ? "Yes"
+                  : lead.installation_check === 0
+                  ? "No"
+                  : "-"}
+              </td>
+            </tr>
+            <tr>
+              <td>
                 <strong>Commission</strong>
               </td>
               <td>{lead.commission || "-"}</td>

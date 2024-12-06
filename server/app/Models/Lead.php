@@ -43,7 +43,9 @@ class Lead extends Model
         'payment_frequency',        // New field for payment frequency
         'maintenance_check',       // New field for maintenance check
         'quote_status',
-        'archive_status'
+        'archive_status',
+        'monitoring_check',
+        'installation_check'
     ];
 
     // Define relationship to User

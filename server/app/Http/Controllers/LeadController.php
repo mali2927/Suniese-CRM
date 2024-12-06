@@ -132,104 +132,108 @@ class LeadController extends Controller
     }
 }
 
-    public function store(Request $request)
-    {
-        try {
-            // Log incoming request data
-            Log::debug($request->all());
-    
-            // Validate the request data
-            $validatedData = $request->validate([
-                'user_id' => 'required|exists:users,id',
-                'title' => 'required|string|max:255',
-                'firstName' => 'required|string|max:255',
-                'surname' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
-                'phoneNumber' => 'required|string|max:20',
-                'houseNumber' => 'required|string|max:255',
-                'streetName' => 'required|string|max:255',
-                'townCity' => 'required|string|max:255',
-                'postalCode' => 'required|string|max:10',
-                'homeownershipStatus' => 'required|string|in:Owner,Tenant',
-                'systemQuoted' => 'required|string|max:255',
-                'quotedPrice' => 'required|numeric',
-                'totalContractValueGross' => 'required|numeric',
-                'totalContractValueNet' => 'required|numeric',
-                'meetingTime' => 'required|date',
-                'bestTimeToCall' => 'nullable|date',
-                'customerType' => 'required|string|max:255',
-                'status' => 'required|exists:lead_statuses,id',
-                'clientName'=> 'nullable|string',
-                'endUser'=> 'nullable|string',
-                'serviceDescription'=> 'nullable|string',
-                'contractLength' => 'required|string',
-                'paymentMethod' => 'required|string',
-                'paymentFrequency' => 'required|string',
-                'comissionStatus' => 'required|string',
-                'customContractLength' => 'nullable|string',
-                'maintenanceCheck' => 'required|boolean',
-                
-            ]);
-    
-            // Map camelCase fields to snake_case fields
-            $mappedData = [
-                'user_id' => $validatedData['user_id'],
-                'title' => $validatedData['title'],
-                'first_name' => $validatedData['firstName'],
-                'surname' => $validatedData['surname'],
-                'email' => $validatedData['email'],
-                'phone_number' => $validatedData['phoneNumber'],
-                'house_number' => $validatedData['houseNumber'],
-                'street_name' => $validatedData['streetName'],
-                'town_city' => $validatedData['townCity'],
-                'postal_code' => $validatedData['postalCode'],
-                'homeownership_status' => $validatedData['customerType'] === 'Commercial' ? "null" : $validatedData['homeownershipStatus'],
-                'system_quoted' => $validatedData['systemQuoted'],
-                'quoted_price' => $validatedData['quotedPrice'],
-                'meeting_time' => $validatedData['meetingTime'],
-                'best_time_to_call' => $validatedData['bestTimeToCall'],
-                'customer_type' => $validatedData['customerType'],
-                'status' => $validatedData['status'],
-                'client_name' => $validatedData['clientName'],
-                'end_user' => $validatedData['endUser'],
-                'service_description' => $validatedData['serviceDescription'],
-                'total_contract_value_net' => $validatedData['totalContractValueNet'],
-                'total_contract_value_gross' => $validatedData['totalContractValueGross'],
-                'contract_length' => $validatedData['contractLength'] === 'custom' ? $validatedData['customContractLength'] : $validatedData['contractLength'],
-                'payment_method' => $validatedData['paymentMethod'],
-                'payment_frequency' => $validatedData['paymentFrequency'],
-                'commission_status' => $validatedData['comissionStatus'],
-                'maintenance_check' => $validatedData['maintenanceCheck'], // Include maintenance_check
-            ];
-    
-            // Calculate commission based on commission status
-            $commissionRate = 0;
-            if ($validatedData['comissionStatus'] === 'external') {
-                $commissionRate = 0.017; // 1.7%
-            } elseif ($validatedData['comissionStatus'] === 'internal') {
-                $commissionRate = 0.026; // 2.6%
-            }
-            $mappedData['commission'] = $validatedData['quotedPrice'] * $commissionRate;
-    
-            Log::debug($mappedData);
-    
-            // Create a new lead in the database
-            $lead = Lead::create($mappedData);
-    
-            // Return a response
-            return response()->json([
-                'success' => true,
-                'message' => 'Lead created successfully',
-                'data' => $lead
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error creating lead: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while creating the lead.',
-            ], 500);
+public function store(Request $request)
+{
+    try {
+        // Log incoming request data
+        Log::debug($request->all());
+
+        // Validate the request data
+        $validatedData = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'title' => 'required|string|max:255',
+            'firstName' => 'required|string|max:255',
+            'surname' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phoneNumber' => 'required|string|max:20',
+            'houseNumber' => 'required|string|max:255',
+            'streetName' => 'required|string|max:255',
+            'townCity' => 'required|string|max:255',
+            'postalCode' => 'required|string|max:10',
+            'homeownershipStatus' => 'required|string|in:Owner,Tenant',
+            'systemQuoted' => 'required|string|max:255',
+            'quotedPrice' => 'required|numeric',
+            'totalContractValueGross' => 'required|numeric',
+            'totalContractValueNet' => 'required|numeric',
+            'meetingTime' => 'required|date',
+            'bestTimeToCall' => 'nullable|date',
+            'customerType' => 'required|string|max:255',
+            'status' => 'required|exists:lead_statuses,id',
+            'clientName'=> 'nullable|string',
+            'endUser'=> 'nullable|string',
+            'serviceDescription'=> 'nullable|string',
+            'contractLength' => 'required|string',
+            'paymentMethod' => 'required|string',
+            'paymentFrequency' => 'required|string',
+            'comissionStatus' => 'required|string',
+            'customContractLength' => 'nullable|string',
+            'maintenanceCheck' => 'nullable|boolean', // Allow nullable for checkboxes
+            'installationCheck' => 'nullable|boolean', // Allow nullable for checkboxes
+            'monitoringCheck' => 'nullable|boolean', // Allow nullable for checkboxes
+        ]);
+
+        // Map camelCase fields to snake_case fields
+        $mappedData = [
+            'user_id' => $validatedData['user_id'],
+            'title' => $validatedData['title'],
+            'first_name' => $validatedData['firstName'],
+            'surname' => $validatedData['surname'],
+            'email' => $validatedData['email'],
+            'phone_number' => $validatedData['phoneNumber'],
+            'house_number' => $validatedData['houseNumber'],
+            'street_name' => $validatedData['streetName'],
+            'town_city' => $validatedData['townCity'],
+            'postal_code' => $validatedData['postalCode'],
+            'homeownership_status' => $validatedData['customerType'] === 'Commercial' ? null : $validatedData['homeownershipStatus'],
+            'system_quoted' => $validatedData['systemQuoted'],
+            'quoted_price' => $validatedData['quotedPrice'],
+            'meeting_time' => $validatedData['meetingTime'],
+            'best_time_to_call' => $validatedData['bestTimeToCall'],
+            'customer_type' => $validatedData['customerType'],
+            'status' => $validatedData['status'],
+            'client_name' => $validatedData['clientName'],
+            'end_user' => $validatedData['endUser'],
+            'service_description' => $validatedData['serviceDescription'],
+            'total_contract_value_net' => $validatedData['totalContractValueNet'],
+            'total_contract_value_gross' => $validatedData['totalContractValueGross'],
+            'contract_length' => $validatedData['contractLength'] === 'custom' ? $validatedData['customContractLength'] : $validatedData['contractLength'],
+            'payment_method' => $validatedData['paymentMethod'],
+            'payment_frequency' => $validatedData['paymentFrequency'],
+            'commission_status' => $validatedData['comissionStatus'],
+            'maintenance_check' => $validatedData['maintenanceCheck'] ? 1 : 0, // Convert to 1 or 0
+            'installation_check' => $validatedData['installationCheck'] ? 1 : 0, // Convert to 1 or 0
+            'monitoring_check' => $validatedData['monitoringCheck'] ? 1 : 0, // Convert to 1 or 0
+        ];
+
+        // Calculate commission based on commission status
+        $commissionRate = 0;
+        if ($validatedData['comissionStatus'] === 'external') {
+            $commissionRate = 0.017; // 1.7%
+        } elseif ($validatedData['comissionStatus'] === 'internal') {
+            $commissionRate = 0.026; // 2.6%
         }
+        $mappedData['commission'] = $validatedData['quotedPrice'] * $commissionRate;
+
+        Log::debug($mappedData);
+
+        // Create a new lead in the database
+        $lead = Lead::create($mappedData);
+
+        // Return a response
+        return response()->json([
+            'success' => true,
+            'message' => 'Lead created successfully',
+            'data' => $lead
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error creating lead: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred while creating the lead.',
+        ], 500);
     }
+}
+
     
 
     public function searchLeadByConsultantId(Request $request)
