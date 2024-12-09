@@ -32,12 +32,11 @@ const QuoteBank = () => {
       if (result.success) {
         // Filter leads based on both status and quote_status
         const filteredLeads = result.data.filter(
-          (lead) =>
-            lead.status && lead.status.id !== 5 && lead.quote_status === 0
+          (lead) => lead.quote_status == "0"
         );
         setChaseLeads(filteredLeads); // Set filtered leads
         const quoted = result.data.filter(
-          (lead) => lead.quote_status !== 0 // Filter quoted leads
+          (lead) => lead.quote_status != "0" // Filter quoted leads
         );
         setQuotedLeads(quoted); // Set quoted leads
       } else {

@@ -27,13 +27,11 @@ const QuoteBank = () => {
 
       if (result.success) {
         // Filter leads for not quoted and quoted separately
-        const chase = result.data.filter(
-          (lead) => lead.id !== 5 && lead.quote_status == 0
-        );
+        const chase = result.data.filter((lead) => lead.quote_status == "0");
         setChaseLeads(chase);
 
         const quoted = result.data.filter(
-          (lead) => lead.quote_status !== 0 // Filter quoted leads
+          (lead) => lead.quote_status != "0" // Filter quoted leads
         );
         setQuotedLeads(quoted); // Set quoted leads
       } else {
