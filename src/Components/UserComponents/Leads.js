@@ -540,17 +540,23 @@ const Leads = () => {
   };
 
   // Handle form submission
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   const validationErrors = validate();
+
+  //   if (Object.keys(validationErrors).length > 0) {
+  //     setErrors(validationErrors);
+  //   } else {
+  //     setErrors({});
+  //     addLead();
+  //   }
+  // };
   const handleSubmit = (e) => {
     e.preventDefault();
-    const validationErrors = validate();
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-    } else {
-      setErrors({});
-      addLead();
-    }
+    setErrors({}); // Optional: Clear any existing errors
+    addLead(); // Directly call addLead without validation
   };
+  
 
   // Handle input change
   const calculateCommission = (quotedPrice, comissionStatus) => {
