@@ -199,6 +199,8 @@ public function store(Request $request)
             'maintenance_check' => $validatedData['maintenanceCheck'] ? 1 : 0, // Convert to 1 or 0
             'installation_check' => $validatedData['installationCheck'] ? 1 : 0, // Convert to 1 or 0
             'monitoring_check' => $validatedData['monitoringCheck'] ? 1 : 0, // Convert to 1 or 0
+            'quote_status' => 0, 
+            'archive_status' => 0, 
         ];
 
         // Calculate commission based on commission status
