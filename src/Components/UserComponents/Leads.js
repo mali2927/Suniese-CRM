@@ -67,7 +67,7 @@ const Leads = () => {
     quotedPrice: "",
     meetingTime: "",
     bestTimeToCall: "",
-    consultantId: "", // Initially empty
+    consultantId: userId, // Initially empty
     status: "",
     customerType: "",
     clientName: "-",
@@ -556,7 +556,6 @@ const Leads = () => {
     setErrors({}); // Optional: Clear any existing errors
     addLead(); // Directly call addLead without validation
   };
-  
 
   // Handle input change
   const calculateCommission = (quotedPrice, comissionStatus) => {
@@ -981,6 +980,7 @@ const Leads = () => {
                       value={newLead.consultantId}
                       onChange={handleChange}
                       isInvalid={!!errors.consultantId}
+                      disabled // This makes the dropdown read-only
                     >
                       <option value="">-- Select Consultant --</option>
                       {consultants.map((consultant) => (
