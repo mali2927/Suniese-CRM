@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import config from "../../config";
 
@@ -10,14 +10,28 @@ const InquiryForm = () => {
     email: "",
     phoneNumber: "",
     homeownerStatus: "owner", // Default value as "owner"
+    services: [],
+    installationTime: "0-6 months", // Default value
+    preferredMethod: "cash", // Default value
   });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const { name, value, type, checked } = e.target;
+
+    if (type === "checkbox") {
+      setFormData((prevFormData) => {
+        const updatedServices = checked
+          ? [...prevFormData.services, value]
+          : prevFormData.services.filter((service) => service !== value);
+
+        return { ...prevFormData, services: updatedServices };
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -30,7 +44,7 @@ const InquiryForm = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`, // Include the token if necessary
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
         },
         body: JSON.stringify(data),
       });
@@ -45,7 +59,10 @@ const InquiryForm = () => {
           email: "",
           phoneNumber: "",
           homeownerStatus: "owner",
-        }); // Clear the form after submission
+          services: [],
+          installationTime: "0-6 months",
+          preferredMethod: "cash",
+        });
       } else {
         alert(result.message || "Error submitting inquiry.");
       }
@@ -58,7 +75,7 @@ const InquiryForm = () => {
   return (
     <>
       <h2>Inquiry Form</h2>
-      <form onSubmit={handleSubmit} className="container mt-4">
+      <form onSubmit={handleSubmit} className="container mt-4 text-start">
         <div className="row">
           <div className="col-md-6 mb-3">
             <label htmlFor="fullName" className="form-label">
@@ -135,6 +152,102 @@ const InquiryForm = () => {
               <option value="owner">Owner</option>
               <option value="tenant">Tenant</option>
             </select>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-12 mb-3">
+            <label className="form-label">Services</label>
+            <div className="form-check">
+              <input
+                type="checkbox"
+                id="maintenance"
+                name="services"
+                value="maintenance"
+                onChange={handleChange}
+                className="form-check-input"
+              />
+              <label htmlFor="maintenance" className="form-check-label">
+                Maintenance Check
+              </label>
+            </div>
+            <div className="form-check">
+              <input
+                type="checkbox"
+                id="monitoring"
+                name="services"
+                value="monitoring"
+                onChange={handleChange}
+                className="form-check-input"
+              />
+              <label htmlFor="monitoring" className="form-check-label">
+                Monitoring Check
+              </label>
+            </div>
+            <div className="form-check">
+              <input
+                type="checkbox"
+                id="installation"
+                name="services"
+                value="installation"
+                onChange={handleChange}
+                className="form-check-input"
+              />
+              <label htmlFor="installation" className="form-check-label">
+                Installation Check
+              </label>
+            </div>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-6 mb-3">
+            <label htmlFor="installationTime" className="form-label">
+              Time When You Will Install Solar Panel
+            </label>
+            <select
+              id="installationTime"
+              name="installationTime"
+              value={formData.installationTime}
+              onChange={handleChange}
+              className="form-select"
+              required
+            >
+              <option value="0-6 months">0-6 Months</option>
+              <option value="6-12 months">6-12 Months</option>
+              <option value="12+ months">12+ Months</option>
+            </select>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-6 mb-3">
+            <label className="form-label">Preferred Method</label>
+            <div className="form-check">
+              <input
+                type="radio"
+                id="cash"
+                name="preferredMethod"
+                value="cash"
+                checked={formData.preferredMethod === "cash"}
+                onChange={handleChange}
+                className="form-check-input"
+              />
+              <label htmlFor="cash" className="form-check-label">
+                Cash
+              </label>
+            </div>
+            <div className="form-check">
+              <input
+                type="radio"
+                id="finance"
+                name="preferredMethod"
+                value="finance"
+                checked={formData.preferredMethod === "finance"}
+                onChange={handleChange}
+                className="form-check-input"
+              />
+              <label htmlFor="finance" className="form-check-label">
+                Finance
+              </label>
+            </div>
           </div>
         </div>
         <button type="submit" className="btn btn-primary">
