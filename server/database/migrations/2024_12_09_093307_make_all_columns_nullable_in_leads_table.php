@@ -13,9 +13,10 @@ class MakeAllColumnsNullableInLeadsTable extends Migration
      */
     public function up()
     {
-        // Skip the foreign key drop since it doesn't exist
         Schema::table('leads', function (Blueprint $table) {
-            // Modify all columns to allow NULL
+            // Ensure the foreign key is dropped if it exists to prevent errors on re-creation
+            $table->dropForeign(['status']);
+            
             $table->unsignedBigInteger('user_id')->nullable()->change();
             $table->string('title')->nullable()->change();
             $table->string('first_name')->nullable()->change();
@@ -50,14 +51,11 @@ class MakeAllColumnsNullableInLeadsTable extends Migration
             $table->string('commission_status')->nullable()->change();
             $table->boolean('monitoring_check')->nullable()->change();
             $table->boolean('installation_check')->nullable()->change();
-        });
-    
-        // Recreate the foreign key constraint
-        Schema::table('leads', function (Blueprint $table) {
-            $table->foreign('status')->references('id')->on('lead_statuses')->onDelete('cascade');
+            
+            // Re-add the foreign key
+            $table->foreign('status', 'leads_status_foreign')->references('id')->on('lead_statuses')->onDelete('cascade');
         });
     }
-    
 
     /**
      * Reverse the migrations.
@@ -67,19 +65,10 @@ class MakeAllColumnsNullableInLeadsTable extends Migration
     public function down()
     {
         Schema::table('leads', function (Blueprint $table) {
-            // Drop the foreign key constraint if it exists
-            if (Schema::hasColumn('leads', 'status')) {
-                try {
-                    $table->dropForeign(['status']);
-                } catch (\Illuminate\Database\QueryException $e) {
-                    // Skip if the foreign key doesn't exist
-                }
-            }
-    
-            // Reverse modifications
+            $table->dropForeign(['status']);
+            // Reverse modifications to the default non-nullable state and reapply the foreign key
             $table->unsignedBigInteger('status')->nullable(false)->change();
-            $table->foreign('status')->references('id')->on('lead_statuses')->onDelete('cascade');
+            $table->foreign('status', 'leads_status_foreign')->references('id')->on('lead_statuses')->onDelete('cascade');
         });
     }
-    
 }
