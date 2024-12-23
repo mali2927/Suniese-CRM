@@ -25,23 +25,16 @@ const WonLeads = ({
   useEffect(() => {
     fetchLeads();
   }, []);
-
   const fetchLeads = async () => {
-    const selectedConsultantId = localStorage.getItem("user_id");
-
     try {
-      const response = await fetch(
-        `${config.baseURL}/leads/consultant/${selectedConsultantId}`
-      );
+      const response = await fetch(`${config.baseURL}/leads`);
       const result = await response.json();
 
       if (result.success) {
-        const won = result.data.filter(
-          (lead) => lead.status && lead.status.id === 5
-        );
+        const won = result.data.filter((lead) => lead.status?.id === 5);
         setWonLeads(won);
       } else {
-        console.error("Failed to fetch leads for the selected consultant");
+        console.error("Failed to fetch leads");
       }
     } catch (error) {
       console.error("Error fetching leads:", error);
@@ -50,9 +43,9 @@ const WonLeads = ({
 
   const filteredWonLeads = wonLeads.filter(
     (lead) =>
-      lead.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.surname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.email.toLowerCase().includes(searchTerm.toLowerCase())
+      lead.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.surname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const indexOfLastLead = currentPage * leadsPerPage;

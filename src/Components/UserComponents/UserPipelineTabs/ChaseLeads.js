@@ -135,9 +135,12 @@ const ChaseLeads = ({
   };
   const filteredChaseLeads = chaseLeads.filter(
     (lead) =>
-      lead.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.surname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.email.toLowerCase().includes(searchTerm.toLowerCase())
+      (lead.first_name &&
+        lead.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (lead.surname &&
+        lead.surname.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (lead.email &&
+        lead.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const indexOfLastLead = currentPage * leadsPerPage;

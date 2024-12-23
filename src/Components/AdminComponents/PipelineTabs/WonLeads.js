@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import config from "../../../config";
 import ViewLeadModal from "../Modals/ViewLeadModal";
+
 const WonLeads = ({
   searchTerm,
   setSearchTerm,
@@ -20,6 +21,7 @@ const WonLeads = ({
   const [wonLeads, setWonLeads] = useState([]);
   const [selectedLead, setSelectedLead] = useState(null); // State for selected lead
   const [showModal, setShowModal] = useState(false); // State to manage modal visibility
+
   useEffect(() => {
     fetchLeads();
   }, []);
@@ -30,9 +32,7 @@ const WonLeads = ({
       const result = await response.json();
 
       if (result.success) {
-        const won = result.data.filter(
-          (lead) => lead.status && lead.status.id === 5
-        );
+        const won = result.data.filter((lead) => lead.status?.id === 5);
         setWonLeads(won);
       } else {
         console.error("Failed to fetch leads");
@@ -44,9 +44,9 @@ const WonLeads = ({
 
   const filteredWonLeads = wonLeads.filter(
     (lead) =>
-      lead.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.surname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.email.toLowerCase().includes(searchTerm.toLowerCase())
+      lead.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.surname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const indexOfLastLead = currentPage * leadsPerPage;
@@ -105,27 +105,27 @@ const WonLeads = ({
             <th>Total Value</th>
             <th>Sales Cons.</th>
             <th>Date Won</th>
-            <th>Action</th> {/* Add Action column */}
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
           {currentWonLeads.length > 0 ? (
             currentWonLeads.map((lead) => (
               <tr key={lead.id}>
-                <td>{lead.first_name}</td>
-                <td>{lead.surname}</td>
-                <td>{lead.email}</td>
-                <td>{lead.phone_number}</td>
-                <td>{lead.quoted_price}</td>
-                <td>{lead.total_payment}</td>
-                <td>{lead.user.name || "Unknown"}</td>
-
-                <td>{new Date(lead.updated_at).toISOString().split("T")[0]}</td>
+                <td>{lead.first_name || "N/A"}</td>
+                <td>{lead.surname || "N/A"}</td>
+                <td>{lead.email || "N/A"}</td>
+                <td>{lead.phone_number || "N/A"}</td>
+                <td>{lead.quoted_price || "N/A"}</td>
+                <td>{lead.total_payment || "N/A"}</td>
+                <td>{lead.user?.name || "Unknown"}</td>
                 <td>
-                  <Button
-                    variant="info"
-                    onClick={() => handleViewLead(lead)} // Trigger the modal
-                  >
+                  {lead.updated_at
+                    ? new Date(lead.updated_at).toISOString().split("T")[0]
+                    : "N/A"}
+                </td>
+                <td>
+                  <Button variant="info" onClick={() => handleViewLead(lead)}>
                     View
                   </Button>
                 </td>
@@ -133,7 +133,7 @@ const WonLeads = ({
             ))
           ) : (
             <tr>
-              <td colSpan="6" className="text-center">
+              <td colSpan="9" className="text-center">
                 No leads found for Won status.
               </td>
             </tr>
