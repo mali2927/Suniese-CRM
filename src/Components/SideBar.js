@@ -9,6 +9,7 @@ import {
   Pen as Pen,
   Shell as Shell,
   Archive as Archive,
+  BadgePoundSterling as BadgePoundSterling,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -45,7 +46,7 @@ const Sidebar = () => {
         >
           <UsersIcon className="me-2" /> User Management
         </Link>
-        <Link
+        {/* <Link
           to="/pipeline"
           className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
             "/pipeline"
@@ -60,6 +61,14 @@ const Sidebar = () => {
           )}`}
         >
           <Pen className="me-2" /> Quote Bank
+        </Link> */}
+        <Link
+          to="/sales"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/sales"
+          )}`}
+        >
+          <BadgePoundSterling className="me-2" /> Sales
         </Link>
         <Link
           to="/archive"

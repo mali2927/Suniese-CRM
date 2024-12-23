@@ -18,6 +18,7 @@ import UserLeads from "./Components/UserComponents/Leads";
 import Summary from "./Components/UserComponents/Summary";
 import InquiryForm from "./Components/UserComponents/InquiryForm";
 import Inquiry from "./Components/UserComponents/Inquiry";
+import Sales from "./Components/AdminComponents/Sales";
 import "./App.css";
 import ProtectedRoute from "../src/ProtectedRoute"; // Import the ProtectedRoute component
 
@@ -70,6 +71,12 @@ function App() {
             path="/quotebank"
             element={
               <ProtectedRoute element={QuoteBank} roleRequired="superadmin" />
+            }
+          />
+          <Route
+            path="/sales"
+            element={
+              <ProtectedRoute element={Sales} roleRequired="superadmin" />
             }
           />
           <Route
