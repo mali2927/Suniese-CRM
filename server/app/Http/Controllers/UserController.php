@@ -248,7 +248,7 @@ class UserController extends Controller
     {
         // Retrieve emails, roles, and status of all users except 'SuperAdmin' and 'Admin'
         $users = User::whereNotIn('role', ['SuperAdmin', 'Admin'])
-                     ->select('name','email', 'role', 'status')
+                     ->select('name','email', 'role', 'status','id')
                      ->get();
     
         // Return the result as a JSON response

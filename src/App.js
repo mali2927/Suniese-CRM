@@ -19,6 +19,7 @@ import Summary from "./Components/UserComponents/Summary";
 import InquiryForm from "./Components/UserComponents/InquiryForm";
 import Inquiry from "./Components/UserComponents/Inquiry";
 import Sales from "./Components/AdminComponents/Sales";
+import AdminSummary from "./Components/AdminComponents/Summary";
 import "./App.css";
 import ProtectedRoute from "../src/ProtectedRoute"; // Import the ProtectedRoute component
 
@@ -77,6 +78,15 @@ function App() {
             path="/sales"
             element={
               <ProtectedRoute element={Sales} roleRequired="superadmin" />
+            }
+          />
+          <Route
+            path="/adminsummary"
+            element={
+              <ProtectedRoute
+                element={AdminSummary}
+                roleRequired="superadmin"
+              />
             }
           />
           <Route

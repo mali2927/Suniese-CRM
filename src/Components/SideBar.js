@@ -10,6 +10,7 @@ import {
   Shell as Shell,
   Archive as Archive,
   BadgePoundSterling as BadgePoundSterling,
+  ClipboardPlus as ClipboardPlus,
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -69,6 +70,14 @@ const Sidebar = () => {
           )}`}
         >
           <BadgePoundSterling className="me-2" /> Sales
+        </Link>
+        <Link
+          to="/adminsummary"
+          className={`list-group-item list-group-item-action d-flex align-items-center mb-3 ${isActive(
+            "/adminsummary"
+          )}`}
+        >
+          <ClipboardPlus className="me-2" /> Summary
         </Link>
         <Link
           to="/archive"
