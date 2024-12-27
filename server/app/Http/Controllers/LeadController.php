@@ -501,47 +501,50 @@ public function deleteLead($id)
             'dateRange.end' => 'required|date|after_or_equal:dateRange.start',
         ]);
     
-        // Retrieve user_id and date range
         $userId = $validated['user_id'];
         $startDate = $validated['dateRange']['start'];
         $endDate = $validated['dateRange']['end'];
     
-        // Fetch the user information
         $user = User::find($userId);
     
-        // Fetch leads for the user within the date range
         $leads = Lead::where('user_id', $userId)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->get();
     
-        // Manually group leads by status ID
         $statusGroups = [
-            'hot' => $leads->filter(fn($lead) => $lead->status == 1),  // Status ID 1 = hot
-            'cold' => $leads->filter(fn($lead) => $lead->status == 2), // Status ID 2 = cold
-            'lost' => $leads->filter(fn($lead) => $lead->status == 4), // Status ID 4 = lost
-            'won' => $leads->filter(fn($lead) => $lead->status == 5),  // Status ID 5 = won
+            'hot' => $leads->filter(fn($lead) => $lead->status == 1),
+            'cold' => $leads->filter(fn($lead) => $lead->status == 2),
+            'lost' => $leads->filter(fn($lead) => $lead->status == 4),
+            'won' => $leads->filter(fn($lead) => $lead->status == 5),
+            'quoted' => $leads->filter(fn($lead) => $lead->quote_status == 1), // New quoted status
         ];
     
-        // Calculate the sum of quote_status where quote_status = 1
-        $quoteStatusSum = $leads->where('quote_status', 1)->sum('quote_status');
+        $statusStats = [];
+        foreach ($statusGroups as $status => $group) {
+            $statusStats[$status] = [
+                'leads' => $group,
+                'total' => $group->count(),
+                'quotedPriceSum' => $group->sum('quoted_price'),
+                'quotedPriceAvg' => $group->isNotEmpty() ? $group->avg('quoted_price') : 0,
+            ];
+        }
     
-        // Prepare data for PDF
         $data = [
             'userId' => $userId,
-            'userName' => $user->name, // Pass the user's name
-            'leads' => $statusGroups,
+            'userName' => $user->name,
+            'statusStats' => $statusStats,
             'totalLeads' => $leads->count(),
             'startDate' => $startDate,
             'endDate' => $endDate,
-            'quoteStatusSum' => $quoteStatusSum, // Include the sum of quote_status
         ];
     
-        // Generate PDF
         $pdf = Pdf::loadView('leads.summary', $data);
     
-        // Return the generated PDF as a download
         return $pdf->download("leads-summary-$userId.pdf");
     }
+    
+    
+    
     
     
     

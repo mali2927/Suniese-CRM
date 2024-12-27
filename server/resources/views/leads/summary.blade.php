@@ -34,29 +34,19 @@
             <tr>
                 <th>Status</th>
                 <th>Number of Leads</th>
+                <th>Quoted Price Sum</th>
+                <th>Quoted Price Average</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>Hot</td>
-                <td>{{ $leads['hot']->count() }}</td>
-            </tr>
-            <tr>
-                <td>Cold</td>
-                <td>{{ $leads['cold']->count() }}</td>
-            </tr>
-            <tr>
-                <td>Lost</td>
-                <td>{{ $leads['lost']->count() }}</td>
-            </tr>
-            <tr>
-                <td>Won</td>
-                <td>{{ $leads['won']->count() }}</td>
-            </tr>
-            <tr>
-                <td>Quoted</td>
-                <td>{{ $quoteStatusSum }}</td>
-            </tr>
+            @foreach ($statusStats as $status => $stats)
+                <tr>
+                    <td>{{ ucfirst($status) }}</td>
+                    <td>{{ $stats['total'] }}</td>
+                    <td>{{ number_format($stats['quotedPriceSum'], 2) }}</td>
+                    <td>{{ number_format($stats['quotedPriceAvg'], 2) }}</td>
+                </tr>
+            @endforeach
         </tbody>
     </table>
 </body>
