@@ -27,11 +27,12 @@ ChartJS.register(
 
 const Overview = () => {
   const [leadStatusCounts, setLeadStatusCounts] = useState({
-    hot: { count: 0, total_price: 0 },
-    cold: { count: 0, total_price: 0 },
-    warm: { count: 0, total_price: 0 },
-    lost: { count: 0, total_price: 0 },
-    won: { count: 0, total_price: 0 },
+    hot: { count: 0, total_price: 0, average_price: 0 },
+    cold: { count: 0, total_price: 0, average_price: 0 },
+    warm: { count: 0, total_price: 0, average_price: 0 },
+    lost: { count: 0, total_price: 0, average_price: 0 },
+    won: { count: 0, total_price: 0, average_price: 0 },
+    quoted: { count: 0, total_price: 0, average_price: 0 },
   });
 
   const [weeklyData, setWeeklyData] = useState({
@@ -41,7 +42,6 @@ const Overview = () => {
   });
 
   useEffect(() => {
-    // Fetch lead status counts for the pie chart and table
     fetch(`${config.baseURL}/lead-status-counts`)
       .then((response) => response.json())
       .then((data) => setLeadStatusCounts(data))
@@ -49,7 +49,6 @@ const Overview = () => {
         console.error("Error fetching lead status counts:", error)
       );
 
-    // Fetch weekly lead data for the line chart
     fetch(`${config.baseURL}/weekly-lead-data`)
       .then((response) => response.json())
       .then((data) => setWeeklyData(data))
@@ -59,21 +58,18 @@ const Overview = () => {
   }, []);
 
   const pieData = {
-    labels: ["Cold Leads", "Hot Leads", "Won Jobs", "Lost Jobs"],
+    labels: ["Quoted Leads", "Won Jobs", "Lost Jobs"],
     datasets: [
       {
         data: [
-          leadStatusCounts.cold.count,
-          leadStatusCounts.hot.count,
+          leadStatusCounts.quoted.count,
           leadStatusCounts.won.count,
           leadStatusCounts.lost.count,
         ],
         backgroundColor: [
-          "#3498db", // Cold
-
-          "#e74c3c", // Hot
-          "#2ecc71", // Won
-          "#95a5a6", // Lost
+          "#f39c12", // Quoted (Orange)
+          "#2ecc71", // Won (Green)
+          "#e74c3c", // Lost (Red)
         ],
       },
     ],
@@ -121,53 +117,64 @@ const Overview = () => {
               <tr>
                 <th>Status</th>
                 <th>Total Quoted Price</th>
+                <th>Average Price</th> {/* New column for Average */}
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Cold Leads</td>
                 <td>£{leadStatusCounts.cold.total_price}</td>
+                <td>£{leadStatusCounts.cold.average_price.toFixed(2)}</td>{" "}
+                {/* Average */}
               </tr>
-              {/* <tr>
-                <td>Warm Leads</td>
-                <td>£{leadStatusCounts.warm.total_price}</td>
-              </tr> */}
+              <tr>
+                <td>Quoted Leads</td>
+                <td>£{leadStatusCounts.quoted?.total_price}</td>
+                <td>
+                  £{leadStatusCounts.quoted?.average_price?.toFixed(2)}
+                </td>{" "}
+                {/* Average */}
+              </tr>
               <tr>
                 <td>Hot Leads</td>
                 <td>£{leadStatusCounts.hot.total_price}</td>
+                <td>£{leadStatusCounts.hot.average_price.toFixed(2)}</td>{" "}
+                {/* Average */}
               </tr>
-              {/* <tr>
-                <td>Won Jobs</td>
-                <td>£{leadStatusCounts.won.total_price}</td>
-              </tr> */}
               <tr>
                 <td>Lost Jobs</td>
                 <td>£{leadStatusCounts.lost.total_price}</td>
+                <td>£{leadStatusCounts.lost.average_price.toFixed(2)}</td>{" "}
+                {/* Average */}
               </tr>
             </tbody>
           </table>
+
           <h3>Sales Prices</h3>
           <table className="table table-striped">
             <thead>
               <tr>
                 <th>Status</th>
                 <th>Total Sales</th>
+                <th>Average Price</th> {/* New column for Average */}
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Won Jobs</td>
                 <td>£{leadStatusCounts.won.total_payment}</td>
+                <td>£{leadStatusCounts.won.average_price.toFixed(2)}</td>{" "}
+                {/* Average */}
               </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* <div style={{ ...styles.chartContainer, marginTop: "2rem" }}>
+      <div style={{ ...styles.chartContainer, marginTop: "2rem" }}>
         <h3>Performance Trends</h3>
         <Line data={lineData} />
-      </div> */}
+      </div>
     </div>
   );
 };

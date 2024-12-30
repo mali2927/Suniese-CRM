@@ -17,6 +17,7 @@ const Dashboard = () => {
     total_consultants: 0,
     total_leads: 0,
     total_revenue: 0,
+    won_leads: 0,
   });
   console.log(dashboardData);
   useEffect(() => {
@@ -34,8 +35,8 @@ const Dashboard = () => {
         <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
           <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
             <UsersIcon style={styles.cardIcon} />
-            <h2>Total Sales Consultants</h2>
-            <p>{dashboardData.total_consultants}</p>
+            <h2>Total Won Leads</h2>
+            <p>{dashboardData.won_leads}</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
             <FileText style={styles.cardIcon} />

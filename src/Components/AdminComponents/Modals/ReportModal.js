@@ -75,7 +75,7 @@ const ReportModal = ({
       4: "Lost",
       5: "Won",
     };
-    return statusMap[statusId] || "Pending";
+    return statusMap[statusId] || "..";
   };
   console.log(leadData[0]?.user_id);
 
@@ -254,10 +254,6 @@ const ReportModal = ({
       background: "rgba(0, 128, 0, 0.6)", // Green
       border: "rgba(0, 128, 0, 1)",
     },
-    Pending: {
-      background: "rgba(201, 203, 207, 0.6)", // Grey
-      border: "rgba(201, 203, 207, 1)",
-    },
   };
 
   // Prepare data for a pie chart
@@ -308,7 +304,7 @@ const ReportModal = ({
 
   // Prepare data for Doughnut chart
   const prepareDoughnutChartData = () => {
-    const labels = ["Hot", "Cold", "Warm", "Lost", "Won", "Pending"];
+    const labels = ["Hot", "Cold", "Warm", "Lost", "Won"];
     const datasets = [
       {
         label: "Leads Status",
@@ -340,7 +336,7 @@ const ReportModal = ({
 
   // Prepare data for Radar chart
   const prepareRadarChartData = () => {
-    const labels = ["Hot", "Cold", "Warm", "Lost", "Won", "Pending"];
+    const labels = ["Hot", "Cold", "Warm", "Lost", "Won"];
     const datasets = consultants.map((consultant) => {
       const leads = leadsAll[consultant.id] || [];
       const data = labels.map(
@@ -367,7 +363,7 @@ const ReportModal = ({
 
   // Prepare data for Polar Area chart
   const preparePolarAreaChartData = () => {
-    const labels = ["Hot", "Cold", "Warm", "Lost", "Won", "Pending"];
+    const labels = ["Hot", "Cold", "Warm", "Lost", "Won"];
     const datasets = [
       {
         label: "Leads Status",
