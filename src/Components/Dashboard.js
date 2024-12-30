@@ -6,6 +6,9 @@ import {
   Users as UsersIcon,
   FileText,
 } from "lucide-react";
+import { DateRangePicker } from "react-date-range";
+import "react-date-range/dist/styles.css"; // Main styles
+import "react-date-range/dist/theme/default.css"; // Theme styles
 import Navbar from "./Navbar";
 import Sidebar from "./SideBar";
 import Overview from "./AdminComponents/overView";
@@ -19,13 +22,32 @@ const Dashboard = () => {
     total_revenue: 0,
     won_leads: 0,
   });
-  console.log(dashboardData);
-  useEffect(() => {
-    fetch(`${config.baseURL}/dashboard-report`)
+  const [dateRange, setDateRange] = useState([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: "selection",
+    },
+  ]);
+
+  // Function to fetch data based on the date range
+  const fetchDashboardData = (startDate, endDate) => {
+    const start = startDate.toISOString().split("T")[0]; // Format: YYYY-MM-DD
+    const end = endDate.toISOString().split("T")[0];
+
+    fetch(
+      `${config.baseURL}/dashboard-report?start_date=${start}&end_date=${end}`
+    )
       .then((response) => response.json())
       .then((data) => setDashboardData(data))
       .catch((error) => console.error("Error fetching dashboard data:", error));
-  }, []);
+  };
+
+  // Fetch data initially and on date range change
+  useEffect(() => {
+    const { startDate, endDate } = dateRange[0];
+    fetchDashboardData(startDate, endDate);
+  }, [dateRange]);
 
   return (
     <div style={styles.container}>
@@ -54,6 +76,15 @@ const Dashboard = () => {
               })}
             </p>
           </motion.div>
+        </div>
+        <div style={{ marginBottom: "2rem" }}>
+          <h3>Select Date Range:</h3>
+          <DateRangePicker
+            ranges={dateRange}
+            onChange={(ranges) => {
+              setDateRange([ranges.selection]); // Update date range and trigger the effect
+            }}
+          />
         </div>
         <Overview />
       </main>

@@ -6,22 +6,48 @@ use App\Models\User;
 use App\Models\Lead;
 use Illuminate\Http\JsonResponse;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+
 
 class DashboardController extends Controller
 {
-    public function getDashboardReport(): JsonResponse
+    public function getDashboardReport(Request $request): JsonResponse
     {
-        // Total number of sales consultants (assuming they have a specific role, e.g., 'sales consultant')
+        // Get the start and end dates from the query parameters, if available
+        $startDate = $request->query('start_date', '1970-01-01'); // Default to the beginning of time
+        $endDate = $request->query('end_date', Carbon::now()->toISOString()); // Default to current date
+    
+        // Convert the date strings to Carbon instances
+        $startDate = Carbon::parse($startDate)->startOfDay(); // Start of the day
+        $endDate = Carbon::parse($endDate)->endOfDay(); // End of the day
+    
+        // Log the start and end dates for debugging
+        \Log::info("Start Date: {$startDate}, End Date: {$endDate}");
+    
+        // Total number of sales consultants
         $totalConsultants = User::where('role', 'Sales Consultant')->count();
     
-        // Total number of leads
-        $totalLeads = Lead::count();
+        // Total number of leads within the date range
+        $totalLeads = Lead::where(function($query) use ($startDate, $endDate) {
+            $query->whereBetween('created_at', [$startDate, $endDate])
+                  ->orWhereBetween('updated_at', [$startDate, $endDate]);
+        })->count();
     
-        // Total revenue (sum of total_payment in the leads with status = 5)
-        $totalRevenue = Lead::where('status', 5)->sum('total_payment');
+        // Total revenue (sum of total_payment in the leads with status = 5 within the date range)
+        $totalRevenue = Lead::where('status', 5)
+                            ->where(function($query) use ($startDate, $endDate) {
+                                $query->whereBetween('created_at', [$startDate, $endDate])
+                                      ->orWhereBetween('updated_at', [$startDate, $endDate]);
+                            })
+                            ->sum('total_payment');
     
         // Total number of won leads (status = 5)
-        $wonLeads = Lead::where('status', 5)->count();
+        $wonLeads = Lead::where('status', 5)
+                        ->where(function($query) use ($startDate, $endDate) {
+                            $query->whereBetween('created_at', [$startDate, $endDate])
+                                  ->orWhereBetween('updated_at', [$startDate, $endDate]);
+                        })
+                        ->count();
     
         // Prepare the response data
         $data = [
@@ -33,6 +59,7 @@ class DashboardController extends Controller
     
         return response()->json($data);
     }
+
     
     public function getLeadStatusCounts(): JsonResponse
     {
