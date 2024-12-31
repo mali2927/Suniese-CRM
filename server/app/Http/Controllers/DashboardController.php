@@ -61,29 +61,42 @@ class DashboardController extends Controller
     }
 
     
-    public function getLeadStatusCounts(): JsonResponse
+    public function getLeadStatusCounts(Request $request): JsonResponse
     {
-        // Get count and sum of quoted price grouped by status
+        // Validate the date range inputs
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+    
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+    
+        // Get count and sum of quoted price grouped by status within the date range
         $leadStatusData = Lead::selectRaw('status, COUNT(*) as count, SUM(quoted_price) as total_price')
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('status')
             ->get()
             ->mapWithKeys(function ($item) {
                 return [
                     $item->status => [
-                        'count' => $item->count, 
+                        'count' => $item->count,
                         'total_price' => $item->total_price,
                         'average_price' => $item->count > 0 ? $item->total_price / $item->count : 0, // Calculate average
-                    ]
+                    ],
                 ];
             });
     
-        // Get count and sum of quoted leads where quote_status = 1 for the given user ID
+        // Get count and sum of quoted leads where quote_status = 1 within the date range
         $quotedLeadsData = Lead::selectRaw('COUNT(*) as count, SUM(quoted_price) as total_price')
             ->where('quote_status', 1)
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->first();
     
-        // Get total payment sum for status 5 (Won)
-        $totalPaymentWon = Lead::where('status', 5)->sum('total_payment');
+        // Get total payment sum for status 5 (Won) within the date range
+        $totalPaymentWon = Lead::where('status', 5)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('total_payment');
     
         // Create a response with status IDs mapped to their names
         $data = [
@@ -111,14 +124,14 @@ class DashboardController extends Controller
                 'count' => $leadStatusData[5]['count'] ?? 0,
                 'total_price' => $leadStatusData[5]['total_price'] ?? 0,
                 'average_price' => $leadStatusData[5]['average_price'] ?? 0, // Average for Won
-                'total_payment' => $totalPaymentWon,  // Add total payment for Won leads
+                'total_payment' => $totalPaymentWon, // Total payment for Won
             ],
             'quoted' => [
                 'count' => $quotedLeadsData->count ?? 0,
                 'total_price' => $quotedLeadsData->total_price ?? 0,
-                'average_price' => ($quotedLeadsData->count ?? 0) > 0 
-                    ? ($quotedLeadsData->total_price ?? 0) / $quotedLeadsData->count 
-                    : 0, // Average for Quoted leads
+                'average_price' => $quotedLeadsData->count > 0
+                    ? $quotedLeadsData->total_price / $quotedLeadsData->count
+                    : 0, // Average for Quoted
             ],
         ];
     

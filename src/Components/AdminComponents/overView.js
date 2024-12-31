@@ -25,7 +25,7 @@ ChartJS.register(
   Title
 );
 
-const Overview = () => {
+const Overview = ({ startDate, endDate }) => {
   const [leadStatusCounts, setLeadStatusCounts] = useState({
     hot: { count: 0, total_price: 0, average_price: 0 },
     cold: { count: 0, total_price: 0, average_price: 0 },
@@ -41,36 +41,36 @@ const Overview = () => {
     converted_sales: [],
   });
 
-  useEffect(() => {
-    fetch(`${config.baseURL}/lead-status-counts`)
+  const fetchLeadStatusCounts = () => {
+    const start = startDate.toISOString().split("T")[0];
+    const end = endDate.toISOString().split("T")[0];
+
+    fetch(
+      `${config.baseURL}/lead-status-counts?start_date=${start}&end_date=${end}`
+    )
       .then((response) => response.json())
       .then((data) => setLeadStatusCounts(data))
       .catch((error) =>
         console.error("Error fetching lead status counts:", error)
       );
+  };
 
-    fetch(`${config.baseURL}/weekly-lead-data`)
-      .then((response) => response.json())
-      .then((data) => setWeeklyData(data))
-      .catch((error) =>
-        console.error("Error fetching weekly lead data:", error)
-      );
-  }, []);
+  useEffect(() => {
+    fetchLeadStatusCounts();
+  }, [startDate, endDate]);
+
+  // Weekly data fetching logic can also include date filtering as needed.
 
   const pieData = {
     labels: ["Quoted Leads", "Won Jobs", "Lost Jobs"],
     datasets: [
       {
         data: [
-          leadStatusCounts.quoted.count,
-          leadStatusCounts.won.count,
-          leadStatusCounts.lost.count,
+          leadStatusCounts.quoted?.count,
+          leadStatusCounts.won?.count,
+          leadStatusCounts.lost?.count,
         ],
-        backgroundColor: [
-          "#f39c12", // Quoted (Orange)
-          "#2ecc71", // Won (Green)
-          "#e74c3c", // Lost (Red)
-        ],
+        backgroundColor: ["#f39c12", "#2ecc71", "#e74c3c"],
       },
     ],
   };
@@ -171,10 +171,10 @@ const Overview = () => {
         </div>
       </div>
 
-      <div style={{ ...styles.chartContainer, marginTop: "2rem" }}>
+      {/* <div style={{ ...styles.chartContainer, marginTop: "2rem" }}>
         <h3>Performance Trends</h3>
         <Line data={lineData} />
-      </div>
+      </div> */}
     </div>
   );
 };

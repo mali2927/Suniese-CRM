@@ -86,7 +86,10 @@ const Dashboard = () => {
             }}
           />
         </div>
-        <Overview />
+        <Overview
+          startDate={dateRange[0].startDate}
+          endDate={dateRange[0].endDate}
+        />
       </main>
     </div>
   );
