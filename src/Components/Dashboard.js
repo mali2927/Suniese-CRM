@@ -24,7 +24,7 @@ const Dashboard = () => {
   });
   const [dateRange, setDateRange] = useState([
     {
-      startDate: new Date(),
+      startDate: new Date("1970-01-01"),
       endDate: new Date(),
       key: "selection",
     },
