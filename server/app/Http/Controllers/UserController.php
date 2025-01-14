@@ -283,6 +283,27 @@ class UserController extends Controller
             'data' => $users
         ]);
     }
+    public function deleteUser(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer|exists:users,id',
+        ]);
+
+        try {
+            $user = User::findOrFail($request->id);
+            $user->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User deleted successfully.',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete user. Please try again.',
+            ], 500);
+        }
+    }
     
 
 

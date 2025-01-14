@@ -9,8 +9,8 @@ const Navbar = () => {
   const [showModal, setShowModal] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem('email');
-    localStorage.removeItem('token');
+    localStorage.removeItem("email");
+    localStorage.removeItem("token");
     navigate("/"); // Redirect to the login page
   };
 
@@ -18,7 +18,7 @@ const Navbar = () => {
     <div className="navbar">
       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
         <Sun className="navbar-icon" />
-        <h1 className="navbar-title">Solar Dashboard</h1>
+        <h1 className="navbar-title">Sunrise Dashboard</h1>
       </div>
       <div style={{ display: "flex" }}>
         <button className="navbar-button" onClick={() => setShowModal(true)}>
@@ -28,9 +28,7 @@ const Navbar = () => {
           Logout
         </button>
       </div>
-      {showModal && (
-        <ChangePasswordModal onClose={() => setShowModal(false)} />
-      )}
+      {showModal && <ChangePasswordModal onClose={() => setShowModal(false)} />}
     </div>
   );
 };

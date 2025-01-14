@@ -73,6 +73,16 @@ const Sales = () => {
           onSelect={(k) => setKey(k)}
           className="mb-3"
         >
+          <Tab eventKey="quoted" title="Quoted Leads">
+            <QuotedLeads
+              leads={quotedLeads}
+              searchTerm={searchTermQuoted}
+              setSearchTerm={setSearchTermQuoted}
+              currentPage={currentPageQuoted}
+              setCurrentPage={setCurrentPageQuoted}
+              quotesPerPage={quotesPerPage}
+            />
+          </Tab>
           {/* Sales Tabs */}
           <Tab eventKey="won" title="Won Leads">
             <WonLeads
@@ -92,17 +102,6 @@ const Sales = () => {
               leadsPerPage={leadsPerPage}
             />
           </Tab>
-          <Tab eventKey="chase" title="Chase Leads">
-            <ChaseLeads
-              searchTerm={searchTermChase}
-              setSearchTerm={setSearchTermChase}
-              currentPage={currentPageChase}
-              setCurrentPage={setCurrentPageChase}
-              leadsPerPage={leadsPerPage}
-            />
-          </Tab>
-
-          {/* Quote Bank Tabs */}
           <Tab eventKey="notQuoted" title="Not Quoted">
             <NotQuoted
               leads={chaseLeads}
@@ -115,17 +114,17 @@ const Sales = () => {
               setSelectedLeadId={setSelectedLeadId} // Pass the selected lead ID
             />
           </Tab>
-
-          <Tab eventKey="quoted" title="Quoted Leads">
-            <QuotedLeads
-              leads={quotedLeads}
-              searchTerm={searchTermQuoted}
-              setSearchTerm={setSearchTermQuoted}
-              currentPage={currentPageQuoted}
-              setCurrentPage={setCurrentPageQuoted}
-              quotesPerPage={quotesPerPage}
+          <Tab eventKey="chase" title="Chase Leads">
+            <ChaseLeads
+              searchTerm={searchTermChase}
+              setSearchTerm={setSearchTermChase}
+              currentPage={currentPageChase}
+              setCurrentPage={setCurrentPageChase}
+              leadsPerPage={leadsPerPage}
             />
           </Tab>
+
+          {/* Quote Bank Tabs */}
         </Tabs>
       </main>
 

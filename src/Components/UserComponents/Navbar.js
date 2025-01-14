@@ -8,15 +8,15 @@ const Navbar = () => {
 
   const handleLogout = () => {
     // Add login logic here
-    localStorage.removeItem('email');
-localStorage.removeItem('token');
+    localStorage.removeItem("email");
+    localStorage.removeItem("token");
     navigate("/"); // Redirect to the dashboard after login
   };
   return (
     <div className="navbar">
       <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
         <Sun className="navbar-icon" />
-        <h1 className="navbar-title">Solar Dashboard</h1>
+        <h1 className="navbar-title">Sunrise Dashboard</h1>
       </div>
       <button className="navbar-button" onClick={handleLogout}>
         Logout
