@@ -49,14 +49,14 @@ const QuoteBank = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify({ url }), // Pass the URL
       });
 
       const result = await response.json();
 
       if (result.success) {
-        alert("Quote status updated successfully!");
-        fetchLeads(); // Re-fetch the leads after updating the quote status
+        alert("Quote status and link updated successfully!");
+        fetchLeads(); // Re-fetch the leads after updating
       } else {
         alert("Failed to update quote status");
       }

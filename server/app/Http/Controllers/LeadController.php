@@ -102,30 +102,36 @@ class LeadController extends Controller
          }
      }
      
+public function updateQuoteStatus(Request $request, $id)
+{
+    try {
+        // Validate the request to ensure 'url' is present and valid
+        $request->validate([
+            'quote_url' => 'required|url',
+        ]);
 
-     public function updateQuoteStatus(Request $request, $id)
-     {
-         try {
-             // Find the lead by its ID
-             $lead = Lead::findOrFail($id);
-     
-             // Set quote_status to 1
-             $lead->quote_status = 1;
-             $lead->save();
-     
-             return response()->json([
-                 'success' => true,
-                 'message' => 'Quote status updated successfully',
-                 'data' => $lead
-             ]);
-         } catch (\Exception $e) {
-             Log::error('Error updating quote status: ' . $e->getMessage());
-             return response()->json([
-                 'success' => false,
-                 'message' => 'An error occurred while updating the quote status.',
-             ], 500);
-         }
-     }
+        // Find the lead by its ID
+        $lead = Lead::findOrFail($id);
+
+        // Update quote_status and quote_link
+        $lead->quote_status = 1;
+        $lead->quote_link = $request->quote_url;
+        $lead->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Quote status and link updated successfully',
+            'data' => $lead
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error updating quote status: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred while updating the quote status.',
+        ], 500);
+    }
+}
+
      
 
 public function store(Request $request)

@@ -45,7 +45,8 @@ class Lead extends Model
         'quote_status',
         'archive_status',
         'monitoring_check',
-        'installation_check'
+        'installation_check',
+        'quote_link'
     ];
 
     // Define relationship to User
