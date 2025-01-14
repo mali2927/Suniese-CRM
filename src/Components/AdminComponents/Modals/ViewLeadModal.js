@@ -199,6 +199,24 @@ const ViewLeadModal = ({ show, handleClose, lead }) => {
             </tr>
             <tr>
               <td>
+                <strong>Quote Link</strong>
+              </td>
+              <td>
+                {lead.quote_link ? (
+                  <a
+                    href={lead.quote_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {lead.quote_link}
+                  </a>
+                ) : (
+                  "N/A"
+                )}
+              </td>
+            </tr>
+            <tr>
+              <td>
                 <strong>Created At</strong>
               </td>
               <td>{new Date(lead.created_at).toLocaleString()}</td>
