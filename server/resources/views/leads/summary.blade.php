@@ -20,6 +20,15 @@
         th {
             background-color: #f4f4f4;
         }
+        .chart-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .chart-container img {
+            max-width: 600px; /* Set the desired width */
+            height: auto; /* Maintain aspect ratio */
+        }
     </style>
 </head>
 <body>
@@ -49,5 +58,9 @@
             @endforeach
         </tbody>
     </table>
+    <h3>Pie Chart</h3>
+    <div class="chart-container">
+        <img src="data:image/png;base64,{{ $chartBase64 }}" alt="Leads Pie Chart">
+    </div>
 </body>
 </html>

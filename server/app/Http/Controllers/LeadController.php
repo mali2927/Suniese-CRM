@@ -12,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf; // Install via `composer require barryvdh/larave
 use Chartjs\Chartjs;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use GuzzleHttp\Client;
 
 
 
@@ -522,7 +523,7 @@ public function deleteLead($id)
             'cold' => $leads->filter(fn($lead) => $lead->status == 2),
             'lost' => $leads->filter(fn($lead) => $lead->status == 4),
             'won' => $leads->filter(fn($lead) => $lead->status == 5),
-            'quoted' => $leads->filter(fn($lead) => $lead->quote_status == 1), // New quoted status
+            'quoted' => $leads->filter(fn($lead) => $lead->quote_status == 1),
         ];
     
         $statusStats = [];
@@ -535,6 +536,31 @@ public function deleteLead($id)
             ];
         }
     
+        // Prepare chart data for QuickChart API
+        $chartData = [
+            'type' => 'pie',
+            'data' => [
+                'labels' => array_keys($statusStats),
+                'datasets' => [[
+                    'data' => array_column($statusStats, 'total'),
+                    'backgroundColor' => ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#9C27B0']
+                ]]
+            ]
+        ];
+    
+        // Send a request to QuickChart API
+        $client = new Client();
+        $response = $client->post('https://quickchart.io/chart', [
+            'json' => [
+                'width' => 500,
+                'height' => 300,
+                'format' => 'png',
+                'chart' => $chartData,
+            ]
+        ]);
+    
+        $chartBase64 = base64_encode($response->getBody());
+    
         $data = [
             'userId' => $userId,
             'userName' => $user->name,
@@ -542,13 +568,13 @@ public function deleteLead($id)
             'totalLeads' => $leads->count(),
             'startDate' => $startDate,
             'endDate' => $endDate,
+            'chartBase64' => $chartBase64,
         ];
     
         $pdf = Pdf::loadView('leads.summary', $data);
     
         return $pdf->download("leads-summary-$userId.pdf");
     }
-    
     
     
     
