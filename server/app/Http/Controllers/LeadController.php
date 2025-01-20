@@ -289,29 +289,48 @@ public function store(Request $request)
                 'system_quoted' => $request->input('system_quoted'),
                 'quoted_price' => $request->input('quoted_price'),
                 'meeting_time' => $request->input('meeting_time'),
-               
+                'total_contract_value_net' => $request->input('total_contract_value_net'),
+                'total_contract_value_gross' => $request->input('total_contract_value_gross'),
                 'best_time_to_call' => $request->input('best_time_to_call'),
-                
+                'customer_type' => $request->input('customer_type'),
+                'maintenance_check' => $request->input('maintenance_check'),
+                'installation_check' => $request->input('installation_check'),
+                'monitoring_check' => $request->input('monitoring_check'),
+                'contract_length' => $request->input('contract_length') === 'custom' ? $request->input('custom_contract_length') : $request->input('contract_length'),
+                'payment_method' => $request->input('payment_method'),
+                'payment_frequency' => $request->input('payment_frequency'),
+                'commission_status' => $request->input('commission_status'),
             ];
     
             // Validate the data
             $validator = Validator::make($mappedData, [
-                'user_id' => 'required|exists:users,id',
-                'title' => 'required|string|max:255',
-                'first_name' => 'required|string|max:255',
-                'surname' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
-                'phone_number' => 'required|string|max:20',
-                'house_number' => 'required|string|max:255',
-                'street_name' => 'required|string|max:255',
-                'town_city' => 'required|string|max:255',
-                'postal_code' => 'required|string|max:10',
-                'homeownership_status' => 'required|string|in:Owner,Tenant',
-                'system_quoted' => 'required|string|max:255',
-                'quoted_price' => 'required|numeric',
-                'meeting_time' => 'required|date',
-               
+                'user_id' => 'nullable|exists:users,id',
+                'title' => 'nullable|string|max:255',
+                'first_name' => 'nullable|string|max:255',
+                'surname' => 'nullable|string|max:255',
+                'email' => 'nullable|email|max:255',
+                'phone_number' => 'nullable|string|max:20',
+                'house_number' => 'nullable|string|max:255',
+                'street_name' => 'nullable|string|max:255',
+                'town_city' => 'nullable|string|max:255',
+                'postal_code' => 'nullable|string|max:10',
+                'homeownership_status' => 'nullable|string|in:Owner,Tenant',
+                'system_quoted' => 'nullable|string|max:255',
+                'quoted_price' => 'nullable|numeric',
+                'meeting_time' => 'nullable|date',
+                'total_contract_value_net' => 'nullable|numeric',
+                'total_contract_value_gross' => 'nullable|numeric',
                 'best_time_to_call' => 'nullable|date',
+                'customer_type' => 'nullable|string|max:255',
+                'maintenance_check' => 'nullable|boolean', // Allow nullable for checkboxes
+                'installation_check' => 'nullable|boolean', // Allow nullable for _checkboxes
+                'monitoring_check' => 'nullable|boolean', // Allow nullable for checkboxes
+                'contract_length' => 'nullable|numeric',
+                'payment_method' => 'nullable|string|max:255',
+                'custom_contract_length' => 'nullable|string',
+                'payment_frequency' => 'nullable|string',
+                'commission_status' => 'nullable|string',
+
             ]);
     
             // Validate the mapped data

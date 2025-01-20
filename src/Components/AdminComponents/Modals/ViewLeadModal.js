@@ -193,6 +193,18 @@ const ViewLeadModal = ({ show, handleClose, lead }) => {
             </tr>
             <tr>
               <td>
+                <strong>Contract Length</strong>
+              </td>
+              <td>{lead.contract_length || "-"}</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Payment Method</strong>
+              </td>
+              <td>{lead.payment_method || "-"}</td>
+            </tr>
+            <tr>
+              <td>
                 <strong>Sales Consultant</strong>
               </td>
               <td>{lead.user?.name || "N/A"}</td>
