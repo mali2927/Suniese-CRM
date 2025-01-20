@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Pie, Line } from "react-chartjs-2";
+import { Pie, Bar, Line, Doughnut, Radar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -7,9 +7,11 @@ import {
   Legend,
   CategoryScale,
   LinearScale,
+  BarElement,
+  Title,
   PointElement,
   LineElement,
-  Title,
+  RadialLinearScale,
 } from "chart.js";
 import { styles } from "../../Styles/dashboardStyles";
 import config from "../../config";
@@ -20,9 +22,11 @@ ChartJS.register(
   Legend,
   CategoryScale,
   LinearScale,
+  BarElement,
+  Title,
   PointElement,
   LineElement,
-  Title
+  RadialLinearScale
 );
 
 const Overview = ({ startDate, endDate }) => {
@@ -35,11 +39,7 @@ const Overview = ({ startDate, endDate }) => {
     quoted: { count: 0, total_price: 0, average_price: 0 },
   });
 
-  const [weeklyData, setWeeklyData] = useState({
-    weeks: [],
-    total_leads: [],
-    converted_sales: [],
-  });
+  const [chartType, setChartType] = useState("Pie");
 
   const fetchLeadStatusCounts = () => {
     const start = startDate.toISOString().split("T")[0];
@@ -59,42 +59,42 @@ const Overview = ({ startDate, endDate }) => {
     fetchLeadStatusCounts();
   }, [startDate, endDate]);
 
-  // Weekly data fetching logic can also include date filtering as needed.
-
-  const pieData = {
+  const chartData = {
     labels: ["Quoted Leads", "Won Jobs", "Lost Jobs"],
     datasets: [
       {
+        label: "Leads Count",
         data: [
           leadStatusCounts.quoted?.count,
           leadStatusCounts.won?.count,
           leadStatusCounts.lost?.count,
         ],
         backgroundColor: ["#f39c12", "#2ecc71", "#e74c3c"],
+        borderColor: ["#f39c12", "#2ecc71", "#e74c3c"],
+        borderWidth: 1,
       },
     ],
   };
 
-  const lineData = {
-    labels: weeklyData.weeks,
-    datasets: [
-      {
-        label: "Total Leads",
-        data: weeklyData.total_leads,
-        borderColor: "#3498db",
-        backgroundColor: "rgba(52, 152, 219, 0.2)",
-        fill: true,
-        tension: 0.4,
-      },
-      {
-        label: "Converted Sales",
-        data: weeklyData.converted_sales,
-        borderColor: "#2ecc71",
-        backgroundColor: "rgba(46, 204, 113, 0.2)",
-        fill: true,
-        tension: 0.4,
-      },
-    ],
+  const handleChartTypeChange = (event) => {
+    setChartType(event.target.value);
+  };
+
+  const renderChart = () => {
+    switch (chartType) {
+      case "Pie":
+        return <Pie data={chartData} />;
+      case "Bar":
+        return <Bar data={chartData} />;
+      case "Line":
+        return <Line data={chartData} />;
+      case "Doughnut":
+        return <Doughnut data={chartData} />;
+      case "Radar":
+        return <Radar data={chartData} />;
+      default:
+        return <Pie data={chartData} />;
+    }
   };
 
   return (
@@ -108,7 +108,23 @@ const Overview = ({ startDate, endDate }) => {
       >
         <div style={styles.chartContainer}>
           <h3>Lead Distribution</h3>
-          <Pie data={pieData} />
+          <div style={{ marginBottom: "1rem" }}>
+            <label htmlFor="chartType" style={{ marginRight: "0.5rem" }}>
+              Select Chart Type:
+            </label>
+            <select
+              id="chartType"
+              value={chartType}
+              onChange={handleChartTypeChange}
+            >
+              <option value="Pie">Pie Chart</option>
+              <option value="Bar">Bar Chart</option>
+              <option value="Line">Line Chart</option>
+              <option value="Doughnut">Doughnut Chart</option>
+              <option value="Radar">Radar Chart</option>
+            </select>
+          </div>
+          {renderChart()}
         </div>
         <div style={styles.chartContainer}>
           <h3>Quoted Prices</h3>
@@ -116,36 +132,23 @@ const Overview = ({ startDate, endDate }) => {
             <thead>
               <tr>
                 <th>Status</th>
+                <th>Count</th>
                 <th>Total Quoted Price</th>
-                <th>Average Price</th> {/* New column for Average */}
+                <th>Average Price</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Cold Leads</td>
-                <td>£{leadStatusCounts.cold.total_price}</td>
-                <td>£{leadStatusCounts.cold.average_price.toFixed(2)}</td>{" "}
-                {/* Average */}
-              </tr>
-              <tr>
                 <td>Quoted Leads</td>
+                <td>{leadStatusCounts.quoted?.count}</td>
                 <td>£{leadStatusCounts.quoted?.total_price}</td>
-                <td>
-                  £{leadStatusCounts.quoted?.average_price?.toFixed(2)}
-                </td>{" "}
-                {/* Average */}
-              </tr>
-              <tr>
-                <td>Hot Leads</td>
-                <td>£{leadStatusCounts.hot.total_price}</td>
-                <td>£{leadStatusCounts.hot.average_price.toFixed(2)}</td>{" "}
-                {/* Average */}
+                <td>£{leadStatusCounts.quoted?.average_price?.toFixed(2)}</td>
               </tr>
               <tr>
                 <td>Lost Jobs</td>
+                <td>{leadStatusCounts.lost?.count}</td>
                 <td>£{leadStatusCounts.lost.total_price}</td>
-                <td>£{leadStatusCounts.lost.average_price.toFixed(2)}</td>{" "}
-                {/* Average */}
+                <td>£{leadStatusCounts.lost.average_price.toFixed(2)}</td>
               </tr>
             </tbody>
           </table>
@@ -155,26 +158,22 @@ const Overview = ({ startDate, endDate }) => {
             <thead>
               <tr>
                 <th>Status</th>
+                <th>Count</th>
                 <th>Total Sales</th>
-                <th>Average Price</th> {/* New column for Average */}
+                <th>Average Price</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Won Jobs</td>
+                <td>{leadStatusCounts.won?.count}</td>
                 <td>£{leadStatusCounts.won.total_payment}</td>
-                <td>£{leadStatusCounts.won.average_price.toFixed(2)}</td>{" "}
-                {/* Average */}
+                <td>£{leadStatusCounts.won.average_price.toFixed(2)}</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-
-      {/* <div style={{ ...styles.chartContainer, marginTop: "2rem" }}>
-        <h3>Performance Trends</h3>
-        <Line data={lineData} />
-      </div> */}
     </div>
   );
 };

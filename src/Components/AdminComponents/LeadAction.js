@@ -4,14 +4,14 @@ import { Nav } from "react-bootstrap";
 const LeadActions = ({ setActiveSection }) => {
   return (
     <Nav variant="tabs" defaultActiveKey="totalLeads" className="mb-4">
-      <Nav.Item>
+      {/* <Nav.Item>
         <Nav.Link
           eventKey="totalLeads"
           onClick={() => setActiveSection("totalLeads")}
         >
           Total Leads
         </Nav.Link>
-      </Nav.Item>
+      </Nav.Item> */}
       <Nav.Item>
         <Nav.Link
           eventKey="individualLeads"
@@ -28,7 +28,6 @@ const LeadActions = ({ setActiveSection }) => {
           Transfer Leads
         </Nav.Link>
       </Nav.Item>
-  
     </Nav>
   );
 };

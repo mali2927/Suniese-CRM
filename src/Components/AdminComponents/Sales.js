@@ -12,7 +12,7 @@ import QuoteNowModal from "./Modals/QuoteNowModal";
 import config from "../../config"; // Adjust path if needed
 
 const Sales = () => {
-  const [key, setKey] = useState("won"); // Default tab is 'Won Leads'
+  const [key, setKey] = useState("quoted"); // Default tab is 'Won Leads'
   const [searchTermWon, setSearchTermWon] = useState("");
   const [searchTermLost, setSearchTermLost] = useState("");
   const [searchTermChase, setSearchTermChase] = useState("");

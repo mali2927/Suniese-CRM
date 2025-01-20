@@ -129,18 +129,18 @@ const Overview = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
+              {/* <tr>
                 <td>Cold Leads</td>
                 <td>£{leadStatusCounts.cold.total_price}</td>
-              </tr>
+              </tr> */}
               {/* <tr>
                 <td>Warm Leads</td>
                 <td>£{leadStatusCounts.warm.total_price}</td>
               </tr> */}
-              <tr>
+              {/* <tr>
                 <td>Hot Leads</td>
                 <td>£{leadStatusCounts.hot.total_price}</td>
-              </tr>
+              </tr> */}
               <tr>
                 <td>Lost Jobs</td>
                 <td>£{leadStatusCounts.lost.total_price}</td>

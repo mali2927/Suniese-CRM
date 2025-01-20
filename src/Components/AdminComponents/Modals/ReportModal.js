@@ -434,7 +434,7 @@ const ReportModal = ({
     <Modal show={show} onHide={onHide} size="lg" centered>
       <Modal.Header closeButton>
         <Modal.Title>
-          Lead Status Report{" "}
+          Sales Summary Report YTD{" "}
           {mode === "single" && consultantName ? `- ${consultantName}` : ""}
         </Modal.Title>
       </Modal.Header>

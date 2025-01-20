@@ -119,13 +119,13 @@ const UserArchive = () => {
                     >
                       Restore
                     </Button>{" "}
-                    <Button
+                    {/* <Button
                       variant="danger"
                       size="sm"
                       onClick={() => handleDeleteLead(lead.id)}
                     >
                       Delete
-                    </Button>
+                    </Button> */}
                   </td>
                 </tr>
               ))}
