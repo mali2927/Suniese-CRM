@@ -68,7 +68,7 @@ const Leads = () => {
     meetingTime: "",
     bestTimeToCall: "",
     consultantId: userId, // Initially empty
-    status: "",
+    status: "2",
     customerType: "",
     clientName: "-",
     endUser: "-",
