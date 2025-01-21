@@ -102,6 +102,28 @@ class LeadController extends Controller
              ], 500);
          }
      }
+     public function getWonLeadsByConsultant($consultantId)
+     {
+         try {
+             // Fetch lost leads where user_id matches the consultantId, status_id is 4, and archive_status is 0
+             $lostLeads = Lead::with(['user', 'status', 'lostRemarks.declaredUser'])
+                              ->where('user_id', $consultantId)
+                              ->where('status', 5) // Assuming 4 represents lost status
+                              ->where('archive_status', 0)
+                              ->get();
+             
+             return response()->json([
+                 'success' => true,
+                 'data' => $lostLeads
+             ]);
+         } catch (\Exception $e) {
+             Log::error('Error fetching lost leads for consultant: ' . $e->getMessage());
+             return response()->json([
+                 'success' => false,
+                 'message' => 'An error occurred while fetching lost leads for the selected consultant.',
+             ], 500);
+         }
+     }
      
 public function updateQuoteStatus(Request $request, $id)
 {

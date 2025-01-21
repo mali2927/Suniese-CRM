@@ -80,6 +80,8 @@ Route::get('/lead-status-counts-by-user-id/{userId}', [DashboardController::clas
 
 Route::get('/leads/consultant/{consultantId}', [LeadController::class, 'getLeadsByConsultant']);
 Route::get('/leads/lost/consultant/{consultantId}', [LeadController::class, 'getLostLeadsByConsultant']);
+Route::get('/leads/won/consultant/{consultantId}', [LeadController::class, 'getLostWonByConsultant']);
+
 
 //Inquiry Queries
 Route::post('/inquiries/{user_id}', [InquiryFormController::class, 'store']);

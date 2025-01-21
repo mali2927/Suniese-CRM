@@ -26,21 +26,24 @@ const WonLeads = ({
     fetchLeads();
   }, []);
   const fetchLeads = async () => {
+    const selectedConsultantId = localStorage.getItem("user_id");
+
     try {
-      const response = await fetch(`${config.baseURL}/leads`);
+      const response = await fetch(
+        `${config.baseURL}/leads/consultant/${selectedConsultantId}`
+      );
       const result = await response.json();
 
       if (result.success) {
         const won = result.data.filter((lead) => lead.status?.id === 5);
         setWonLeads(won);
       } else {
-        console.error("Failed to fetch leads");
+        console.error("Failed to fetch leads for the selected consultant");
       }
     } catch (error) {
       console.error("Error fetching leads:", error);
     }
   };
-
   const filteredWonLeads = wonLeads.filter(
     (lead) =>
       lead.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
