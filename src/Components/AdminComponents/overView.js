@@ -55,10 +55,20 @@ const Overview = ({ startDate, endDate }) => {
         console.error("Error fetching lead status counts:", error)
       );
   };
-
   useEffect(() => {
+    // Clear previous data before fetching new data
+    setLeadStatusCounts({
+      hot: { count: 0, total_price: 0, average_price: 0 },
+      cold: { count: 0, total_price: 0, average_price: 0 },
+      warm: { count: 0, total_price: 0, average_price: 0 },
+      lost: { count: 0, total_price: 0, average_price: 0 },
+      won: { count: 0, total_price: 0, average_price: 0 },
+      quoted: { count: 0, total_price: 0, average_price: 0 },
+      unquoted: { count: 0, total_price: 0, average_price: 0 },
+    });
+
     fetchLeadStatusCounts();
-  }, [startDate, endDate]);
+  }, [startDate, endDate]); // Re-run on date range change
 
   const chartData = {
     labels: ["Quoted Leads", "Won Jobs", "Lost Jobs", "Un-Quoted Leads"],
