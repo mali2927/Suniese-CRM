@@ -68,7 +68,7 @@ const Leads = () => {
     meetingTime: "",
     bestTimeToCall: "",
     consultantId: userId, // Initially empty
-    status: "2",
+    status: "6",
     customerType: "",
     clientName: "-",
     endUser: "-",
@@ -1007,8 +1007,8 @@ const Leads = () => {
                       isInvalid={!!errors.status}
                     >
                       <option value="">-- Select Status --</option>
-                      <option value="1">Hot</option>
-                      <option value="2">Cold</option>
+                      {/* <option value="1">Hot</option>
+                      <option value="2">Cold</option> */}
                       {/* <option value="3">Warm</option> */}
                       <option value="4">Lost</option>
                       <option value="5">Won</option>
