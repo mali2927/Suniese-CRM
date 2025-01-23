@@ -26,8 +26,8 @@
             margin-top: 20px;
         }
         .chart-container img {
-            max-width: 600px; /* Set the desired width */
-            height: auto; /* Maintain aspect ratio */
+            max-width: 600px;
+            height: auto;
         }
     </style>
 </head>
@@ -43,8 +43,8 @@
             <tr>
                 <th>Status</th>
                 <th>Number of Leads</th>
-                <th>Quoted Price Sum</th>
-                <th>Quoted Price Average</th>
+                <th>Quoted Price Sum (£)</th>
+                <th>Quoted Price Average (£)</th>
             </tr>
         </thead>
         <tbody>

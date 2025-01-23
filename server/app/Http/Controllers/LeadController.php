@@ -560,11 +560,10 @@ public function deleteLead($id)
             ->get();
     
         $statusGroups = [
-            'hot' => $leads->filter(fn($lead) => $lead->status == 1),
-            'cold' => $leads->filter(fn($lead) => $lead->status == 2),
             'lost' => $leads->filter(fn($lead) => $lead->status == 4),
             'won' => $leads->filter(fn($lead) => $lead->status == 5),
             'quoted' => $leads->filter(fn($lead) => $lead->quote_status == 1),
+            'unquoted' => $leads->filter(fn($lead) => $lead->quote_status == 0),
         ];
     
         $statusStats = [];
@@ -584,9 +583,9 @@ public function deleteLead($id)
                 'labels' => array_keys($statusStats),
                 'datasets' => [[
                     'data' => array_column($statusStats, 'total'),
-                    'backgroundColor' => ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#9C27B0']
-                ]]
-            ]
+                    'backgroundColor' => ['#FFCE56', '#4CAF50', '#36A2EB', '#9C27B0'],
+                ]],
+            ],
         ];
     
         // Send a request to QuickChart API
@@ -597,7 +596,7 @@ public function deleteLead($id)
                 'height' => 300,
                 'format' => 'png',
                 'chart' => $chartData,
-            ]
+            ],
         ]);
     
         $chartBase64 = base64_encode($response->getBody());
@@ -616,6 +615,9 @@ public function deleteLead($id)
     
         return $pdf->download("leads-summary-$userId.pdf");
     }
+    
+    
+    
     
     
     
