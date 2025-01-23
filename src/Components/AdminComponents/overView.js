@@ -37,6 +37,7 @@ const Overview = ({ startDate, endDate }) => {
     lost: { count: 0, total_price: 0, average_price: 0 },
     won: { count: 0, total_price: 0, average_price: 0 },
     quoted: { count: 0, total_price: 0, average_price: 0 },
+    unquoted: { count: 0, total_price: 0, average_price: 0 },
   });
 
   const [chartType, setChartType] = useState("Pie");
@@ -60,7 +61,7 @@ const Overview = ({ startDate, endDate }) => {
   }, [startDate, endDate]);
 
   const chartData = {
-    labels: ["Quoted Leads", "Won Jobs", "Lost Jobs"],
+    labels: ["Quoted Leads", "Won Jobs", "Lost Jobs", "Un-Quoted Leads"],
     datasets: [
       {
         label: "Leads Count",
@@ -68,9 +69,10 @@ const Overview = ({ startDate, endDate }) => {
           leadStatusCounts.quoted?.count,
           leadStatusCounts.won?.count,
           leadStatusCounts.lost?.count,
+          leadStatusCounts.unquoted?.count,
         ],
-        backgroundColor: ["#f39c12", "#2ecc71", "#e74c3c"],
-        borderColor: ["#f39c12", "#2ecc71", "#e74c3c"],
+        backgroundColor: ["#f39c12", "#2ecc71", "#e74c3c", "#9b59b6"], // Updated Un-Quoted Leads to purple
+        borderColor: ["#f39c12", "#2ecc71", "#e74c3c", "#9b59b6"], // Updated Un-Quoted Leads to purple
         borderWidth: 1,
       },
     ],
@@ -143,6 +145,12 @@ const Overview = ({ startDate, endDate }) => {
                 <td>{leadStatusCounts.quoted?.count}</td>
                 <td>£{leadStatusCounts.quoted?.total_price}</td>
                 <td>£{leadStatusCounts.quoted?.average_price?.toFixed(2)}</td>
+              </tr>
+              <tr>
+                <td>Un-Quoted Leads</td>
+                <td>{leadStatusCounts.unquoted?.count}</td>
+                <td>£{leadStatusCounts.unquoted?.total_price}</td>
+                <td>£{leadStatusCounts.unquoted?.average_price?.toFixed(2)}</td>
               </tr>
               <tr>
                 <td>Lost Jobs</td>

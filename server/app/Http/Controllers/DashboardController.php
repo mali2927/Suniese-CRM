@@ -92,6 +92,10 @@ class DashboardController extends Controller
             ->where('quote_status', 1)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->first();
+        $unQuotedLeadsData = Lead::selectRaw('COUNT(*) as count, SUM(quoted_price) as total_price')
+            ->where('quote_status', 0)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->first();
     
         // Get total payment sum for status 5 (Won) within the date range
         $totalPaymentWon = Lead::where('status', 5)
@@ -131,6 +135,13 @@ class DashboardController extends Controller
                 'total_price' => $quotedLeadsData->total_price ?? 0,
                 'average_price' => $quotedLeadsData->count > 0
                     ? $quotedLeadsData->total_price / $quotedLeadsData->count
+                    : 0, // Average for Quoted
+            ],
+            'unquoted' => [
+                'count' => $unQuotedLeadsData->count ?? 0,
+                'total_price' => $unQuotedLeadsData->total_price ?? 0,
+                'average_price' => $unQuotedLeadsData->count > 0
+                    ? $unQuotedLeadsData->total_price / $unQuotedLeadsData->count
                     : 0, // Average for Quoted
             ],
         ];
