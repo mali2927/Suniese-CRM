@@ -24,7 +24,7 @@ const Dashboard = () => {
   });
   const [dateRange, setDateRange] = useState([
     {
-      startDate: new Date("1970-01-01"),
+      startDate: new Date("2024-01-01"),
       endDate: new Date(),
       key: "selection",
     },
@@ -84,6 +84,8 @@ const Dashboard = () => {
             onChange={(ranges) => {
               setDateRange([ranges.selection]); // Update date range and trigger the effect
             }}
+            minDate={new Date("2024-01-01")}
+            maxDate={new Date("2034-12-31")}
           />
         </div>
         <Overview
