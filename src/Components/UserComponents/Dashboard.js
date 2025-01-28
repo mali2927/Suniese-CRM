@@ -1,4 +1,3 @@
-// Dashboard.js
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -7,57 +6,71 @@ import {
   Users as UsersIcon,
   FileText,
 } from "lucide-react";
+import { DateRangePicker } from "react-date-range";
+import "react-date-range/dist/styles.css"; // Main styles
+import "react-date-range/dist/theme/default.css"; // Theme styles
 import Navbar from "./Navbar";
-import Sidebar from "./SideBar"; // Import the Sidebar component
-import Overview from ".//Modals/overView";
+import Sidebar from "./SideBar";
+import Overview from "./Modals/overView";
 import { styles } from "../../Styles/dashboardStyles";
 import config from "../../config";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState({
-    salesConsultantName: "",
     totalSalesConsultants: 0,
     totalLeads: 0,
     totalRevenue: 0,
+    wonLeads: 0,
   });
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      const email = localStorage.getItem("email");
+  const [dateRange, setDateRange] = useState([
+    {
+      startDate: new Date("2024-01-01"),
+      endDate: new Date(),
+      key: "selection",
+    },
+  ]);
 
-      if (!email) return;
+  // Function to fetch dashboard data
+  const fetchDashboardData = (startDate, endDate) => {
+    const email = localStorage.getItem("email");
+    if (!email) return;
 
-      try {
-        const response = await fetch(
-          `${config.baseURL}/dashboard/data?email=${email}`
-        );
-        const data = await response.json();
+    const start = startDate.toISOString().split("T")[0];
+    const end = endDate.toISOString().split("T")[0];
 
-        if (response.ok) {
-          setDashboardData(data);
-        } else {
-          console.error(data.error);
+    fetch(
+      `${config.baseURL}/dashboard/data?email=${email}&start_date=${start}&end_date=${end}`
+    )
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((data) => {
+            throw new Error(data.error || "Failed to fetch dashboard data");
+          });
         }
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      }
-    };
+        return response.json();
+      })
+      .then((data) => {
+        setDashboardData(data);
+      })
+      .catch((error) => console.error("Error fetching dashboard data:", error));
+  };
 
-    fetchDashboardData();
-  }, []);
+  useEffect(() => {
+    const { startDate, endDate } = dateRange[0];
+    fetchDashboardData(startDate, endDate);
+  }, [dateRange]);
 
   return (
     <div style={styles.container}>
-      <Sidebar /> {/* Use the Sidebar component here */}
+      <Sidebar />
       <main style={styles.mainContent}>
         <Navbar />
         <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
           <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
             <UsersIcon style={styles.cardIcon} />
-            <h2>
-              {dashboardData.salesConsultantName || "Total Sales Consultant"}
-            </h2>
-            <p>{dashboardData.totalSalesConsultants}</p>
+            <h2>Total Won Leads</h2>
+            <p>{dashboardData.wonLeads}</p>
           </motion.div>
           <motion.div whileHover={{ scale: 1.05 }} style={styles.card}>
             <FileText style={styles.cardIcon} />
@@ -70,8 +83,21 @@ const Dashboard = () => {
             <p>£{dashboardData.totalRevenue.toLocaleString()}</p>
           </motion.div>
         </div>
-        {/* Include the Overview component here */}
-        <Overview />
+        <div style={{ marginBottom: "2rem" }}>
+          <h3>Select Date Range:</h3>
+          <DateRangePicker
+            ranges={dateRange}
+            onChange={(ranges) => {
+              setDateRange([ranges.selection]); // Update date range and trigger the effect
+            }}
+            minDate={new Date("2024-01-01")}
+            maxDate={new Date("2034-12-31")}
+          />
+        </div>
+        <Overview
+          startDate={dateRange[0].startDate}
+          endDate={dateRange[0].endDate}
+        />
       </main>
     </div>
   );

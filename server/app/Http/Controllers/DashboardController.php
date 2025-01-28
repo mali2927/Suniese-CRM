@@ -150,47 +150,138 @@ class DashboardController extends Controller
     }
     
 
-    public function getLeadStatusCountsByUserId($userId): JsonResponse
+    public function getLeadStatusCountsByUserId(Request $request,$userId): JsonResponse
     {
-        // Get count and sum of quoted price grouped by status for the given user ID
+        // Validate the date range inputs
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+    
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+    
+        // Get count and sum of quoted price grouped by status within the date range
         $leadStatusData = Lead::selectRaw('status, COUNT(*) as count, SUM(quoted_price) as total_price')
-            ->where('user_id', $userId) // Filter by user ID
+        ->where('user_id', $userId) // Filter by user ID
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('status')
             ->get()
             ->mapWithKeys(function ($item) {
-                return [$item->status => ['count' => $item->count, 'total_price' => $item->total_price]];
+                return [
+                    $item->status => [
+                        'count' => $item->count,
+                        'total_price' => $item->total_price,
+                        'average_price' => $item->count > 0 ? $item->total_price / $item->count : 0, // Calculate average
+                    ],
+                ];
             });
     
-        // Get total payment sum for status 5 (Won) for the given user ID
-        $totalPaymentWon = Lead::where('user_id', $userId) // Filter by user ID
-            ->where('status', 5)
-            ->sum('total_payment');
-    
-        // Get count and sum of quoted leads where quote_status = 1 for the given user ID
+        // Get count and sum of quoted leads where quote_status = 1 within the date range
         $quotedLeadsData = Lead::selectRaw('COUNT(*) as count, SUM(quoted_price) as total_price')
-            ->where('user_id', $userId) // Filter by user ID
+        ->where('user_id', $userId) // Filter by user ID
             ->where('quote_status', 1)
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->first();
+        $unQuotedLeadsData = Lead::selectRaw('COUNT(*) as count, SUM(quoted_price) as total_price')
+        ->where('user_id', $userId) // Filter by user ID
+            ->where('quote_status', 0)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->first();
+    
+        // Get total payment sum for status 5 (Won) within the date range
+        $totalPaymentWon = Lead::where('status', 5)
+        ->where('user_id', $userId) // Filter by user ID
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('total_payment');
     
         // Create a response with status IDs mapped to their names
         $data = [
-            'hot' => ['count' => $leadStatusData[1]['count'] ?? 0, 'total_price' => $leadStatusData[1]['total_price'] ?? 0],   // Status ID 1 = Hot
-            'cold' => ['count' => $leadStatusData[2]['count'] ?? 0, 'total_price' => $leadStatusData[2]['total_price'] ?? 0],  // Status ID 2 = Cold
-            'warm' => ['count' => $leadStatusData[3]['count'] ?? 0, 'total_price' => $leadStatusData[3]['total_price'] ?? 0],  // Status ID 3 = Warm
-            'lost' => ['count' => $leadStatusData[4]['count'] ?? 0, 'total_price' => $leadStatusData[4]['total_price'] ?? 0],  // Status ID 4 = Lost
+            'hot' => [
+                'count' => $leadStatusData[1]['count'] ?? 0,
+                'total_price' => $leadStatusData[1]['total_price'] ?? 0,
+                'average_price' => $leadStatusData[1]['average_price'] ?? 0, // Average for Hot
+            ],
+            'cold' => [
+                'count' => $leadStatusData[2]['count'] ?? 0,
+                'total_price' => $leadStatusData[2]['total_price'] ?? 0,
+                'average_price' => $leadStatusData[2]['average_price'] ?? 0, // Average for Cold
+            ],
+            'warm' => [
+                'count' => $leadStatusData[3]['count'] ?? 0,
+                'total_price' => $leadStatusData[3]['total_price'] ?? 0,
+                'average_price' => $leadStatusData[3]['average_price'] ?? 0, // Average for Warm
+            ],
+            'lost' => [
+                'count' => $leadStatusData[4]['count'] ?? 0,
+                'total_price' => $leadStatusData[4]['total_price'] ?? 0,
+                'average_price' => $leadStatusData[4]['average_price'] ?? 0, // Average for Lost
+            ],
             'won' => [
                 'count' => $leadStatusData[5]['count'] ?? 0,
                 'total_price' => $leadStatusData[5]['total_price'] ?? 0,
-                'total_payment' => $totalPaymentWon,  // Add total payment for Won leads
+                'average_price' => $leadStatusData[5]['average_price'] ?? 0, // Average for Won
+                'total_payment' => $totalPaymentWon, // Total payment for Won
             ],
             'quoted' => [
-                'count' => $quotedLeadsData->count ?? 0, 
-                'total_price' => $quotedLeadsData->total_price ?? 0
-            ], // Add quoted leads count and sum
+                'count' => $quotedLeadsData->count ?? 0,
+                'total_price' => $quotedLeadsData->total_price ?? 0,
+                'average_price' => $quotedLeadsData->count > 0
+                    ? $quotedLeadsData->total_price / $quotedLeadsData->count
+                    : 0, // Average for Quoted
+            ],
+            'unquoted' => [
+                'count' => $unQuotedLeadsData->count ?? 0,
+                'total_price' => $unQuotedLeadsData->total_price ?? 0,
+                'average_price' => $unQuotedLeadsData->count > 0
+                    ? $unQuotedLeadsData->total_price / $unQuotedLeadsData->count
+                    : 0, // Average for Quoted
+            ],
         ];
     
         return response()->json($data);
     }
+    // public function getLeadStatusCountsByUserId($userId): JsonResponse
+    // {
+    //     // Get count and sum of quoted price grouped by status for the given user ID
+    //     $leadStatusData = Lead::selectRaw('status, COUNT(*) as count, SUM(quoted_price) as total_price')
+    //         ->where('user_id', $userId) // Filter by user ID
+    //         ->groupBy('status')
+    //         ->get()
+    //         ->mapWithKeys(function ($item) {
+    //             return [$item->status => ['count' => $item->count, 'total_price' => $item->total_price]];
+    //         });
+    
+    //     // Get total payment sum for status 5 (Won) for the given user ID
+    //     $totalPaymentWon = Lead::where('user_id', $userId) // Filter by user ID
+    //         ->where('status', 5)
+    //         ->sum('total_payment');
+    
+    //     // Get count and sum of quoted leads where quote_status = 1 for the given user ID
+    //     $quotedLeadsData = Lead::selectRaw('COUNT(*) as count, SUM(quoted_price) as total_price')
+    //         ->where('user_id', $userId) // Filter by user ID
+    //         ->where('quote_status', 1)
+    //         ->first();
+    
+    //     // Create a response with status IDs mapped to their names
+    //     $data = [
+    //         'hot' => ['count' => $leadStatusData[1]['count'] ?? 0, 'total_price' => $leadStatusData[1]['total_price'] ?? 0],   // Status ID 1 = Hot
+    //         'cold' => ['count' => $leadStatusData[2]['count'] ?? 0, 'total_price' => $leadStatusData[2]['total_price'] ?? 0],  // Status ID 2 = Cold
+    //         'warm' => ['count' => $leadStatusData[3]['count'] ?? 0, 'total_price' => $leadStatusData[3]['total_price'] ?? 0],  // Status ID 3 = Warm
+    //         'lost' => ['count' => $leadStatusData[4]['count'] ?? 0, 'total_price' => $leadStatusData[4]['total_price'] ?? 0],  // Status ID 4 = Lost
+    //         'won' => [
+    //             'count' => $leadStatusData[5]['count'] ?? 0,
+    //             'total_price' => $leadStatusData[5]['total_price'] ?? 0,
+    //             'total_payment' => $totalPaymentWon,  // Add total payment for Won leads
+    //         ],
+    //         'quoted' => [
+    //             'count' => $quotedLeadsData->count ?? 0, 
+    //             'total_price' => $quotedLeadsData->total_price ?? 0
+    //         ], // Add quoted leads count and sum
+    //     ];
+    
+    //     return response()->json($data);
+    // }
     
     
 
