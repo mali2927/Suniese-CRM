@@ -246,6 +246,7 @@ const Leads = () => {
           status: "",
         });
         setErrors({}); // Reset errors
+        window.location.reload();
       } else {
         alert("Failed to add lead");
       }
@@ -576,14 +577,15 @@ const Leads = () => {
 
   // Handle input change and calculate commission
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, type, value, checked } = e.target;
+
     setNewLead((prev) => {
       const updatedLead = {
         ...prev,
-        [name]: value,
+        [name]: type === "checkbox" ? (checked ? "1" : "") : value, // Handle checkboxes properly
       };
 
-      // Recalculate commission immediately after updating state
+      // Recalculate commission if necessary
       if (name === "quotedPrice" || name === "comissionStatus") {
         calculateCommission(
           updatedLead.quotedPrice,
