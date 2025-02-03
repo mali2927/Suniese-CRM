@@ -38,10 +38,15 @@ const ChaseLeads = ({
       const result = await response.json();
 
       if (result.success) {
-        const chase = result.data.filter((lead) => lead.id !== 5); // Exclude leads with ID 5
-        setChaseLeads(chase);
+        const filteredLeads = result.data.filter(
+          (lead) =>
+            !lead.status ||
+            lead.status == "" ||
+            ![4, 5].includes(lead.status.id)
+        );
+        setChaseLeads(filteredLeads);
       } else {
-        console.error("Failed to fetch leads");
+        console.error("Failed to fetch leads for the selected consultant");
       }
     } catch (error) {
       console.error("Error fetching leads:", error);

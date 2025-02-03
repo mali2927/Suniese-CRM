@@ -42,10 +42,13 @@ const ChaseLeads = ({
       const result = await response.json();
 
       if (result.success) {
-        const won = result.data.filter(
-          (lead) => lead.status && lead.status.id !== 5
+        const filteredLeads = result.data.filter(
+          (lead) =>
+            !lead.status ||
+            lead.status == "" ||
+            ![4, 5].includes(lead.status.id)
         );
-        setChaseLeads(won);
+        setChaseLeads(filteredLeads);
       } else {
         console.error("Failed to fetch leads for the selected consultant");
       }
@@ -53,7 +56,6 @@ const ChaseLeads = ({
       console.error("Error fetching leads:", error);
     }
   };
-
   const fetchChaseNotes = async (leadId) => {
     try {
       const response = await fetch(`${config.baseURL}/chase_notes/${leadId}`);
@@ -182,14 +184,16 @@ const ChaseLeads = ({
           {currentChaseLeads.length > 0 ? (
             currentChaseLeads.map((lead) => (
               <tr key={lead.id}>
-                <td>{lead.first_name}</td>
-                <td>{lead.surname}</td>
-                <td>{lead.email}</td>
-                <td>{lead.phone_number}</td>
-                <td>{lead.quoted_price}</td>
+                <td>{lead.first_name || "NA"}</td>
+                <td>{lead.surname || "NA"}</td>
+                <td>{lead.email || "NA"}</td>
+                <td>{lead.phone_number || "NA"}</td>
+                <td>{lead.quoted_price ? `$${lead.quoted_price}` : "NA"}</td>
                 <td>
                   <Button variant="link" onClick={() => handleNotesClick(lead)}>
-                    {lead.chase_notes[0]?.talk_detail || "View Notes"}
+                    {lead.chase_notes?.length > 0
+                      ? lead.chase_notes[0].talk_detail
+                      : "View Notes"}
                   </Button>
                 </td>
                 <td>
