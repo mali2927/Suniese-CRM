@@ -14,7 +14,8 @@ class LeadStatusController extends Controller
      */
     public function index()
     {
-        $statuses = LeadStatus::whereNotIn('id', [1, 2])->get();
+        $statuses = LeadStatus::whereIn('id', [4, 5])->get();
         return response()->json($statuses);
     }
+    
 }
