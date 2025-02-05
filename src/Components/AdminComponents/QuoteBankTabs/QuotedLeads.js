@@ -13,11 +13,11 @@ const QuotedLeads = ({
   // Filter leads based on the search term
   const filteredLeads = leads.filter(
     (lead) =>
-      lead.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.surname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.phone_number.includes(searchTerm) ||
-      (lead.quoted_price && lead.quoted_price.toString().includes(searchTerm))
+      lead?.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead?.surname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead?.phone_number.includes(searchTerm) ||
+      (lead?.quoted_price && lead?.quoted_price.toString().includes(searchTerm))
   );
 
   // Pagination logic: Calculate the indices for the current page
@@ -65,12 +65,12 @@ const QuotedLeads = ({
         <tbody>
           {currentLeads.length > 0 ? (
             currentLeads.map((lead) => (
-              <tr key={lead.id}>
-                <td>{lead.first_name}</td>
-                <td>{lead.surname}</td>
-                <td>{lead.email}</td>
-                <td>{lead.phone_number}</td>
-                <td>{lead.quoted_price || "N/A"}</td>
+              <tr key={lead?.id}>
+                <td>{lead?.first_name}</td>
+                <td>{lead?.surname}</td>
+                <td>{lead?.email}</td>
+                <td>{lead?.phone_number}</td>
+                <td>{lead?.quoted_price || "N/A"}</td>
                 <td>
                   <Button
                     variant="info"

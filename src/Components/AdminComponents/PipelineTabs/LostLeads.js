@@ -33,7 +33,7 @@ const LostLeads = ({
 
       if (result.success) {
         const lost = result.data.filter(
-          (lead) => lead.status && lead.status.id === 4
+          (lead) => lead?.status && lead?.status.id === 4
         );
         setLostLeads(lost);
       } else {
@@ -46,12 +46,12 @@ const LostLeads = ({
 
   const filteredLostLeads = lostLeads.filter(
     (lead) =>
-      (lead.first_name &&
-        lead.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (lead.surname &&
-        lead.surname.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (lead.email &&
-        lead.email.toLowerCase().includes(searchTerm.toLowerCase()))
+      (lead?.first_name &&
+        lead?.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (lead?.surname &&
+        lead?.surname.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (lead?.email &&
+        lead?.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const indexOfLastLead = currentPage * leadsPerPage;
@@ -103,15 +103,15 @@ const LostLeads = ({
         <tbody>
           {currentLostLeads.length > 0 ? (
             currentLostLeads.map((lead) => (
-              <tr key={lead.id}>
-                <td>{lead.first_name || "N/A"}</td> {/* Handle null */}
-                <td>{lead.surname || "N/A"}</td> {/* Handle null */}
-                <td>{lead.email || "N/A"}</td> {/* Handle null */}
-                <td>{lead.phone_number || "N/A"}</td> {/* Handle null */}
-                <td>{lead.quoted_price || "N/A"}</td> {/* Handle null */}
-                <td>{lead.lost_remarks?.[0]?.title || "No remarks"}</td>{" "}
+              <tr key={lead?.id}>
+                <td>{lead?.first_name || "N/A"}</td> {/* Handle null */}
+                <td>{lead?.surname || "N/A"}</td> {/* Handle null */}
+                <td>{lead?.email || "N/A"}</td> {/* Handle null */}
+                <td>{lead?.phone_number || "N/A"}</td> {/* Handle null */}
+                <td>{lead?.quoted_price || "N/A"}</td> {/* Handle null */}
+                <td>{lead?.lost_remarks?.[0]?.title || "No remarks"}</td>{" "}
                 {/* Handle null/undefined */}
-                <td>{lead.user?.name || "Unknown"}</td>{" "}
+                <td>{lead?.user?.name || "Unknown"}</td>{" "}
                 {/* Handle null/undefined */}
                 <td>
                   <Button

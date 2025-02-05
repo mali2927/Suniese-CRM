@@ -40,9 +40,9 @@ const ChaseLeads = ({
       if (result.success) {
         const filteredLeads = result.data.filter(
           (lead) =>
-            !lead.status ||
-            lead.status == "" ||
-            ![4, 5].includes(lead.status.id)
+            !lead?.status ||
+            lead?.status == "" ||
+            ![4, 5].includes(lead?.status.id)
         );
         setChaseLeads(filteredLeads);
       } else {
@@ -70,7 +70,7 @@ const ChaseLeads = ({
 
   const handleChaseClick = (lead) => {
     setSelectedLead(lead);
-    fetchChaseNotes(lead.id); // Fetch chase notes when a lead is selected
+    fetchChaseNotes(lead?.id); // Fetch chase notes when a lead is selected
     setShowModal(true);
   };
 
@@ -86,7 +86,7 @@ const ChaseLeads = ({
     if (!selectedLead) return;
 
     const chaseNote = {
-      lead_id: selectedLead.id,
+      lead_id: selectedLead?.id,
       talk_details: talkDetail,
       chased_via: chaseMethod,
       date_contacted: chaseDate,
@@ -104,7 +104,7 @@ const ChaseLeads = ({
 
       if (result.success) {
         alert("Chase note saved successfully!");
-        fetchChaseNotes(selectedLead.id); // Refresh chase notes after saving
+        fetchChaseNotes(selectedLead?.id); // Refresh chase notes after saving
         handleCloseModal(); // Close the modal after saving
       } else {
         console.error("Failed to save chase note");
@@ -116,7 +116,7 @@ const ChaseLeads = ({
   const handleNotesClick = async (lead) => {
     setSelectedLead(lead);
     try {
-      const response = await fetch(`${config.baseURL}/chase_notes/${lead.id}`);
+      const response = await fetch(`${config.baseURL}/chase_notes/${lead?.id}`);
       const result = await response.json();
       if (result.success) {
         setAllChaseNotes(result.data);
@@ -134,12 +134,12 @@ const ChaseLeads = ({
   };
   const filteredChaseLeads = chaseLeads.filter(
     (lead) =>
-      (lead.first_name &&
-        lead.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (lead.surname &&
-        lead.surname.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (lead.email &&
-        lead.email.toLowerCase().includes(searchTerm.toLowerCase()))
+      (lead?.first_name &&
+        lead?.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (lead?.surname &&
+        lead?.surname.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (lead?.email &&
+        lead?.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const indexOfLastLead = currentPage * leadsPerPage;
@@ -180,15 +180,15 @@ const ChaseLeads = ({
         <tbody>
           {currentChaseLeads.length > 0 ? (
             currentChaseLeads.map((lead) => (
-              <tr key={lead.id}>
-                <td>{lead.first_name}</td>
-                <td>{lead.surname}</td>
-                <td>{lead.email}</td>
-                <td>{lead.phone_number}</td>
-                <td>{lead.quoted_price}</td>
+              <tr key={lead?.id}>
+                <td>{lead?.first_name}</td>
+                <td>{lead?.surname}</td>
+                <td>{lead?.email}</td>
+                <td>{lead?.phone_number}</td>
+                <td>{lead?.quoted_price}</td>
                 <td>
                   <Button variant="link" onClick={() => handleNotesClick(lead)}>
-                    {lead.chase_notes[0]?.talk_detail || "View Notes"}
+                    {lead?.chase_notes[0]?.talk_detail || "View Notes"}
                   </Button>
                 </td>
                 <td>

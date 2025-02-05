@@ -17,9 +17,9 @@ const NotQuoted = ({
   const [selectedLead, setSelectedLead] = useState(null);
 
   const filteredLeads = leads.filter((lead) =>
-    `${lead.first_name} ${lead.surname} ${lead.email} ${lead.phone_number} ${
-      lead.quoted_price
-    } ${lead.chase_notes?.[0]?.talk_detail || ""}`
+    `${lead?.first_name} ${lead?.surname} ${lead?.email} ${
+      lead?.phone_number
+    } ${lead?.quoted_price} ${lead?.chase_notes?.[0]?.talk_detail || ""}`
       .toLowerCase()
       .includes(searchTerm.toLowerCase())
   );
@@ -65,7 +65,7 @@ const NotQuoted = ({
       return;
     }
 
-    fetch(`${config.baseURL}/leads/${selectedLead.id}/update-quote-status`, {
+    fetch(`${config.baseURL}/leads/${selectedLead?.id}/update-quote-status`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -76,7 +76,7 @@ const NotQuoted = ({
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          alert(`Submitted URL: ${quoteUrl} for Lead ID: ${selectedLead.id}`);
+          alert(`Submitted URL: ${quoteUrl} for Lead ID: ${selectedLead?.id}`);
           setShowModal(false);
           setQuoteUrl("");
         } else {
@@ -117,14 +117,14 @@ const NotQuoted = ({
         <tbody>
           {currentChaseLeads.length > 0 ? (
             currentChaseLeads.map((lead) => (
-              <tr key={lead.id}>
-                <td>{lead.first_name}</td>
-                <td>{lead.surname}</td>
-                <td>{lead.email}</td>
-                <td>{lead.phone_number}</td>
-                <td>{lead.quoted_price || "N/A"}</td>
+              <tr key={lead?.id}>
+                <td>{lead?.first_name}</td>
+                <td>{lead?.surname}</td>
+                <td>{lead?.email}</td>
+                <td>{lead?.phone_number}</td>
+                <td>{lead?.quoted_price || "N/A"}</td>
                 <td>
-                  {lead.chase_notes?.[0]?.talk_detail || "No Notes Available"}
+                  {lead?.chase_notes?.[0]?.talk_detail || "No Notes Available"}
                 </td>
                 <td>
                   <Button
