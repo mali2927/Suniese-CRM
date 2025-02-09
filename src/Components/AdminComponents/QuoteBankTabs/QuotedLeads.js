@@ -13,11 +13,12 @@ const QuotedLeads = ({
   // Filter leads based on the search term
   const filteredLeads = leads.filter(
     (lead) =>
-      lead?.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead?.surname.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead?.phone_number.includes(searchTerm) ||
-      (lead?.quoted_price && lead?.quoted_price.toString().includes(searchTerm))
+      lead?.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead?.surname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead?.phone_number?.includes(searchTerm) ||
+      (lead?.quoted_price &&
+        lead?.quoted_price?.toString().includes(searchTerm))
   );
 
   // Pagination logic: Calculate the indices for the current page

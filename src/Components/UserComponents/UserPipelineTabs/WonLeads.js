@@ -35,7 +35,7 @@ const WonLeads = ({
       const result = await response.json();
 
       if (result.success) {
-        const won = result.data.filter((lead) => lead.status?.id === 5);
+        const won = result.data.filter((lead) => lead?.status?.id === 5);
         setWonLeads(won);
       } else {
         console.error("Failed to fetch leads for the selected consultant");
@@ -46,9 +46,9 @@ const WonLeads = ({
   };
   const filteredWonLeads = wonLeads.filter(
     (lead) =>
-      lead.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.surname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lead.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      lead?.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead?.surname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lead?.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const indexOfLastLead = currentPage * leadsPerPage;
@@ -60,7 +60,7 @@ const WonLeads = ({
 
   // Calculate the average selling price for won leads
   const totalPayment = filteredWonLeads.reduce(
-    (sum, lead) => sum + parseFloat(lead.total_payment || 0),
+    (sum, lead) => sum + parseFloat(lead?.total_payment || 0),
     0
   );
   const averageSellingPrice =
@@ -112,14 +112,16 @@ const WonLeads = ({
         <tbody>
           {currentWonLeads.length > 0 ? (
             currentWonLeads.map((lead) => (
-              <tr key={lead.id}>
-                <td>{lead.first_name}</td>
-                <td>{lead.surname}</td>
-                <td>{lead.email}</td>
-                <td>{lead.phone_number}</td>
-                <td>{lead.quoted_price}</td>
-                <td>{lead.total_payment}</td>
-                <td>{new Date(lead.updated_at).toISOString().split("T")[0]}</td>
+              <tr key={lead?.id}>
+                <td>{lead?.first_name}</td>
+                <td>{lead?.surname}</td>
+                <td>{lead?.email}</td>
+                <td>{lead?.phone_number}</td>
+                <td>{lead?.quoted_price}</td>
+                <td>{lead?.total_payment}</td>
+                <td>
+                  {new Date(lead?.updated_at).toISOString().split("T")[0]}
+                </td>
                 <td>
                   <Button
                     variant="info"
