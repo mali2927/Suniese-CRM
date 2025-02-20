@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); // State for handling errors
   const navigate = useNavigate();
+  const logo = "/3.png"; // Since the image is in the public folder
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -60,24 +61,20 @@ export default function LoginPage() {
       >
         <motion.div
           initial={{ scale: 0 }}
-          animate={{ scale: 1, rotate: 360 }}
+          animate={{ scale: 1 }}
           transition={{
             delay: 0.2,
             type: "spring",
             stiffness: 260,
             damping: 20,
-            rotate: {
-              duration: 10,
-              repeat: Infinity,
-              ease: "linear",
-            },
           }}
           className="icon-wrapper"
         >
           <div className="sun-icon-wrapper">
-            <SunIcon />
+            <img src={logo} alt="Sunrise Logo" className="sun-logo" />
           </div>
         </motion.div>
+
         <h1 className="page-title">Sunrise Energy Solutions</h1>
         <h2 className="page-subtitle">CRM Login</h2>
         <form onSubmit={handleLogin} className="login-form">

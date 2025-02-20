@@ -92,4 +92,9 @@
     height: 3rem;
     color: #fbbf24;
   }
+  .sun-logo {
+    width: 80px; /* Adjust as needed */
+    height: auto;
+  }
+  
   
